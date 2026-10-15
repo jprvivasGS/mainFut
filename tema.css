@@ -1,0 +1,40 @@
+/* Tema compartilhado entre Hub, Brasileirão Regional e Copa do Brasil.
+   Fonte única: cada site faz <link rel="stylesheet" href="https://jprvivasgs.github.io/shared/tema.css"> */
+:root {
+    --bg: #0b0f19;
+    --card: #151d2a;
+    --card-2: #0d131f;
+    --borda: #243044;
+    --verde: #00875a;
+    --vermelho: #c4170c;
+    --azul: #0052cc;
+    --texto: #ffffff;
+    --texto-2: #94a3b8;
+    --raio: 8px;
+    --fonte-titulo: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
+    --fonte: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--texto); font-family: var(--fonte); line-height: 1.5; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--verde); outline-offset: 2px; }
+
+/* Barra de topo padrão dos sites de simulação (com volta ao hub) */
+.topo-site {
+    display: flex; align-items: center; gap: 16px;
+    padding: 12px 20px; background: #080b12; border-bottom: 2px solid var(--verde);
+}
+.topo-site h1 { font-family: var(--fonte-titulo); font-size: 1.5rem; font-weight: 700; }
+.topo-site .hub-link { margin-left: auto; font-size: 0.85rem; color: var(--texto-2); text-decoration: none; }
+.topo-site .hub-link:hover { color: var(--texto); }
+
+.card { background: var(--card); border: 1px solid var(--borda); border-radius: var(--raio); padding: 18px; }
+
+.btn {
+    display: inline-block; padding: 9px 16px; border: 0; border-radius: 6px;
+    background: #243044; color: var(--texto); font-weight: 800; font-size: 0.85rem;
+    text-decoration: none; cursor: pointer;
+}
+.btn-verde { background: var(--verde); }
+.btn:hover { filter: brightness(1.15); }

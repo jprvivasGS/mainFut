@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Futebol Brasileiro Simulado</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="shared/tema.css">
+    <link rel="stylesheet" href="hub.css">
+</head>
+<body>
+    <header class="hero">
+        <h1>Futebol Brasileiro Simulado</h1>
+        <p>Simule o Campeonato Nacional, com cinco séries A e playoffs, e leve os melhores times para o chaveamento circular da Copa Nacional. O resultado de uma etapa alimenta a próxima.</p>
+    </header>
+
+    <ol class="trilha">
+        <li class="etapa" id="etapa-campeonato">
+            <span class="num">1</span>
+            <div class="card">
+                <div class="info">
+                    <h2>Campeonato Nacional</h2>
+                    <p class="desc">Cinco séries A com 20 times, 38 rodadas e, no fim, os playoffs entre as regiões.</p>
+                    <p class="status" id="status-campeonato"></p>
+                </div>
+                <a class="btn btn-verde" id="link-campeonato">Abrir campeonato</a>
+            </div>
+        </li>
+        <li class="etapa" id="etapa-copa">
+            <span class="num">2</span>
+            <div class="card">
+                <div class="info">
+                    <h2>Copa Nacional</h2>
+                    <p class="desc">Chaveamento circular com confrontos clicáveis, uniformes e comemoração do campeão.</p>
+                    <p class="status" id="status-copa"></p>
+                </div>
+                <a class="btn btn-verde" id="link-copa">Abrir Copa</a>
+            </div>
+        </li>
+    </ol>
+
+    <p class="rodape">Os resultados ficam salvos neste navegador.</p>
+
+    <script src="shared/hub-data.js"></script>
+    <script>
+        // Endereços dos projetos, relativos a esta página (dentro de /mainFut/).
+        const SITES = {
+            campeonato: 'campeonato/',
+            copa: 'copa/'
+        };
+
+        // Dados gravados pelos outros sites (ver shared/hub-data.js).
+        const progresso = HubData.get('campeonato:progresso');
+        const campeaoCampeonato = HubData.get('campeonato:campeao');
+        const classificados = HubData.get('campeonato:classificados');
+        const campeaoCopa = HubData.get('copa:campeao');
+
+        const estado = {
+            campeonato: {
+                texto: campeaoCampeonato
+                    ? `Campeão dos playoffs: ${campeaoCampeonato.nome}`
+                    : (progresso ? `${progresso.concluidas} de ${progresso.total} temporadas concluídas` : 'Nenhuma temporada simulada ainda.'),
+                ok: !!campeaoCampeonato
+            },
+            copa: {
+                texto: campeaoCopa
+                    ? `Campeão: ${campeaoCopa.nome}`
+                    : (classificados && classificados.length
+                        ? `${classificados.length} vagas diretas definidas pelo campeonato.`
+                        : 'Sorteio livre: nenhum classificado do campeonato ainda.'),
+                ok: !!campeaoCopa
+            }
+        };
+
+        Object.keys(estado).forEach(chave => {
+            document.getElementById('status-' + chave).textContent = estado[chave].texto;
+            document.getElementById('etapa-' + chave).classList.toggle('concluida', estado[chave].ok);
+            document.getElementById('link-' + chave).href = SITES[chave];
+        });
+    </script>
+</body>
+</html>
