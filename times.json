@@ -1,0 +1,2935 @@
+{
+  "versao": "2.0",
+  "atualizado": "2026-10-19",
+  "times": [
+    {
+      "id": "atletico-ac",
+      "nome": "Atlético",
+      "sigla": "AAC",
+      "uf": "AC",
+      "regiao": "norte",
+      "cidade": "Rio Branco",
+      "federacao": {
+        "sigla": "FFAC",
+        "imagem": "federacao/AC.png"
+      },
+      "serie": null,
+      "fundacao": 1952,
+      "escudo": "escudos/atletico-ac.png",
+      "cores": [
+        "cores/branco.png",
+        "cores/azul.png"
+      ],
+      "mascote": {
+        "nome": "Galo",
+        "imagem": "mascotes/atletico-ac.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/atletico-ac-1.png",
+        "reserva": "uniformes/atletico-ac-2.png"
+      }
+    },
+    {
+      "id": "atletico-juventus-ac",
+      "nome": "Atlético Juventus",
+      "sigla": "ACJ",
+      "uf": "AC",
+      "regiao": "norte",
+      "cidade": "Rio Branco",
+      "federacao": {
+        "sigla": "FFAC",
+        "imagem": "federacao/AC.png"
+      },
+      "serie": null,
+      "fundacao": 1966,
+      "escudo": "escudos/atletico-juventus-ac.png",
+      "cores": [
+        "cores/vermelho.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Águia",
+        "imagem": "mascotes/atletico-juventus-ac.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/atletico-juventus-ac-1.png",
+        "reserva": "uniformes/atletico-juventus-ac-2.png"
+      }
+    },
+    {
+      "id": "galvez-ac",
+      "nome": "Galvez",
+      "sigla": "GVZ",
+      "uf": "AC",
+      "regiao": "norte",
+      "cidade": "Rio Branco",
+      "federacao": {
+        "sigla": "FFAC",
+        "imagem": "federacao/AC.png"
+      },
+      "serie": "D",
+      "fundacao": 2011,
+      "escudo": "escudos/galvez-ac.png",
+      "cores": [
+        "cores/amarelo.png",
+        "cores/verde.png"
+      ],
+      "mascote": {
+        "nome": "Gavião",
+        "imagem": "mascotes/galvez-ac.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/galvez-ac-1.png",
+        "reserva": "uniformes/galvez-ac-2.png"
+      }
+    },
+    {
+      "id": "rio-branco-ac",
+      "nome": "Rio Branco",
+      "sigla": "RBA",
+      "uf": "AC",
+      "regiao": "norte",
+      "cidade": "Rio Branco",
+      "federacao": {
+        "sigla": "FFAC",
+        "imagem": "federacao/AC.png"
+      },
+      "serie": null,
+      "fundacao": 1919,
+      "escudo": "escudos/rio-branco-ac.png",
+      "cores": [
+        "cores/vermelho.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Estrela Altaneira",
+        "imagem": "mascotes/rio-branco-ac.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/rio-branco-ac-1.png",
+        "reserva": "uniformes/rio-branco-ac-2.png"
+      }
+    },
+    {
+      "id": "asa-al",
+      "nome": "ASA",
+      "sigla": "ASA",
+      "uf": "AL",
+      "regiao": "nordeste",
+      "cidade": "Arapiraca",
+      "federacao": {
+        "sigla": "FFAL",
+        "imagem": "federacao/AL.png"
+      },
+      "serie": null,
+      "fundacao": 1977,
+      "escudo": "escudos/asa-al.png",
+      "cores": [
+        "cores/preto.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Fantasma",
+        "imagem": "mascotes/asa-al.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/asa-al-1.png",
+        "reserva": "uniformes/asa-al-2.png"
+      }
+    },
+    {
+      "id": "coruripe-al",
+      "nome": "Coruripe",
+      "sigla": "CRR",
+      "uf": "AL",
+      "regiao": "nordeste",
+      "cidade": "Coruripe",
+      "federacao": {
+        "sigla": "FFAL",
+        "imagem": "federacao/AL.png"
+      },
+      "serie": null,
+      "fundacao": 2003,
+      "escudo": "escudos/coruripe-al.png",
+      "cores": [
+        "cores/verde.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Hulk",
+        "imagem": "mascotes/coruripe-al.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/coruripe-al-1.png",
+        "reserva": "uniformes/coruripe-al-2.png"
+      }
+    },
+    {
+      "id": "crb-al",
+      "nome": "CRB",
+      "sigla": "CRB",
+      "uf": "AL",
+      "regiao": "nordeste",
+      "cidade": "Maceió",
+      "federacao": {
+        "sigla": "FFAL",
+        "imagem": "federacao/AL.png"
+      },
+      "serie": "B",
+      "fundacao": 1912,
+      "escudo": "escudos/crb-al.png",
+      "cores": [
+        "cores/branco.png",
+        "cores/vermelho.png"
+      ],
+      "mascote": {
+        "nome": "Galo",
+        "imagem": "mascotes/crb-al.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/crb-al-1.png",
+        "reserva": "uniformes/crb-al-2.png"
+      }
+    },
+    {
+      "id": "csa-al",
+      "nome": "CSA",
+      "sigla": "CSA",
+      "uf": "AL",
+      "regiao": "nordeste",
+      "cidade": "Maceió",
+      "federacao": {
+        "sigla": "FFAL",
+        "imagem": "federacao/AL.png"
+      },
+      "serie": "D",
+      "fundacao": 1913,
+      "escudo": "escudos/csa-al.png",
+      "cores": [
+        "cores/azul.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Azulão",
+        "imagem": "mascotes/csa-al.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/csa-al-1.png",
+        "reserva": "uniformes/csa-al-2.png"
+      }
+    },
+    {
+      "id": "amazonas-am",
+      "nome": "Amazonas",
+      "sigla": "AMZ",
+      "uf": "AM",
+      "regiao": "norte",
+      "cidade": "Manaus",
+      "federacao": {
+        "sigla": "FFAM",
+        "imagem": "federacao/AM.png"
+      },
+      "serie": "C",
+      "fundacao": 2019,
+      "escudo": "escudos/amazonas-am.png",
+      "cores": [
+        "cores/amarelo.png",
+        "cores/preto.png"
+      ],
+      "mascote": {
+        "nome": "Onça Pintada",
+        "imagem": "mascotes/amazonas-am.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/amazonas-am-1.png",
+        "reserva": "uniformes/amazonas-am-2.png"
+      }
+    },
+    {
+      "id": "manaus-am",
+      "nome": "Manaus",
+      "sigla": "MNU",
+      "uf": "AM",
+      "regiao": "norte",
+      "cidade": "Manaus",
+      "federacao": {
+        "sigla": "FFAM",
+        "imagem": "federacao/AM.png"
+      },
+      "serie": "D",
+      "fundacao": 2013,
+      "escudo": "escudos/manaus-am.png",
+      "cores": [
+        "cores/preto.png",
+        "cores/verde.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Gavião",
+        "imagem": "mascotes/manaus-am.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/manaus-am-1.png",
+        "reserva": "uniformes/manaus-am-2.png"
+      }
+    },
+    {
+      "id": "nacional-am",
+      "nome": "Nacional",
+      "sigla": "NAC",
+      "uf": "AM",
+      "regiao": "norte",
+      "cidade": "Manaus",
+      "federacao": {
+        "sigla": "FFAM",
+        "imagem": "federacao/AM.png"
+      },
+      "serie": "C",
+      "fundacao": 1913,
+      "escudo": "escudos/nacional-am.png",
+      "cores": [
+        "cores/azul.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Águia",
+        "imagem": "mascotes/nacional-am.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/nacional-am-1.png",
+        "reserva": "uniformes/nacional-am-2.png"
+      }
+    },
+    {
+      "id": "rio-negro-am",
+      "nome": "Rio Negro",
+      "sigla": "RNG",
+      "uf": "AM",
+      "regiao": "norte",
+      "cidade": "Manaus",
+      "federacao": {
+        "sigla": "FFAM",
+        "imagem": "federacao/AM.png"
+      },
+      "serie": null,
+      "fundacao": 1913,
+      "escudo": "escudos/rio-negro-am.png",
+      "cores": [
+        "cores/preto.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Galo",
+        "imagem": "mascotes/rio-negro-am.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/rio-negro-am-1.png",
+        "reserva": "uniformes/rio-negro-am-2.png"
+      }
+    },
+    {
+      "id": "macapa-ap",
+      "nome": "Macapá",
+      "sigla": "MCP",
+      "uf": "AP",
+      "regiao": "norte",
+      "cidade": "Macapá",
+      "federacao": {
+        "sigla": "FFAP",
+        "imagem": "federacao/AP.png"
+      },
+      "serie": null,
+      "fundacao": 1944,
+      "escudo": "escudos/macapa-ap.png",
+      "cores": [],
+      "mascote": {
+        "nome": "Leão",
+        "imagem": "mascotes/macapa-ap.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/macapa-ap-1.png",
+        "reserva": "uniformes/macapa-ap-2.png"
+      }
+    },
+    {
+      "id": "santana-ap",
+      "nome": "Santana",
+      "sigla": "SAN",
+      "uf": "AP",
+      "regiao": "norte",
+      "cidade": "Macapá",
+      "federacao": {
+        "sigla": "FFAP",
+        "imagem": "federacao/AP.png"
+      },
+      "serie": null,
+      "fundacao": 1955,
+      "escudo": "escudos/santana-ap.png",
+      "cores": [
+        "cores/preto.png",
+        "cores/amarelo.png",
+        "cores/vermelho.png"
+      ],
+      "mascote": {
+        "nome": "Canário",
+        "imagem": "mascotes/santana-ap.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/santana-ap-1.png",
+        "reserva": "uniformes/santana-ap-2.png"
+      }
+    },
+    {
+      "id": "trem-ap",
+      "nome": "Trem",
+      "sigla": "TRE",
+      "uf": "AP",
+      "regiao": "norte",
+      "cidade": "Macapá",
+      "federacao": {
+        "sigla": "FFAP",
+        "imagem": "federacao/AP.png"
+      },
+      "serie": null,
+      "fundacao": 1947,
+      "escudo": "escudos/trem-ap.png",
+      "cores": [
+        "cores/vermelho.png",
+        "cores/preto.png"
+      ],
+      "mascote": {
+        "nome": "Locomotiva",
+        "imagem": "mascotes/trem-ap.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/trem-ap-1.png",
+        "reserva": "uniformes/trem-ap-2.png"
+      }
+    },
+    {
+      "id": "ypiranga-ap",
+      "nome": "Ypiranga",
+      "sigla": "YPG",
+      "uf": "AP",
+      "regiao": "norte",
+      "cidade": "Macapá",
+      "federacao": {
+        "sigla": "FFAP",
+        "imagem": "federacao/AP.png"
+      },
+      "serie": null,
+      "fundacao": 1963,
+      "escudo": "escudos/ypiranga-ap.png",
+      "cores": [
+        "cores/azul.png",
+        "cores/branco.png",
+        "cores/preto.png"
+      ],
+      "mascote": {
+        "nome": "Coruja Branca",
+        "imagem": "mascotes/ypiranga-ap.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/ypiranga-ap-1.png",
+        "reserva": "uniformes/ypiranga-ap-2.png"
+      }
+    },
+    {
+      "id": "bahia-ba",
+      "nome": "Bahia",
+      "sigla": "BAH",
+      "uf": "BA",
+      "regiao": "nordeste",
+      "cidade": "Salvador",
+      "federacao": {
+        "sigla": "FFBA",
+        "imagem": "federacao/BA.png"
+      },
+      "serie": "A",
+      "fundacao": 1931,
+      "escudo": "escudos/bahia-ba.png",
+      "cores": [
+        "cores/anil.png",
+        "cores/branco.png",
+        "cores/vermelho.png"
+      ],
+      "mascote": {
+        "nome": "Super-homem",
+        "imagem": "mascotes/bahia-ba.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/bahia-ba-1.png",
+        "reserva": "uniformes/bahia-ba-2.png"
+      }
+    },
+    {
+      "id": "jacuipense-ba",
+      "nome": "Jacuipense",
+      "sigla": "JAC",
+      "uf": "BA",
+      "regiao": "nordeste",
+      "cidade": "Riachão do Jacuípe",
+      "federacao": {
+        "sigla": "FFBA",
+        "imagem": "federacao/BA.png"
+      },
+      "serie": "D",
+      "fundacao": 1965,
+      "escudo": "escudos/jacuipense-ba.png",
+      "cores": [
+        "cores/branco.png",
+        "cores/vermelho.png"
+      ],
+      "mascote": {
+        "nome": "Leão",
+        "imagem": "mascotes/jacuipense-ba.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/jacuipense-ba-1.png",
+        "reserva": "uniformes/jacuipense-ba-2.png"
+      }
+    },
+    {
+      "id": "juazeirense-ba",
+      "nome": "Juazeirense",
+      "sigla": "JUA",
+      "uf": "BA",
+      "regiao": "nordeste",
+      "cidade": "Juazeiro",
+      "federacao": {
+        "sigla": "FFBA",
+        "imagem": "federacao/BA.png"
+      },
+      "serie": "D",
+      "fundacao": 2006,
+      "escudo": "escudos/juazeirense-ba.png",
+      "cores": [
+        "cores/amarelo.png",
+        "cores/verde.png",
+        "cores/vermelho.png"
+      ],
+      "mascote": {
+        "nome": "Cancão de Fogo",
+        "imagem": "mascotes/juazeirense-ba.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/juazeirense-ba-1.png",
+        "reserva": "uniformes/juazeirense-ba-2.png"
+      }
+    },
+    {
+      "id": "vitoria-ba",
+      "nome": "Vitória",
+      "sigla": "VIT",
+      "uf": "BA",
+      "regiao": "nordeste",
+      "cidade": "Salvador",
+      "federacao": {
+        "sigla": "FFBA",
+        "imagem": "federacao/BA.png"
+      },
+      "serie": "A",
+      "fundacao": 1899,
+      "escudo": "escudos/vitoria-ba.png",
+      "cores": [
+        "cores/vermelho.png",
+        "cores/preto.png"
+      ],
+      "mascote": {
+        "nome": "Leão",
+        "imagem": "mascotes/vitoria-ba.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/vitoria-ba-1.png",
+        "reserva": "uniformes/vitoria-ba-2.png"
+      }
+    },
+    {
+      "id": "ceara-ce",
+      "nome": "Ceará",
+      "sigla": "CSC",
+      "uf": "CE",
+      "regiao": "nordeste",
+      "cidade": "Fortaleza",
+      "federacao": {
+        "sigla": "FFCE",
+        "imagem": "federacao/CE.png"
+      },
+      "serie": "B",
+      "fundacao": 1914,
+      "escudo": "escudos/ceara-ce.png",
+      "cores": [],
+      "mascote": {
+        "nome": "Vozão",
+        "imagem": "mascotes/ceara-ce.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/ceara-ce-1.png",
+        "reserva": "uniformes/ceara-ce-2.png"
+      }
+    },
+    {
+      "id": "fortaleza-ce",
+      "nome": "Fortaleza",
+      "sigla": "FOR",
+      "uf": "CE",
+      "regiao": "nordeste",
+      "cidade": "Fortaleza",
+      "federacao": {
+        "sigla": "FFCE",
+        "imagem": "federacao/CE.png"
+      },
+      "serie": "B",
+      "fundacao": 1916,
+      "escudo": "escudos/fortaleza-ce.png",
+      "cores": [
+        "cores/azul.png",
+        "cores/branco.png",
+        "cores/vermelho.png"
+      ],
+      "mascote": {
+        "nome": "Leão do Pici",
+        "imagem": "mascotes/fortaleza-ce.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/fortaleza-ce-1.png",
+        "reserva": "uniformes/fortaleza-ce-2.png"
+      }
+    },
+    {
+      "id": "icasa-ce",
+      "nome": "Icasa",
+      "sigla": "ICA",
+      "uf": "CE",
+      "regiao": "nordeste",
+      "cidade": "Juazeiro do Norte",
+      "federacao": {
+        "sigla": "FFCE",
+        "imagem": "federacao/CE.png"
+      },
+      "serie": null,
+      "fundacao": 1963,
+      "escudo": "escudos/icasa-ce.png",
+      "cores": [
+        "cores/verde.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Periquito",
+        "imagem": "mascotes/icasa-ce.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/icasa-ce-1.png",
+        "reserva": "uniformes/icasa-ce-2.png"
+      }
+    },
+    {
+      "id": "iguatu-ce",
+      "nome": "Iguatu",
+      "sigla": "IGT",
+      "uf": "CE",
+      "regiao": "nordeste",
+      "cidade": "Iguatu",
+      "federacao": {
+        "sigla": "FFCE",
+        "imagem": "federacao/CE.png"
+      },
+      "serie": "D",
+      "fundacao": 2010,
+      "escudo": "escudos/iguatu-ce.png",
+      "cores": [
+        "cores/azul.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Tigre",
+        "imagem": "mascotes/iguatu-ce.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/iguatu-ce-1.png",
+        "reserva": "uniformes/iguatu-ce-2.png"
+      }
+    },
+    {
+      "id": "brasilia-df",
+      "nome": "Brasília",
+      "sigla": "BRS",
+      "uf": "DF",
+      "regiao": "centro_oeste",
+      "cidade": "Brasília",
+      "federacao": {
+        "sigla": "FFDF",
+        "imagem": "federacao/DF.png"
+      },
+      "serie": null,
+      "fundacao": 1999,
+      "escudo": "escudos/brasilia-df.png",
+      "cores": [
+        "cores/branco.png",
+        "cores/vermelho.png"
+      ],
+      "mascote": {
+        "nome": "Avião",
+        "imagem": "mascotes/brasilia-df.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/brasilia-df-1.png",
+        "reserva": "uniformes/brasilia-df-2.png"
+      }
+    },
+    {
+      "id": "brasiliense-df",
+      "nome": "Brasiliense",
+      "sigla": "BSL",
+      "uf": "DF",
+      "regiao": "centro_oeste",
+      "cidade": "Brasília",
+      "federacao": {
+        "sigla": "FFDF",
+        "imagem": "federacao/DF.png"
+      },
+      "serie": "D",
+      "fundacao": 2000,
+      "escudo": "escudos/brasiliense-df.png",
+      "cores": [
+        "cores/amarelo.png",
+        "cores/branco.png",
+        "cores/verde.png"
+      ],
+      "mascote": {
+        "nome": "Jacaré",
+        "imagem": "mascotes/brasiliense-df.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/brasiliense-df-1.png",
+        "reserva": "uniformes/brasiliense-df-2.png"
+      }
+    },
+    {
+      "id": "capital-df",
+      "nome": "Capital",
+      "sigla": "CPT",
+      "uf": "DF",
+      "regiao": "centro_oeste",
+      "cidade": "Brasília",
+      "federacao": {
+        "sigla": "FFDF",
+        "imagem": "federacao/DF.png"
+      },
+      "serie": "D",
+      "fundacao": 2005,
+      "escudo": "escudos/capital-df.png",
+      "cores": [
+        "cores/azul.png",
+        "cores/branco.png",
+        "cores/preto.png"
+      ],
+      "mascote": {
+        "nome": "Coruja",
+        "imagem": "mascotes/capital-df.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/capital-df-1.png",
+        "reserva": "uniformes/capital-df-2.png"
+      }
+    },
+    {
+      "id": "gama-df",
+      "nome": "Gama",
+      "sigla": "GMA",
+      "uf": "DF",
+      "regiao": "centro_oeste",
+      "cidade": "Brasília",
+      "federacao": {
+        "sigla": "FFDF",
+        "imagem": "federacao/DF.png"
+      },
+      "serie": "C",
+      "fundacao": 1975,
+      "escudo": "escudos/gama-df.png",
+      "cores": [
+        "cores/verde.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Periquito",
+        "imagem": "mascotes/gama-df.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/gama-df-1.png",
+        "reserva": "uniformes/gama-df-2.png"
+      }
+    },
+    {
+      "id": "desportiva-ferroviaria-es",
+      "nome": "Desportiva Ferroviária",
+      "sigla": "DFV",
+      "uf": "ES",
+      "regiao": "sudeste",
+      "cidade": "Cariacica",
+      "federacao": {
+        "sigla": "FFES",
+        "imagem": "federacao/ES.png"
+      },
+      "serie": "D",
+      "fundacao": 1963,
+      "escudo": "escudos/desportiva-ferroviaria-es.png",
+      "cores": [],
+      "mascote": {
+        "nome": "Maquinista Grená",
+        "imagem": "mascotes/desportiva-ferroviaria-es.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/desportiva-ferroviaria-es-1.png",
+        "reserva": "uniformes/desportiva-ferroviaria-es-2.png"
+      }
+    },
+    {
+      "id": "rio-branco-es",
+      "nome": "Rio Branco",
+      "sigla": "RBC",
+      "uf": "ES",
+      "regiao": "sudeste",
+      "cidade": "Vitória",
+      "federacao": {
+        "sigla": "FFES",
+        "imagem": "federacao/ES.png"
+      },
+      "serie": "D",
+      "fundacao": 1913,
+      "escudo": "escudos/rio-branco-es.png",
+      "cores": [
+        "cores/preto.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Cavaleiro Capa-Preta",
+        "imagem": "mascotes/rio-branco-es.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/rio-branco-es-1.png",
+        "reserva": "uniformes/rio-branco-es-2.png"
+      }
+    },
+    {
+      "id": "serra-es",
+      "nome": "Serra",
+      "sigla": "SRR",
+      "uf": "ES",
+      "regiao": "sudeste",
+      "cidade": "Serra",
+      "federacao": {
+        "sigla": "FFES",
+        "imagem": "federacao/ES.png"
+      },
+      "serie": null,
+      "fundacao": 1930,
+      "escudo": "escudos/serra-es.png",
+      "cores": [
+        "cores/preto.png",
+        "cores/branco.png",
+        "cores/vermelho.png"
+      ],
+      "mascote": {
+        "nome": "Cobra Coral",
+        "imagem": "mascotes/serra-es.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/serra-es-1.png",
+        "reserva": "uniformes/serra-es-2.png"
+      }
+    },
+    {
+      "id": "vitoria-es",
+      "nome": "Vitória",
+      "sigla": "VES",
+      "uf": "ES",
+      "regiao": "sudeste",
+      "cidade": "Vitória",
+      "federacao": {
+        "sigla": "FFES",
+        "imagem": "federacao/ES.png"
+      },
+      "serie": null,
+      "fundacao": 1912,
+      "escudo": "escudos/vitoria-es.png",
+      "cores": [
+        "cores/azul.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Águia Azul",
+        "imagem": "mascotes/vitoria-es.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/vitoria-es-1.png",
+        "reserva": "uniformes/vitoria-es-2.png"
+      }
+    },
+    {
+      "id": "atletico-go",
+      "nome": "Atlético",
+      "sigla": "AGO",
+      "uf": "GO",
+      "regiao": "centro_oeste",
+      "cidade": "Goiânia",
+      "federacao": {
+        "sigla": "FFGO",
+        "imagem": "federacao/GO.png"
+      },
+      "serie": "B",
+      "fundacao": 1937,
+      "escudo": "escudos/atletico-go.png",
+      "cores": [
+        "cores/preto.png",
+        "cores/vermelho.png"
+      ],
+      "mascote": {
+        "nome": "Dragão",
+        "imagem": "mascotes/atletico-go.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/atletico-go-1.png",
+        "reserva": "uniformes/atletico-go-2.png"
+      }
+    },
+    {
+      "id": "goiania-go",
+      "nome": "Goiânia",
+      "sigla": "GON",
+      "uf": "GO",
+      "regiao": "centro_oeste",
+      "cidade": "Goiânia",
+      "federacao": {
+        "sigla": "FFGO",
+        "imagem": "federacao/GO.png"
+      },
+      "serie": "D",
+      "fundacao": 1938,
+      "escudo": "escudos/goiania-go.png",
+      "cores": [
+        "cores/preto.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Galo",
+        "imagem": "mascotes/goiania-go.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/goiania-go-1.png",
+        "reserva": "uniformes/goiania-go-2.png"
+      }
+    },
+    {
+      "id": "goias-go",
+      "nome": "Goiás",
+      "sigla": "GOI",
+      "uf": "GO",
+      "regiao": "centro_oeste",
+      "cidade": "Goiânia",
+      "federacao": {
+        "sigla": "FFGO",
+        "imagem": "federacao/GO.png"
+      },
+      "serie": "B",
+      "fundacao": 1943,
+      "escudo": "escudos/goias-go.png",
+      "cores": [
+        "cores/verde.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Periquito",
+        "imagem": "mascotes/goias-go.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/goias-go-1.png",
+        "reserva": "uniformes/goias-go-2.png"
+      }
+    },
+    {
+      "id": "vila-nova-go",
+      "nome": "Vila Nova",
+      "sigla": "VLN",
+      "uf": "GO",
+      "regiao": "centro_oeste",
+      "cidade": "Goiânia",
+      "federacao": {
+        "sigla": "FFGO",
+        "imagem": "federacao/GO.png"
+      },
+      "serie": "B",
+      "fundacao": 1943,
+      "escudo": "escudos/vila-nova-go.png",
+      "cores": [
+        "cores/vermelho.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Tigre",
+        "imagem": "mascotes/vila-nova-go.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/vila-nova-go-1.png",
+        "reserva": "uniformes/vila-nova-go-2.png"
+      }
+    },
+    {
+      "id": "imperatriz-ma",
+      "nome": "Imperatriz",
+      "sigla": "IMP",
+      "uf": "MA",
+      "regiao": "nordeste",
+      "cidade": "Imperatriz",
+      "federacao": {
+        "sigla": "FFMA",
+        "imagem": "federacao/MA.png"
+      },
+      "serie": "C",
+      "fundacao": 2001,
+      "escudo": "escudos/imperatriz-ma.png",
+      "cores": [
+        "cores/vermelho.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Cavalo de Aço",
+        "imagem": "mascotes/imperatriz-ma.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/imperatriz-ma-1.png",
+        "reserva": "uniformes/imperatriz-ma-2.png"
+      }
+    },
+    {
+      "id": "maranhao-ma",
+      "nome": "Maranhão",
+      "sigla": "MRN",
+      "uf": "MA",
+      "regiao": "nordeste",
+      "cidade": "São Luís",
+      "federacao": {
+        "sigla": "FFMA",
+        "imagem": "federacao/MA.png"
+      },
+      "serie": "C",
+      "fundacao": 1932,
+      "escudo": "escudos/maranhao-ma.png",
+      "cores": [
+        "cores/azul.png",
+        "cores/branco.png",
+        "cores/vermelho.png",
+        "cores/preto.png"
+      ],
+      "mascote": {
+        "nome": "Bode",
+        "imagem": "mascotes/maranhao-ma.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/maranhao-ma-1.png",
+        "reserva": "uniformes/maranhao-ma-2.png"
+      }
+    },
+    {
+      "id": "moto-club-ma",
+      "nome": "Moto Club",
+      "sigla": "MOT",
+      "uf": "MA",
+      "regiao": "nordeste",
+      "cidade": "São Luís",
+      "federacao": {
+        "sigla": "FFMA",
+        "imagem": "federacao/MA.png"
+      },
+      "serie": "D",
+      "fundacao": 1937,
+      "escudo": "escudos/moto-club-ma.png",
+      "cores": [
+        "cores/vermelho.png",
+        "cores/preto.png"
+      ],
+      "mascote": {
+        "nome": "Bicho-Papão",
+        "imagem": "mascotes/moto-club-ma.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/moto-club-ma-1.png",
+        "reserva": "uniformes/moto-club-ma-2.png"
+      }
+    },
+    {
+      "id": "sampaio-correa-ma",
+      "nome": "Sampaio Corrêa",
+      "sigla": "SAM",
+      "uf": "MA",
+      "regiao": "nordeste",
+      "cidade": "São Luís",
+      "federacao": {
+        "sigla": "FFMA",
+        "imagem": "federacao/MA.png"
+      },
+      "serie": "D",
+      "fundacao": 1923,
+      "escudo": "escudos/sampaio-correa-ma.png",
+      "cores": [
+        "cores/verde.png",
+        "cores/vermelho.png",
+        "cores/amarelo.png"
+      ],
+      "mascote": {
+        "nome": "Tubarão",
+        "imagem": "mascotes/sampaio-correa-ma.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/sampaio-correa-ma-1.png",
+        "reserva": "uniformes/sampaio-correa-ma-2.png"
+      }
+    },
+    {
+      "id": "america-mg",
+      "nome": "América",
+      "sigla": "AMG",
+      "uf": "MG",
+      "regiao": "sudeste",
+      "cidade": "Belo Horizonte",
+      "federacao": {
+        "sigla": "FFMG",
+        "imagem": "federacao/MG.png"
+      },
+      "serie": "C",
+      "fundacao": 1912,
+      "escudo": "escudos/america-mg.png",
+      "cores": [
+        "cores/branco.png",
+        "cores/verde.png"
+      ],
+      "mascote": {
+        "nome": "Coelho",
+        "imagem": "mascotes/america-mg.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/america-mg-1.png",
+        "reserva": "uniformes/america-mg-2.png"
+      }
+    },
+    {
+      "id": "atletico-mg",
+      "nome": "Atlético",
+      "sigla": "CAM",
+      "uf": "MG",
+      "regiao": "sudeste",
+      "cidade": "Belo Horizonte",
+      "federacao": {
+        "sigla": "FFMG",
+        "imagem": "federacao/MG.png"
+      },
+      "serie": "A",
+      "fundacao": 1908,
+      "escudo": "escudos/atletico-mg.png",
+      "cores": [
+        "cores/branco.png",
+        "cores/preto.png"
+      ],
+      "mascote": {
+        "nome": "Galo",
+        "imagem": "mascotes/atletico-mg.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/atletico-mg-1.png",
+        "reserva": "uniformes/atletico-mg-2.png"
+      }
+    },
+    {
+      "id": "cruzeiro-mg",
+      "nome": "Cruzeiro",
+      "sigla": "CRU",
+      "uf": "MG",
+      "regiao": "sudeste",
+      "cidade": "Belo Horizonte",
+      "federacao": {
+        "sigla": "FFMG",
+        "imagem": "federacao/MG.png"
+      },
+      "serie": "A",
+      "fundacao": 1921,
+      "escudo": "escudos/cruzeiro-mg.png",
+      "cores": [
+        "cores/azul.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Raposa",
+        "imagem": "mascotes/cruzeiro-mg.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/cruzeiro-mg-1.png",
+        "reserva": "uniformes/cruzeiro-mg-2.png"
+      }
+    },
+    {
+      "id": "pouso-alegre-mg",
+      "nome": "Pouso Alegre",
+      "sigla": "POU",
+      "uf": "MG",
+      "regiao": "sudeste",
+      "cidade": "Pouso Alegre",
+      "federacao": {
+        "sigla": "FFMG",
+        "imagem": "federacao/MG.png"
+      },
+      "serie": null,
+      "fundacao": 1913,
+      "escudo": "escudos/pouso-alegre-mg.png",
+      "cores": [
+        "cores/vermelho.png",
+        "cores/preto.png"
+      ],
+      "mascote": {
+        "nome": "Dragão",
+        "imagem": "mascotes/pouso-alegre-mg.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/pouso-alegre-mg-1.png",
+        "reserva": "uniformes/pouso-alegre-mg-2.png"
+      }
+    },
+    {
+      "id": "aguia-negra-ms",
+      "nome": "Águia Negra",
+      "sigla": "AGN",
+      "uf": "MS",
+      "regiao": "centro_oeste",
+      "cidade": "Rio Brilhante",
+      "federacao": {
+        "sigla": "FFMS",
+        "imagem": "federacao/MS.png"
+      },
+      "serie": null,
+      "fundacao": 1971,
+      "escudo": "escudos/aguia-negra-ms.png",
+      "cores": [
+        "cores/vermelho.png",
+        "cores/preto.png"
+      ],
+      "mascote": {
+        "nome": "Águia Negra",
+        "imagem": "mascotes/aguia-negra-ms.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/aguia-negra-ms-1.png",
+        "reserva": "uniformes/aguia-negra-ms-2.png"
+      }
+    },
+    {
+      "id": "comercial-ms",
+      "nome": "Comercial",
+      "sigla": "CMS",
+      "uf": "MS",
+      "regiao": "centro_oeste",
+      "cidade": "Campo Grande",
+      "federacao": {
+        "sigla": "FFMS",
+        "imagem": "federacao/MS.png"
+      },
+      "serie": "D",
+      "fundacao": 1943,
+      "escudo": "escudos/comercial-ms.png",
+      "cores": [
+        "cores/vermelho.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Saci",
+        "imagem": "mascotes/comercial-ms.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/comercial-ms-1.png",
+        "reserva": "uniformes/comercial-ms-2.png"
+      }
+    },
+    {
+      "id": "costa-rica-ms",
+      "nome": "Costa Rica",
+      "sigla": "CRC",
+      "uf": "MS",
+      "regiao": "centro_oeste",
+      "cidade": "Costa Rica",
+      "federacao": {
+        "sigla": "FFMS",
+        "imagem": "federacao/MS.png"
+      },
+      "serie": "D",
+      "fundacao": 2004,
+      "escudo": "escudos/costa-rica-ms.png",
+      "cores": [
+        "cores/amarelo.png",
+        "cores/branco.png",
+        "cores/azul.png"
+      ],
+      "mascote": {
+        "nome": "Cobra",
+        "imagem": "mascotes/costa-rica-ms.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/costa-rica-ms-1.png",
+        "reserva": "uniformes/costa-rica-ms-2.png"
+      }
+    },
+    {
+      "id": "operario-ms",
+      "nome": "Opérario",
+      "sigla": "OMS",
+      "uf": "MS",
+      "regiao": "centro_oeste",
+      "cidade": "Campo Grande",
+      "federacao": {
+        "sigla": "FFMS",
+        "imagem": "federacao/MS.png"
+      },
+      "serie": null,
+      "fundacao": 1938,
+      "escudo": "escudos/operario-ms.png",
+      "cores": [
+        "cores/preto.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Galo",
+        "imagem": "mascotes/operario-ms.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/operario-ms-1.png",
+        "reserva": "uniformes/operario-ms-2.png"
+      }
+    },
+    {
+      "id": "cuiaba-mt",
+      "nome": "Cuiabá",
+      "sigla": "CUI",
+      "uf": "MT",
+      "regiao": "centro_oeste",
+      "cidade": "Cuiabá",
+      "federacao": {
+        "sigla": "FFMT",
+        "imagem": "federacao/MT.png"
+      },
+      "serie": "B",
+      "fundacao": 2001,
+      "escudo": "escudos/cuiaba-mt.png",
+      "cores": [
+        "cores/amarelo.png",
+        "cores/verde.png"
+      ],
+      "mascote": {
+        "nome": "Peixe Dourado",
+        "imagem": "mascotes/cuiaba-mt.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/cuiaba-mt-1.png",
+        "reserva": "uniformes/cuiaba-mt-2.png"
+      }
+    },
+    {
+      "id": "luverdense-mt",
+      "nome": "Luverdense",
+      "sigla": "LUV",
+      "uf": "MT",
+      "regiao": "centro_oeste",
+      "cidade": "Lucas do Rio Verde",
+      "federacao": {
+        "sigla": "FFMT",
+        "imagem": "federacao/MT.png"
+      },
+      "serie": "D",
+      "fundacao": 2004,
+      "escudo": "escudos/luverdense-mt.png",
+      "cores": [
+        "cores/branco.png",
+        "cores/verde.png"
+      ],
+      "mascote": {
+        "nome": "Verdão do Nortão",
+        "imagem": "mascotes/luverdense-mt.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/luverdense-mt-1.png",
+        "reserva": "uniformes/luverdense-mt-2.png"
+      }
+    },
+    {
+      "id": "mixto-mt",
+      "nome": "Mixto",
+      "sigla": "MIX",
+      "uf": "MT",
+      "regiao": "centro_oeste",
+      "cidade": "Cuiabá",
+      "federacao": {
+        "sigla": "FFMT",
+        "imagem": "federacao/MT.png"
+      },
+      "serie": "D",
+      "fundacao": 1934,
+      "escudo": "escudos/mixto-mt.png",
+      "cores": [
+        "cores/preto.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Tigre",
+        "imagem": "mascotes/mixto-mt.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/mixto-mt-1.png",
+        "reserva": "uniformes/mixto-mt-2.png"
+      }
+    },
+    {
+      "id": "varzea-grande-mt",
+      "nome": "Várzea Grande",
+      "sigla": "VZG",
+      "uf": "MT",
+      "regiao": "centro_oeste",
+      "cidade": "Várzea Grande",
+      "federacao": {
+        "sigla": "FFMT",
+        "imagem": "federacao/MT.png"
+      },
+      "serie": null,
+      "fundacao": 2002,
+      "escudo": "escudos/varzea-grande-mt.png",
+      "cores": [
+        "cores/vermelho.png",
+        "cores/preto.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Chicote",
+        "imagem": "mascotes/varzea-grande-mt.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/varzea-grande-mt-1.png",
+        "reserva": "uniformes/varzea-grande-mt-2.png"
+      }
+    },
+    {
+      "id": "aguia-de-maraba-pa",
+      "nome": "Águia de Marabá",
+      "sigla": "AMB",
+      "uf": "PA",
+      "regiao": "norte",
+      "cidade": "Marabá",
+      "federacao": {
+        "sigla": "FFPA",
+        "imagem": "federacao/PA.png"
+      },
+      "serie": "D",
+      "fundacao": 1982,
+      "escudo": "escudos/aguia-de-maraba-pa.png",
+      "cores": [
+        "cores/azul.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Águia",
+        "imagem": "mascotes/aguia-de-maraba-pa.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/aguia-de-maraba-pa-1.png",
+        "reserva": "uniformes/aguia-de-maraba-pa-2.png"
+      }
+    },
+    {
+      "id": "paysandu-pa",
+      "nome": "Paysandu",
+      "sigla": "PAY",
+      "uf": "PA",
+      "regiao": "norte",
+      "cidade": "Belém",
+      "federacao": {
+        "sigla": "FFPA",
+        "imagem": "federacao/PA.png"
+      },
+      "serie": "C",
+      "fundacao": 1914,
+      "escudo": "escudos/paysandu-pa.png",
+      "cores": [
+        "cores/anil.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Lobo",
+        "imagem": "mascotes/paysandu-pa.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/paysandu-pa-1.png",
+        "reserva": "uniformes/paysandu-pa-2.png"
+      }
+    },
+    {
+      "id": "remo-pa",
+      "nome": "Remo",
+      "sigla": "REM",
+      "uf": "PA",
+      "regiao": "norte",
+      "cidade": "Belém",
+      "federacao": {
+        "sigla": "FFPA",
+        "imagem": "federacao/PA.png"
+      },
+      "serie": "A",
+      "fundacao": 1905,
+      "escudo": "escudos/remo-pa.png",
+      "cores": [
+        "cores/azul.png"
+      ],
+      "mascote": {
+        "nome": "Leão",
+        "imagem": "mascotes/remo-pa.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/remo-pa-1.png",
+        "reserva": "uniformes/remo-pa-2.png"
+      }
+    },
+    {
+      "id": "tuna-luso-pa",
+      "nome": "Tuna Luso",
+      "sigla": "TNL",
+      "uf": "PA",
+      "regiao": "norte",
+      "cidade": "Belém",
+      "federacao": {
+        "sigla": "FFPA",
+        "imagem": "federacao/PA.png"
+      },
+      "serie": "D",
+      "fundacao": 1903,
+      "escudo": "escudos/tuna-luso-pa.png",
+      "cores": [
+        "cores/verde.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Águia",
+        "imagem": "mascotes/tuna-luso-pa.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/tuna-luso-pa-1.png",
+        "reserva": "uniformes/tuna-luso-pa-2.png"
+      }
+    },
+    {
+      "id": "belo-pb",
+      "nome": "Belo",
+      "sigla": "BPB",
+      "uf": "PB",
+      "regiao": "nordeste",
+      "cidade": "João Pessoa",
+      "federacao": {
+        "sigla": "FFPB",
+        "imagem": "federacao/PB.png"
+      },
+      "serie": "C",
+      "fundacao": 1931,
+      "escudo": "escudos/belo-pb.png",
+      "cores": [
+        "cores/preto.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Xerife",
+        "imagem": "mascotes/belo-pb.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/belo-pb-1.png",
+        "reserva": "uniformes/belo-pb-2.png"
+      }
+    },
+    {
+      "id": "campinense-pb",
+      "nome": "Campinense",
+      "sigla": "CPN",
+      "uf": "PB",
+      "regiao": "nordeste",
+      "cidade": "Campina Grande",
+      "federacao": {
+        "sigla": "FFPB",
+        "imagem": "federacao/PB.png"
+      },
+      "serie": "D",
+      "fundacao": 1915,
+      "escudo": "escudos/campinense-pb.png",
+      "cores": [
+        "cores/vermelho.png",
+        "cores/preto.png"
+      ],
+      "mascote": {
+        "nome": "Raposa",
+        "imagem": "mascotes/campinense-pb.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/campinense-pb-1.png",
+        "reserva": "uniformes/campinense-pb-2.png"
+      }
+    },
+    {
+      "id": "sousa-pb",
+      "nome": "Sousa",
+      "sigla": "SOU",
+      "uf": "PB",
+      "regiao": "nordeste",
+      "cidade": "Sousa",
+      "federacao": {
+        "sigla": "FFPB",
+        "imagem": "federacao/PB.png"
+      },
+      "serie": "D",
+      "fundacao": 1991,
+      "escudo": "escudos/sousa-pb.png",
+      "cores": [
+        "cores/branco.png",
+        "cores/verde.png",
+        "cores/lima.png"
+      ],
+      "mascote": {
+        "nome": "Dinossauro",
+        "imagem": "mascotes/sousa-pb.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/sousa-pb-1.png",
+        "reserva": "uniformes/sousa-pb-2.png"
+      }
+    },
+    {
+      "id": "treze-pb",
+      "nome": "Treze",
+      "sigla": "TRZ",
+      "uf": "PB",
+      "regiao": "nordeste",
+      "cidade": "Campina Grande",
+      "federacao": {
+        "sigla": "FFPB",
+        "imagem": "federacao/PB.png"
+      },
+      "serie": "D",
+      "fundacao": 1925,
+      "escudo": "escudos/treze-pb.png",
+      "cores": [
+        "cores/preto.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Galo",
+        "imagem": "mascotes/treze-pb.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/treze-pb-1.png",
+        "reserva": "uniformes/treze-pb-2.png"
+      }
+    },
+    {
+      "id": "nautico-pe",
+      "nome": "Náutico",
+      "sigla": "NAU",
+      "uf": "PE",
+      "regiao": "nordeste",
+      "cidade": "Recife",
+      "federacao": {
+        "sigla": "FFPE",
+        "imagem": "federacao/PE.png"
+      },
+      "serie": "B",
+      "fundacao": 1901,
+      "escudo": "escudos/nautico-pe.png",
+      "cores": [
+        "cores/branco.png",
+        "cores/vermelho.png"
+      ],
+      "mascote": {
+        "nome": "Timbu",
+        "imagem": "mascotes/nautico-pe.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/nautico-pe-1.png",
+        "reserva": "uniformes/nautico-pe-2.png"
+      }
+    },
+    {
+      "id": "salgueiro-pe",
+      "nome": "Salgueiro",
+      "sigla": "SAL",
+      "uf": "PE",
+      "regiao": "nordeste",
+      "cidade": "Salgueiro",
+      "federacao": {
+        "sigla": "FFPE",
+        "imagem": "federacao/PE.png"
+      },
+      "serie": null,
+      "fundacao": 1972,
+      "escudo": "escudos/salgueiro-pe.png",
+      "cores": [
+        "cores/verde.png",
+        "cores/vermelho.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Carcará",
+        "imagem": "mascotes/salgueiro-pe.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/salgueiro-pe-1.png",
+        "reserva": "uniformes/salgueiro-pe-2.png"
+      }
+    },
+    {
+      "id": "santa-cruz-pe",
+      "nome": "Santa Cruz",
+      "sigla": "STA",
+      "uf": "PE",
+      "regiao": "nordeste",
+      "cidade": "Recifie",
+      "federacao": {
+        "sigla": "FFPE",
+        "imagem": "federacao/PE.png"
+      },
+      "serie": "B",
+      "fundacao": 1914,
+      "escudo": "escudos/santa-cruz-pe.png",
+      "cores": [
+        "cores/branco.png",
+        "cores/preto.png",
+        "cores/vermelho.png"
+      ],
+      "mascote": {
+        "nome": "Cobra Coral",
+        "imagem": "mascotes/santa-cruz-pe.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/santa-cruz-pe-1.png",
+        "reserva": "uniformes/santa-cruz-pe-2.png"
+      }
+    },
+    {
+      "id": "sport-pe",
+      "nome": "Sport",
+      "sigla": "SPT",
+      "uf": "PE",
+      "regiao": "nordeste",
+      "cidade": "Recife",
+      "federacao": {
+        "sigla": "FFPE",
+        "imagem": "federacao/PE.png"
+      },
+      "serie": "B",
+      "fundacao": 1905,
+      "escudo": "escudos/sport-pe.png",
+      "cores": [
+        "cores/vermelho.png",
+        "cores/preto.png"
+      ],
+      "mascote": {
+        "nome": "Leão",
+        "imagem": "mascotes/sport-pe.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/sport-pe-1.png",
+        "reserva": "uniformes/sport-pe-2.png"
+      }
+    },
+    {
+      "id": "altos-pi",
+      "nome": "Altos",
+      "sigla": "ATL",
+      "uf": "PI",
+      "regiao": "nordeste",
+      "cidade": "Altos",
+      "federacao": {
+        "sigla": "FFPI",
+        "imagem": "federacao/PI.png"
+      },
+      "serie": "D",
+      "fundacao": 2013,
+      "escudo": "escudos/altos-pi.png",
+      "cores": [
+        "cores/verde.png",
+        "cores/amarelo.png",
+        "cores/branco.png",
+        "cores/azul.png"
+      ],
+      "mascote": {
+        "nome": "Jacaré",
+        "imagem": "mascotes/altos-pi.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/altos-pi-1.png",
+        "reserva": "uniformes/altos-pi-2.png"
+      }
+    },
+    {
+      "id": "parnahyba-pi",
+      "nome": "Parnahyba",
+      "sigla": "PHY",
+      "uf": "PI",
+      "regiao": "nordeste",
+      "cidade": "Parnaíba",
+      "federacao": {
+        "sigla": "FFPI",
+        "imagem": "federacao/PI.png"
+      },
+      "serie": "D",
+      "fundacao": 1913,
+      "escudo": "escudos/parnahyba-pi.png",
+      "cores": [
+        "cores/azul.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Tubarão",
+        "imagem": "mascotes/parnahyba-pi.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/parnahyba-pi-1.png",
+        "reserva": "uniformes/parnahyba-pi-2.png"
+      }
+    },
+    {
+      "id": "piaui-pi",
+      "nome": "Piauí",
+      "sigla": "PIA",
+      "uf": "PI",
+      "regiao": "nordeste",
+      "cidade": "Teresina",
+      "federacao": {
+        "sigla": "FFPI",
+        "imagem": "federacao/PI.png"
+      },
+      "serie": null,
+      "fundacao": 1948,
+      "escudo": "escudos/piaui-pi.png",
+      "cores": [
+        "cores/azul.png",
+        "cores/vermelho.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Rato",
+        "imagem": "mascotes/piaui-pi.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/piaui-pi-1.png",
+        "reserva": "uniformes/piaui-pi-2.png"
+      }
+    },
+    {
+      "id": "tiradentes-pi",
+      "nome": "Tiradentes",
+      "sigla": "TIR",
+      "uf": "PI",
+      "regiao": "nordeste",
+      "cidade": "Teresina",
+      "federacao": {
+        "sigla": "FFPI",
+        "imagem": "federacao/PI.png"
+      },
+      "serie": null,
+      "fundacao": 1959,
+      "escudo": "escudos/tiradentes-pi.png",
+      "cores": [
+        "cores/azul.png",
+        "cores/amarelo.png"
+      ],
+      "mascote": {
+        "nome": "Tigre",
+        "imagem": "mascotes/tiradentes-pi.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/tiradentes-pi-1.png",
+        "reserva": "uniformes/tiradentes-pi-2.png"
+      }
+    },
+    {
+      "id": "athletico-pr",
+      "nome": "Athletico",
+      "sigla": "CAP",
+      "uf": "PR",
+      "regiao": "sul",
+      "cidade": "Curitiba",
+      "federacao": {
+        "sigla": "FFPR",
+        "imagem": "federacao/PR.png"
+      },
+      "serie": "A",
+      "fundacao": 1924,
+      "escudo": "escudos/athletico-pr.png",
+      "cores": [
+        "cores/vermelho.png",
+        "cores/preto.png"
+      ],
+      "mascote": {
+        "nome": "Furacão",
+        "imagem": "mascotes/athletico-pr.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/athletico-pr-1.png",
+        "reserva": "uniformes/athletico-pr-2.png"
+      }
+    },
+    {
+      "id": "coritiba-pr",
+      "nome": "Coritiba",
+      "sigla": "CFC",
+      "uf": "PR",
+      "regiao": "sul",
+      "cidade": "Curitiba",
+      "federacao": {
+        "sigla": "FFPR",
+        "imagem": "federacao/PR.png"
+      },
+      "serie": "A",
+      "fundacao": 1909,
+      "escudo": "escudos/coritiba-pr.png",
+      "cores": [
+        "cores/verde.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Vovô Coxa",
+        "imagem": "mascotes/coritiba-pr.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/coritiba-pr-1.png",
+        "reserva": "uniformes/coritiba-pr-2.png"
+      }
+    },
+    {
+      "id": "operario-ferroviario-pr",
+      "nome": "Opérario Ferroviário",
+      "sigla": "OPF",
+      "uf": "PR",
+      "regiao": "sul",
+      "cidade": "Ponta Grossa",
+      "federacao": {
+        "sigla": "FFPR",
+        "imagem": "federacao/PR.png"
+      },
+      "serie": "B",
+      "fundacao": 1912,
+      "escudo": "escudos/operario-ferroviario-pr.png",
+      "cores": [
+        "cores/preto.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Fantasma",
+        "imagem": "mascotes/operario-ferroviario-pr.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/operario-ferroviario-pr-1.png",
+        "reserva": "uniformes/operario-ferroviario-pr-2.png"
+      }
+    },
+    {
+      "id": "parana-club-pr",
+      "nome": "Paraná Club",
+      "sigla": "PRN",
+      "uf": "PR",
+      "regiao": "sul",
+      "cidade": "Curitiba",
+      "federacao": {
+        "sigla": "FFPR",
+        "imagem": "federacao/PR.png"
+      },
+      "serie": "D",
+      "fundacao": 1989,
+      "escudo": "escudos/parana-club-pr.png",
+      "cores": [
+        "cores/azul.png",
+        "cores/vermelho.png"
+      ],
+      "mascote": {
+        "nome": "Gralha Azul",
+        "imagem": "mascotes/parana-club-pr.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/parana-club-pr-1.png",
+        "reserva": "uniformes/parana-club-pr-2.png"
+      }
+    },
+    {
+      "id": "botafogo-rj",
+      "nome": "Botafogo",
+      "sigla": "BOT",
+      "uf": "RJ",
+      "regiao": "sudeste",
+      "cidade": "Rio de Janeiro",
+      "federacao": {
+        "sigla": "FFRJ",
+        "imagem": "federacao/RJ.png"
+      },
+      "serie": "A",
+      "fundacao": 1942,
+      "escudo": "escudos/botafogo-rj.png",
+      "cores": [],
+      "mascote": {
+        "nome": "Cachorro",
+        "imagem": "mascotes/botafogo-rj.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/botafogo-rj-1.png",
+        "reserva": "uniformes/botafogo-rj-2.png"
+      }
+    },
+    {
+      "id": "flamengo-rj",
+      "nome": "Flamengo",
+      "sigla": "FLA",
+      "uf": "RJ",
+      "regiao": "sudeste",
+      "cidade": "Rio de Janeiro",
+      "federacao": {
+        "sigla": "FFRJ",
+        "imagem": "federacao/RJ.png"
+      },
+      "serie": "A",
+      "fundacao": 1895,
+      "escudo": "escudos/flamengo-rj.png",
+      "cores": [
+        "cores/vermelho.png",
+        "cores/preto.png"
+      ],
+      "mascote": {
+        "nome": "Urubu",
+        "imagem": "mascotes/flamengo-rj.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/flamengo-rj-1.png",
+        "reserva": "uniformes/flamengo-rj-2.png"
+      }
+    },
+    {
+      "id": "fluminense-rj",
+      "nome": "Fluminense",
+      "sigla": "FLU",
+      "uf": "RJ",
+      "regiao": "sudeste",
+      "cidade": "Rio de Janeiro",
+      "federacao": {
+        "sigla": "FFRJ",
+        "imagem": "federacao/RJ.png"
+      },
+      "serie": "A",
+      "fundacao": 1902,
+      "escudo": "escudos/fluminense-rj.png",
+      "cores": [
+        "cores/vermelho.png",
+        "cores/branco.png",
+        "cores/verde.png"
+      ],
+      "mascote": {
+        "nome": "Guerreirinho",
+        "imagem": "mascotes/fluminense-rj.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/fluminense-rj-1.png",
+        "reserva": "uniformes/fluminense-rj-2.png"
+      }
+    },
+    {
+      "id": "vasco-rj",
+      "nome": "Vasco",
+      "sigla": "VAS",
+      "uf": "RJ",
+      "regiao": "sudeste",
+      "cidade": "Rio de Janiero",
+      "federacao": {
+        "sigla": "FFRJ",
+        "imagem": "federacao/RJ.png"
+      },
+      "serie": "A",
+      "fundacao": 1898,
+      "escudo": "escudos/vasco-rj.png",
+      "cores": [
+        "cores/preto.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Almirante",
+        "imagem": "mascotes/vasco-rj.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/vasco-rj-1.png",
+        "reserva": "uniformes/vasco-rj-2.png"
+      }
+    },
+    {
+      "id": "abc-rn",
+      "nome": "ABC",
+      "sigla": "ABC",
+      "uf": "RN",
+      "regiao": "nordeste",
+      "cidade": "Natal",
+      "federacao": {
+        "sigla": "FFRN",
+        "imagem": "federacao/RN.png"
+      },
+      "serie": "C",
+      "fundacao": 1915,
+      "escudo": "escudos/abc-rn.png",
+      "cores": [
+        "cores/preto.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Fantão",
+        "imagem": "mascotes/abc-rn.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/abc-rn-1.png",
+        "reserva": "uniformes/abc-rn-2.png"
+      }
+    },
+    {
+      "id": "alecrim-rn",
+      "nome": "Alecrim",
+      "sigla": "ALC",
+      "uf": "RN",
+      "regiao": "nordeste",
+      "cidade": "Natal",
+      "federacao": {
+        "sigla": "FFRN",
+        "imagem": "federacao/RN.png"
+      },
+      "serie": null,
+      "fundacao": 1915,
+      "escudo": "escudos/alecrim-rn.png",
+      "cores": [
+        "cores/verde.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Periquito",
+        "imagem": "mascotes/alecrim-rn.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/alecrim-rn-1.png",
+        "reserva": "uniformes/alecrim-rn-2.png"
+      }
+    },
+    {
+      "id": "america-rn",
+      "nome": "América",
+      "sigla": "ARN",
+      "uf": "RN",
+      "regiao": "nordeste",
+      "cidade": "Natal",
+      "federacao": {
+        "sigla": "FFRN",
+        "imagem": "federacao/RN.png"
+      },
+      "serie": "D",
+      "fundacao": 1915,
+      "escudo": "escudos/america-rn.png",
+      "cores": [
+        "cores/vermelho.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Dragão",
+        "imagem": "mascotes/america-rn.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/america-rn-1.png",
+        "reserva": "uniformes/america-rn-2.png"
+      }
+    },
+    {
+      "id": "potiguar-rn",
+      "nome": "Potiguar",
+      "sigla": "PTG",
+      "uf": "RN",
+      "regiao": "nordeste",
+      "cidade": "Mossoró",
+      "federacao": {
+        "sigla": "FFRN",
+        "imagem": "federacao/RN.png"
+      },
+      "serie": null,
+      "fundacao": 1945,
+      "escudo": "escudos/potiguar-rn.png",
+      "cores": [
+        "cores/vermelho.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Príncipe",
+        "imagem": "mascotes/potiguar-rn.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/potiguar-rn-1.png",
+        "reserva": "uniformes/potiguar-rn-2.png"
+      }
+    },
+    {
+      "id": "ji-parana-ro",
+      "nome": "Ji-Paraná",
+      "sigla": "JIP",
+      "uf": "RO",
+      "regiao": "norte",
+      "cidade": "Ji-Paraná",
+      "federacao": {
+        "sigla": "FFRO",
+        "imagem": "federacao/RO.png"
+      },
+      "serie": "D",
+      "fundacao": 1991,
+      "escudo": "escudos/ji-parana-ro.png",
+      "cores": [
+        "cores/anil.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Galo Azul",
+        "imagem": "mascotes/ji-parana-ro.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/ji-parana-ro-1.png",
+        "reserva": "uniformes/ji-parana-ro-2.png"
+      }
+    },
+    {
+      "id": "moto-esporte-ro",
+      "nome": "Moto Esporte",
+      "sigla": "MTE",
+      "uf": "RO",
+      "regiao": "norte",
+      "cidade": "Porto Velho",
+      "federacao": {
+        "sigla": "FFRO",
+        "imagem": "federacao/RO.png"
+      },
+      "serie": "D",
+      "fundacao": 1952,
+      "escudo": "escudos/moto-esporte-ro.png",
+      "cores": [
+        "cores/vermelho.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Tatu-Bola",
+        "imagem": "mascotes/moto-esporte-ro.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/moto-esporte-ro-1.png",
+        "reserva": "uniformes/moto-esporte-ro-2.png"
+      }
+    },
+    {
+      "id": "porto-velho-ro",
+      "nome": "Porto Velho",
+      "sigla": "PTV",
+      "uf": "RO",
+      "regiao": "norte",
+      "cidade": "Porto Velho",
+      "federacao": {
+        "sigla": "FFRO",
+        "imagem": "federacao/RO.png"
+      },
+      "serie": "D",
+      "fundacao": 2018,
+      "escudo": "escudos/porto-velho-ro.png",
+      "cores": [],
+      "mascote": {
+        "nome": "Locomotiva",
+        "imagem": "mascotes/porto-velho-ro.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/porto-velho-ro-1.png",
+        "reserva": "uniformes/porto-velho-ro-2.png"
+      }
+    },
+    {
+      "id": "real-ariquemedes-ro",
+      "nome": "Real Ariquemedes",
+      "sigla": "RAQ",
+      "uf": "RO",
+      "regiao": "norte",
+      "cidade": "Ariquemes",
+      "federacao": {
+        "sigla": "FFRO",
+        "imagem": "federacao/RO.png"
+      },
+      "serie": null,
+      "fundacao": 2011,
+      "escudo": "escudos/real-ariquemedes-ro.png",
+      "cores": [
+        "cores/preto.png",
+        "cores/branco.png",
+        "cores/vermelho.png"
+      ],
+      "mascote": {
+        "nome": "Furacão",
+        "imagem": "mascotes/real-ariquemedes-ro.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/real-ariquemedes-ro-1.png",
+        "reserva": "uniformes/real-ariquemedes-ro-2.png"
+      }
+    },
+    {
+      "id": "bare-rr",
+      "nome": "Baré",
+      "sigla": "BRE",
+      "uf": "RR",
+      "regiao": "norte",
+      "cidade": "Boa Vista",
+      "federacao": {
+        "sigla": "FFRR",
+        "imagem": "federacao/RR.png"
+      },
+      "serie": null,
+      "fundacao": 1946,
+      "escudo": "escudos/bare-rr.png",
+      "cores": [
+        "cores/branco.png",
+        "cores/vermelho.png"
+      ],
+      "mascote": {
+        "nome": "Índio",
+        "imagem": "mascotes/bare-rr.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/bare-rr-1.png",
+        "reserva": "uniformes/bare-rr-2.png"
+      }
+    },
+    {
+      "id": "gas-rr",
+      "nome": "GAS",
+      "sigla": "GAS",
+      "uf": "RR",
+      "regiao": "norte",
+      "cidade": "Boa Vista",
+      "federacao": {
+        "sigla": "FFRR",
+        "imagem": "federacao/RR.png"
+      },
+      "serie": "D",
+      "fundacao": 1965,
+      "escudo": "escudos/gas-rr.png",
+      "cores": [
+        "cores/amarelo.png",
+        "cores/azul.png",
+        "cores/vermelho.png"
+      ],
+      "mascote": {
+        "nome": "Leão",
+        "imagem": "mascotes/gas-rr.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/gas-rr-1.png",
+        "reserva": "uniformes/gas-rr-2.png"
+      }
+    },
+    {
+      "id": "monte-roraima-rr",
+      "nome": "Monte Roraima",
+      "sigla": "MRR",
+      "uf": "RR",
+      "regiao": "norte",
+      "cidade": "Boa Vista",
+      "federacao": {
+        "sigla": "FFRR",
+        "imagem": "federacao/RR.png"
+      },
+      "serie": "D",
+      "fundacao": 2023,
+      "escudo": "escudos/monte-roraima-rr.png",
+      "cores": [
+        "cores/amarelo.png",
+        "cores/branco.png",
+        "cores/verde.png"
+      ],
+      "mascote": {
+        "nome": "Tamanduá",
+        "imagem": "mascotes/monte-roraima-rr.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/monte-roraima-rr-1.png",
+        "reserva": "uniformes/monte-roraima-rr-2.png"
+      }
+    },
+    {
+      "id": "sao-raimundo-rr",
+      "nome": "São Raimundo",
+      "sigla": "SRM",
+      "uf": "RR",
+      "regiao": "norte",
+      "cidade": "Boa Vista",
+      "federacao": {
+        "sigla": "FFRR",
+        "imagem": "federacao/RR.png"
+      },
+      "serie": null,
+      "fundacao": 1963,
+      "escudo": "escudos/sao-raimundo-rr.png",
+      "cores": [
+        "cores/azul.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Pássaro Azul",
+        "imagem": "mascotes/sao-raimundo-rr.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/sao-raimundo-rr-1.png",
+        "reserva": "uniformes/sao-raimundo-rr-2.png"
+      }
+    },
+    {
+      "id": "caxias-do-sul-rs",
+      "nome": "Caxias do Sul",
+      "sigla": "CXS",
+      "uf": "RS",
+      "regiao": "sul",
+      "cidade": "Caxias",
+      "federacao": {
+        "sigla": "FFRS",
+        "imagem": "federacao/RS.png"
+      },
+      "serie": "C",
+      "fundacao": 1935,
+      "escudo": "escudos/caxias-do-sul-rs.png",
+      "cores": [
+        "cores/vermelho.png",
+        "cores/azul.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Falcão",
+        "imagem": "mascotes/caxias-do-sul-rs.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/caxias-do-sul-rs-1.png",
+        "reserva": "uniformes/caxias-do-sul-rs-2.png"
+      }
+    },
+    {
+      "id": "gremio-rs",
+      "nome": "Grêmio",
+      "sigla": "GRE",
+      "uf": "RS",
+      "regiao": "sul",
+      "cidade": "Porto Alegre",
+      "federacao": {
+        "sigla": "FFRS",
+        "imagem": "federacao/RS.png"
+      },
+      "serie": "A",
+      "fundacao": 1903,
+      "escudo": "escudos/gremio-rs.png",
+      "cores": [
+        "cores/preto.png",
+        "cores/branco.png",
+        "cores/azul.png"
+      ],
+      "mascote": {
+        "nome": "Flecha Negra",
+        "imagem": "mascotes/gremio-rs.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/gremio-rs-1.png",
+        "reserva": "uniformes/gremio-rs-2.png"
+      }
+    },
+    {
+      "id": "internacional-rs",
+      "nome": "Internacional",
+      "sigla": "INT",
+      "uf": "RS",
+      "regiao": "sul",
+      "cidade": "Porto Alegre",
+      "federacao": {
+        "sigla": "FFRS",
+        "imagem": "federacao/RS.png"
+      },
+      "serie": "A",
+      "fundacao": 1909,
+      "escudo": "escudos/internacional-rs.png",
+      "cores": [
+        "cores/vermelho.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Saci",
+        "imagem": "mascotes/internacional-rs.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/internacional-rs-1.png",
+        "reserva": "uniformes/internacional-rs-2.png"
+      }
+    },
+    {
+      "id": "juventude-rs",
+      "nome": "Juventude",
+      "sigla": "JUV",
+      "uf": "RS",
+      "regiao": "sul",
+      "cidade": "Caxias",
+      "federacao": {
+        "sigla": "FFRS",
+        "imagem": "federacao/RS.png"
+      },
+      "serie": "B",
+      "fundacao": 1913,
+      "escudo": "escudos/juventude-rs.png",
+      "cores": [
+        "cores/verde.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Periquito",
+        "imagem": "mascotes/juventude-rs.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/juventude-rs-1.png",
+        "reserva": "uniformes/juventude-rs-2.png"
+      }
+    },
+    {
+      "id": "avai-sc",
+      "nome": "Avaí",
+      "sigla": "AVA",
+      "uf": "SC",
+      "regiao": "sul",
+      "cidade": "Florianópolis",
+      "federacao": {
+        "sigla": "FFSC",
+        "imagem": "federacao/SC.png"
+      },
+      "serie": "B",
+      "fundacao": 1923,
+      "escudo": "escudos/avai-sc.png",
+      "cores": [
+        "cores/azul.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Leão",
+        "imagem": "mascotes/avai-sc.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/avai-sc-1.png",
+        "reserva": "uniformes/avai-sc-2.png"
+      }
+    },
+    {
+      "id": "chapecoense-sc",
+      "nome": "Chapecoense",
+      "sigla": "CHA",
+      "uf": "SC",
+      "regiao": "sul",
+      "cidade": "Chapecó",
+      "federacao": {
+        "sigla": "FFSC",
+        "imagem": "federacao/SC.png"
+      },
+      "serie": "B",
+      "fundacao": 1973,
+      "escudo": "escudos/chapecoense-sc.png",
+      "cores": [],
+      "mascote": {
+        "nome": "Índio Condá",
+        "imagem": "mascotes/chapecoense-sc.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/chapecoense-sc-1.png",
+        "reserva": "uniformes/chapecoense-sc-2.png"
+      }
+    },
+    {
+      "id": "criciuma-sc",
+      "nome": "Criciúma",
+      "sigla": "CRM",
+      "uf": "SC",
+      "regiao": "sul",
+      "cidade": "Criciúma",
+      "federacao": {
+        "sigla": "FFSC",
+        "imagem": "federacao/SC.png"
+      },
+      "serie": "B",
+      "fundacao": 1947,
+      "escudo": "escudos/criciuma-sc.png",
+      "cores": [
+        "cores/preto.png",
+        "cores/branco.png",
+        "cores/amarelo.png"
+      ],
+      "mascote": {
+        "nome": "Tigre",
+        "imagem": "mascotes/criciuma-sc.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/criciuma-sc-1.png",
+        "reserva": "uniformes/criciuma-sc-2.png"
+      }
+    },
+    {
+      "id": "figueirense-sc",
+      "nome": "Figueirense",
+      "sigla": "FIG",
+      "uf": "SC",
+      "regiao": "sul",
+      "cidade": "Florianópolis",
+      "federacao": {
+        "sigla": "FFSC",
+        "imagem": "federacao/SC.png"
+      },
+      "serie": "C",
+      "fundacao": 1921,
+      "escudo": "escudos/figueirense-sc.png",
+      "cores": [
+        "cores/preto.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Furacão",
+        "imagem": "mascotes/figueirense-sc.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/figueirense-sc-1.png",
+        "reserva": "uniformes/figueirense-sc-2.png"
+      }
+    },
+    {
+      "id": "confianca-se",
+      "nome": "Confiança",
+      "sigla": "ADC",
+      "uf": "SE",
+      "regiao": "nordeste",
+      "cidade": "Aracaju",
+      "federacao": {
+        "sigla": "FFSE",
+        "imagem": "federacao/SE.png"
+      },
+      "serie": "D",
+      "fundacao": 1936,
+      "escudo": "escudos/confianca-se.png",
+      "cores": [
+        "cores/azul.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Dragão",
+        "imagem": "mascotes/confianca-se.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/confianca-se-1.png",
+        "reserva": "uniformes/confianca-se-2.png"
+      }
+    },
+    {
+      "id": "cotinguiba-se",
+      "nome": "Cotinguiba",
+      "sigla": "CTN",
+      "uf": "SE",
+      "regiao": "nordeste",
+      "cidade": "Aracaju",
+      "federacao": {
+        "sigla": "FFSE",
+        "imagem": "federacao/SE.png"
+      },
+      "serie": null,
+      "fundacao": 1909,
+      "escudo": "escudos/cotinguiba-se.png",
+      "cores": [
+        "cores/branco.png",
+        "cores/azul.png"
+      ],
+      "mascote": {
+        "nome": "Tubarão",
+        "imagem": "mascotes/cotinguiba-se.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/cotinguiba-se-1.png",
+        "reserva": "uniformes/cotinguiba-se-2.png"
+      }
+    },
+    {
+      "id": "itabaiana-se",
+      "nome": "Itabaiana",
+      "sigla": "ITA",
+      "uf": "SE",
+      "regiao": "nordeste",
+      "cidade": "Itabaiana",
+      "federacao": {
+        "sigla": "FFSE",
+        "imagem": "federacao/SE.png"
+      },
+      "serie": "D",
+      "fundacao": 1938,
+      "escudo": "escudos/itabaiana-se.png",
+      "cores": [
+        "cores/azul.png",
+        "cores/branco.png",
+        "cores/vermelho.png"
+      ],
+      "mascote": {
+        "nome": "Tremendão",
+        "imagem": "mascotes/itabaiana-se.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/itabaiana-se-1.png",
+        "reserva": "uniformes/itabaiana-se-2.png"
+      }
+    },
+    {
+      "id": "sergipe-se",
+      "nome": "Sergipe",
+      "sigla": "SEG",
+      "uf": "SE",
+      "regiao": "nordeste",
+      "cidade": "Aracaju",
+      "federacao": {
+        "sigla": "FFSE",
+        "imagem": "federacao/SE.png"
+      },
+      "serie": "D",
+      "fundacao": 1909,
+      "escudo": "escudos/sergipe-se.png",
+      "cores": [
+        "cores/branco.png",
+        "cores/vermelho.png"
+      ],
+      "mascote": {
+        "nome": "Diabo Rubro",
+        "imagem": "mascotes/sergipe-se.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/sergipe-se-1.png",
+        "reserva": "uniformes/sergipe-se-2.png"
+      }
+    },
+    {
+      "id": "corinthians-sp",
+      "nome": "Corinthians",
+      "sigla": "COR",
+      "uf": "SP",
+      "regiao": "sudeste",
+      "cidade": "São Paulo",
+      "federacao": {
+        "sigla": "FFSP",
+        "imagem": "federacao/SP.png"
+      },
+      "serie": "A",
+      "fundacao": 1910,
+      "escudo": "escudos/corinthians-sp.png",
+      "cores": [
+        "cores/preto.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Mosquitero",
+        "imagem": "mascotes/corinthians-sp.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/corinthians-sp-1.png",
+        "reserva": "uniformes/corinthians-sp-2.png"
+      }
+    },
+    {
+      "id": "palmeiras-sp",
+      "nome": "Palmeiras",
+      "sigla": "PAL",
+      "uf": "SP",
+      "regiao": "sudeste",
+      "cidade": "São Paulo",
+      "federacao": {
+        "sigla": "FFSP",
+        "imagem": "federacao/SP.png"
+      },
+      "serie": "A",
+      "fundacao": 1914,
+      "escudo": "escudos/palmeiras-sp.png",
+      "cores": [
+        "cores/verde.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Porco",
+        "imagem": "mascotes/palmeiras-sp.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/palmeiras-sp-1.png",
+        "reserva": "uniformes/palmeiras-sp-2.png"
+      }
+    },
+    {
+      "id": "santos-sp",
+      "nome": "Santos",
+      "sigla": "SAN",
+      "uf": "SP",
+      "regiao": "sudeste",
+      "cidade": "Santos",
+      "federacao": {
+        "sigla": "FFSP",
+        "imagem": "federacao/SP.png"
+      },
+      "serie": "A",
+      "fundacao": 1912,
+      "escudo": "escudos/santos-sp.png",
+      "cores": [
+        "cores/preto.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Peixe",
+        "imagem": "mascotes/santos-sp.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/santos-sp-1.png",
+        "reserva": "uniformes/santos-sp-2.png"
+      }
+    },
+    {
+      "id": "sao-paulo-sp",
+      "nome": "São Paulo",
+      "sigla": "SAO",
+      "uf": "SP",
+      "regiao": "sudeste",
+      "cidade": "São Paulo",
+      "federacao": {
+        "sigla": "FFSP",
+        "imagem": "federacao/SP.png"
+      },
+      "serie": "A",
+      "fundacao": 1930,
+      "escudo": "escudos/sao-paulo-sp.png",
+      "cores": [
+        "cores/preto.png",
+        "cores/branco.png",
+        "cores/vermelho.png"
+      ],
+      "mascote": {
+        "nome": "São Paulo",
+        "imagem": "mascotes/sao-paulo-sp.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/sao-paulo-sp-1.png",
+        "reserva": "uniformes/sao-paulo-sp-2.png"
+      }
+    },
+    {
+      "id": "gurupi-to",
+      "nome": "Gurupi",
+      "sigla": "GRP",
+      "uf": "TO",
+      "regiao": "norte",
+      "cidade": "1988",
+      "federacao": {
+        "sigla": "FFTO",
+        "imagem": "federacao/TO.png"
+      },
+      "serie": null,
+      "fundacao": null,
+      "escudo": "escudos/gurupi-to.png",
+      "cores": [
+        "cores/amarelo.png",
+        "cores/verde.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Camaleão",
+        "imagem": "mascotes/gurupi-to.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/gurupi-to-1.png",
+        "reserva": "uniformes/gurupi-to-2.png"
+      }
+    },
+    {
+      "id": "interporto-to",
+      "nome": "Interporto",
+      "sigla": "ITP",
+      "uf": "TO",
+      "regiao": "norte",
+      "cidade": "Porto Nacional",
+      "federacao": {
+        "sigla": "FFTO",
+        "imagem": "federacao/TO.png"
+      },
+      "serie": null,
+      "fundacao": 1990,
+      "escudo": "escudos/interporto-to.png",
+      "cores": [
+        "cores/azul.png",
+        "cores/amarelo.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Tigre",
+        "imagem": "mascotes/interporto-to.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/interporto-to-1.png",
+        "reserva": "uniformes/interporto-to-2.png"
+      }
+    },
+    {
+      "id": "palmas-to",
+      "nome": "Palmas",
+      "sigla": "PLM",
+      "uf": "TO",
+      "regiao": "norte",
+      "cidade": "Palmas",
+      "federacao": {
+        "sigla": "FFTO",
+        "imagem": "federacao/TO.png"
+      },
+      "serie": "D",
+      "fundacao": 1991,
+      "escudo": "escudos/palmas-to.png",
+      "cores": [
+        "cores/azul.png",
+        "cores/branco.png",
+        "cores/amarelo.png"
+      ],
+      "mascote": {
+        "nome": "Arara-Canindé",
+        "imagem": "mascotes/palmas-to.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/palmas-to-1.png",
+        "reserva": "uniformes/palmas-to-2.png"
+      }
+    },
+    {
+      "id": "tocantinopolis-to",
+      "nome": "Tocantinópolis",
+      "sigla": "TOC",
+      "uf": "TO",
+      "regiao": "norte",
+      "cidade": "Tocantinópolis",
+      "federacao": {
+        "sigla": "FFTO",
+        "imagem": "federacao/TO.png"
+      },
+      "serie": "D",
+      "fundacao": 1989,
+      "escudo": "escudos/tocantinopolis-to.png",
+      "cores": [
+        "cores/verde.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Papagaio",
+        "imagem": "mascotes/tocantinopolis-to.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/tocantinopolis-to-1.png",
+        "reserva": "uniformes/tocantinopolis-to-2.png"
+      }
+    }
+  ]
+}
