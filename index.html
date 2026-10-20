@@ -1,84 +1,389 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Futebol Brasileiro Simulado</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="shared/tema.css">
-    <link rel="stylesheet" href="hub.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>mainFut – Hub de times</title>
+<style>
+  :root {
+    --bg-main: #0d1117; --panel-bg: #161b22; --border-color: #30363d;
+    --text-color: #c9d1d9; --heading: #f0f6fc; --muted: #8b949e;
+    --node-bg: #21262d; --accent: #58a6ff; --accent-glow: rgba(56, 139, 253, 0.18);
+    --green: #238636; --green-hover: #2ea043; --danger: #f85149;
+    --font: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { color-scheme: dark; }
+  body { margin: 0; background: var(--bg-main); color: var(--text-color); font: 15px/1.5 var(--font); min-height: 100vh; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* ---------- Botão do menu (canto superior esquerdo) ---------- */
+  .topbar { position: fixed; top: 14px; left: 14px; z-index: 50; }
+  .menu-btn {
+    display: inline-flex; align-items: center; gap: 10px; padding: 9px 14px;
+    background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 8px;
+    font-weight: 600; font-size: .85rem; box-shadow: 0 4px 12px rgba(0,0,0,.35);
+    transition: background .2s, border-color .2s;
+  }
+  .menu-btn:hover { background: #1c232c; border-color: var(--muted); }
+  .menu-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; }
+  .menu-btn .cont { background: var(--node-bg); border: 1px solid var(--border-color); border-radius: 999px; padding: 0 8px; font-size: .75rem; color: var(--muted); }
+  .menu-btn .cont:empty { display: none; }
+
+  /* ---------- Tela inicial ---------- */
+  .hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 80px 20px 40px; gap: 14px; }
+  .hero h1 { margin: 0; font-size: clamp(2rem, 6vw, 3.2rem); color: var(--heading); letter-spacing: .5px; }
+  .hero .lead { margin: 0; max-width: 46ch; color: var(--muted); }
+  .hero .stats { margin: 0; font-size: .9rem; color: var(--muted); max-width: 56ch; }
+  .hero .stats.erro { color: var(--danger); }
+  .cta { background: var(--green); color: #fff; border: 0; border-radius: 8px; padding: 12px 24px; font-weight: 700; box-shadow: 0 4px 12px rgba(35,134,54,.4); transition: background .2s, transform .1s; }
+  .cta:hover { background: var(--green-hover); transform: scale(1.02); }
+  .cta:disabled { opacity: .5; cursor: default; transform: none; }
+
+  /* ---------- Menu lateral ---------- */
+  .scrim { position: fixed; inset: 0; background: rgba(0,0,0,.55); opacity: 0; pointer-events: none; transition: opacity .25s; z-index: 60; }
+  .scrim.open { opacity: 1; pointer-events: auto; }
+  .drawer {
+    position: fixed; top: 0; bottom: 0; left: 0; z-index: 70; width: min(360px, 92vw);
+    background: var(--panel-bg); border-right: 1px solid var(--border-color);
+    box-shadow: 8px 0 32px rgba(0,0,0,.5); display: flex; flex-direction: column;
+    transform: translateX(-102%); transition: transform .25s ease;
+  }
+  .drawer.open { transform: translateX(0); }
+  .drawer-head { display: flex; align-items: center; gap: 10px; padding: 14px 16px 10px; }
+  .drawer-head h2 { margin: 0; font-size: 1rem; color: var(--heading); flex: 1; }
+  .drawer-head .qtd { font-size: .75rem; color: var(--muted); }
+  .fechar { background: none; border: 0; font-size: 1.4rem; line-height: 1; padding: 2px 8px; color: var(--text-color); border-radius: 6px; }
+  .fechar:hover { color: var(--danger); }
+  .busca { margin: 0 16px 10px; padding: 9px 12px; background: var(--bg-main); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 6px; font: inherit; font-size: .85rem; }
+  .lista { flex: 1; overflow-y: auto; padding: 0 8px 16px; border-top: 1px solid var(--border-color); }
+  .letra { position: sticky; top: 0; background: var(--panel-bg); padding: 8px 8px 4px; font-size: .7rem; font-weight: 700; letter-spacing: 1px; color: var(--accent); }
+  .item { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; padding: 7px 8px; background: none; border: 0; border-bottom: 1px solid var(--border-color); border-radius: 6px; transition: background .15s; }
+  .item:hover { background: rgba(255,255,255,.05); }
+  .item .txt { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .item .nome { font-size: .85rem; color: var(--heading); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .item .sub { font-size: .72rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .uf-tag { font-size: .72rem; font-weight: 700; color: var(--muted); border: 1px solid var(--border-color); border-radius: 4px; padding: 0 6px; }
+  .nada { padding: 20px 8px; color: var(--muted); font-size: .85rem; }
+
+  /* ---------- Escudo redondo ---------- */
+  .badge { flex: none; border-radius: 50%; background: var(--node-bg); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .badge.sm { width: 32px; height: 32px; }
+  .badge.sm img { width: 22px; height: 22px; }
+  .badge.lg { width: 84px; height: 84px; border-width: 2px; }
+  .badge.lg img { width: 56px; height: 56px; }
+  .badge img { object-fit: contain; }
+  .badge .sigla { font-size: .65rem; font-weight: 700; color: var(--muted); }
+  .badge.lg .sigla { font-size: .95rem; }
+  button.badge { padding: 0; transition: transform .2s, border-color .2s, box-shadow .2s; }
+  button.badge:hover { transform: scale(1.1); border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
+
+  /* ---------- Janela do time ---------- */
+  dialog { border: 0; padding: 0; background: transparent; color: inherit; max-width: none; max-height: none; overflow: visible; }
+  dialog::backdrop { background: rgba(0,0,0,.7); backdrop-filter: blur(4px); }
+  .card { position: relative; width: min(460px, 92vw); max-height: 90vh; overflow-y: auto; background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 26px 22px 22px; box-shadow: 0 16px 40px rgba(0,0,0,.6); display: flex; flex-direction: column; align-items: center; gap: 4px; animation: pop .2s ease-out; }
+  @keyframes pop { from { transform: scale(.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .card .fechar { position: absolute; top: 10px; right: 12px; }
+  .card h3 { margin: 10px 0 0; font-size: 1.2rem; color: var(--heading); text-align: center; }
+  .card .local { margin: 0 0 14px; font-size: .85rem; color: var(--muted); text-align: center; }
+  .sec { width: 100%; border-top: 1px solid var(--border-color); padding-top: 14px; margin-top: 8px; }
+  .sec h4 { margin: 0 0 10px; font-size: .72rem; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); }
+  .info { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; margin: 0; }
+  .info div { min-width: 0; }
+  .info dt { font-size: .7rem; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; }
+  .info dd { margin: 0; color: var(--heading); font-size: .9rem; }
+  .fed { display: flex; align-items: center; gap: 10px; }
+  .fed img { width: 34px; height: 34px; object-fit: contain; }
+  .fed span { color: var(--heading); font-weight: 600; }
+  .cores { display: flex; flex-wrap: wrap; gap: 8px; }
+  .cor { display: inline-flex; align-items: center; gap: 6px; background: var(--node-bg); border: 1px solid var(--border-color); border-radius: 999px; padding: 3px 10px 3px 4px; font-size: .8rem; color: var(--heading); }
+  .cor img { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; }
+  .cor.sem-img { padding-left: 10px; }
+  .vazio-txt { font-size: .85rem; color: #6e7681; }
+  .kits { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .kit { display: flex; flex-direction: column; align-items: center; gap: 6px; background: var(--node-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 6px; min-width: 0; }
+  .kit-t { font-size: .68rem; font-weight: 600; text-transform: uppercase; color: var(--muted); text-align: center; }
+  .kit-img { width: 100%; height: 100px; display: flex; align-items: center; justify-content: center; padding: 2px; background: rgba(0,0,0,.2); border: 1px dashed var(--border-color); border-radius: 6px; overflow: hidden; transition: transform .2s, border-color .2s, box-shadow .2s; }
+  .kit-img img { max-width: 100%; max-height: 100%; object-fit: contain; }
+  .kit-img:not(:disabled):hover { transform: scale(1.06); border-color: var(--accent); border-style: solid; box-shadow: 0 0 15px var(--accent-glow); }
+  .kit-img:disabled { cursor: default; }
+  .kit-vazio { font-size: .7rem; color: #6e7681; }
+  .kit-n { font-size: .78rem; color: var(--heading); text-align: center; }
+
+  /* ---------- Visualizador de imagem ---------- */
+  #visualizador::backdrop { background: rgba(0,0,0,.85); backdrop-filter: blur(6px); }
+  #visualizador figure { margin: 0; text-align: center; cursor: pointer; }
+  #visualizador img { max-width: 90vw; max-height: 82vh; object-fit: contain; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 20px 50px rgba(0,0,0,.8); background: var(--panel-bg); }
+  #visualizador figcaption { margin-top: 10px; color: var(--text-color); font-size: .9rem; }
+
+  @media (max-width: 420px) { .kits { grid-template-columns: repeat(2, 1fr); } }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
 </head>
 <body>
-    <header class="hero">
-        <h1>Futebol Brasileiro Simulado</h1>
-        <p>Simule o Campeonato Nacional Expandido com playoffs ou a Copa mais democrática do mundo!</p>
-    </header>
 
-    <ol class="trilha">
-        <li class="etapa" id="etapa-campeonato">
-            <span class="num">1</span>
-            <div class="card">
-                <div class="info">
-                    <h2>Campeonato Nacional</h2>
-                    <p class="desc">Cinco séries A com 20 times, 38 rodadas e, no fim, os playoffs entre as regiões.</p>
-                    <p class="status" id="status-campeonato"></p>
-                </div>
-                <a class="btn btn-verde" id="link-campeonato">Abrir campeonato</a>
-            </div>
-        </li>
-        <li class="etapa" id="etapa-copa">
-            <span class="num">2</span>
-            <div class="card">
-                <div class="info">
-                    <h2>Copa Nacional</h2>
-                    <p class="desc">Chaveamento circular com confrontos clicáveis, uniformes e comemoração do campeão.</p>
-                    <p class="status" id="status-copa"></p>
-                </div>
-                <a class="btn btn-verde" id="link-copa">Abrir Copa</a>
-            </div>
-        </li>
-    </ol>
+<div class="topbar">
+  <button class="menu-btn" id="btnMenu" aria-expanded="false" aria-controls="drawer">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    <span>Times</span><span class="cont" id="contBtn"></span>
+  </button>
+</div>
 
-    <p class="rodape">Os resultados ficam salvos neste navegador.</p>
+<div class="scrim" id="scrim"></div>
 
-    <script src="shared/hub-data.js"></script>
-    <script>
-        // Endereços dos projetos, relativos a esta página (dentro de /mainFut/).
-        const SITES = {
-            campeonato: 'campeonato/',
-            copa: 'copa/'
-        };
+<aside class="drawer" id="drawer" aria-label="Lista de times" inert>
+  <div class="drawer-head">
+    <h2>Times em ordem alfabética</h2>
+    <span class="qtd" id="qtd"></span>
+    <button class="fechar" id="btnFecharMenu" aria-label="Fechar menu">×</button>
+  </div>
+  <input class="busca" id="busca" type="search" placeholder="Buscar por nome, cidade ou estado" aria-label="Buscar time" autocomplete="off">
+  <div class="lista" id="lista"></div>
+</aside>
 
-        // Dados gravados pelos outros sites (ver shared/hub-data.js).
-        const progresso = HubData.get('campeonato:progresso');
-        const campeaoCampeonato = HubData.get('campeonato:campeao');
-        const classificados = HubData.get('campeonato:classificados');
-        const campeaoCopa = HubData.get('copa:campeao');
+<main class="hero">
+  <h1>mainFut</h1>
+  <p class="lead">Escudos, uniformes, mascotes e federações dos times da base.</p>
+  <p class="stats" id="stats">Carregando base de times…</p>
+  <button class="cta" id="btnAbrir" disabled>Ver lista de times</button>
+</main>
 
-        const estado = {
-            campeonato: {
-                texto: campeaoCampeonato
-                    ? `Campeão dos playoffs: ${campeaoCampeonato.nome}`
-                    : (progresso ? `${progresso.concluidas} de ${progresso.total} temporadas concluídas` : 'Nenhuma temporada simulada ainda.'),
-                ok: !!campeaoCampeonato
-            },
-            copa: {
-                texto: campeaoCopa
-                    ? `Campeão: ${campeaoCopa.nome}`
-                    : (classificados && classificados.length
-                        ? `${classificados.length} vagas diretas definidas pelo campeonato.`
-                        : 'Sorteio livre: nenhum classificado do campeonato ainda.'),
-                ok: !!campeaoCopa
-            }
-        };
+<dialog id="modal" aria-labelledby="mNome">
+  <div class="card" id="card"></div>
+</dialog>
 
-        Object.keys(estado).forEach(chave => {
-            document.getElementById('status-' + chave).textContent = estado[chave].texto;
-            document.getElementById('etapa-' + chave).classList.toggle('concluida', estado[chave].ok);
-            document.getElementById('link-' + chave).href = SITES[chave];
-        });
-    </script>
+<dialog id="visualizador" aria-label="Imagem ampliada">
+  <figure><img id="vImg" alt=""><figcaption id="vLeg"></figcaption></figure>
+</dialog>
+
+<script>
+const ESTADOS = {
+  AC:"Acre", AL:"Alagoas", AP:"Amapá", AM:"Amazonas", BA:"Bahia", CE:"Ceará", DF:"Distrito Federal",
+  ES:"Espírito Santo", GO:"Goiás", MA:"Maranhão", MT:"Mato Grosso", MS:"Mato Grosso do Sul",
+  MG:"Minas Gerais", PA:"Pará", PB:"Paraíba", PR:"Paraná", PE:"Pernambuco", PI:"Piauí",
+  RJ:"Rio de Janeiro", RN:"Rio Grande do Norte", RS:"Rio Grande do Sul", RO:"Rondônia",
+  RR:"Roraima", SC:"Santa Catarina", SP:"São Paulo", SE:"Sergipe", TO:"Tocantins"
+};
+const REGIOES = { norte:"Norte", nordeste:"Nordeste", centro_oeste:"Centro-Oeste", sudeste:"Sudeste", sul:"Sul" };
+
+const $ = id => document.getElementById(id);
+let times = [];
+
+// ---------- Utilidades ----------
+function el(tag, cls, texto) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (texto != null) e.textContent = texto;
+  return e;
+}
+function semAcento(s) {
+  return String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+}
+function imagem(src, alt, aoFalhar) {
+  const i = new Image();
+  i.alt = alt || "";
+  i.onerror = () => aoFalhar ? aoFalhar(i) : i.remove();
+  i.src = src;
+  return i;
+}
+function badge(t, tamanho, comoBotao) {
+  const b = el(comoBotao ? "button" : "div", "badge " + tamanho);
+  if (comoBotao) b.type = "button";
+  const sigla = () => b.replaceChildren(el("span", "sigla", t.sigla || t.nome.charAt(0)));
+  if (t.escudo) b.append(imagem(t.escudo, "Escudo do " + t.nome, sigla)); else sigla();
+  return b;
+}
+function nomeDaCor(caminho) {
+  const base = caminho.split("/").pop().replace(/\.[a-z]+$/i, "");
+  return base.charAt(0).toUpperCase() + base.slice(1);
+}
+
+// ---------- Carregar a base ----------
+async function carregar() {
+  try {
+    const r = await fetch("times.json", { cache: "no-cache" });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const dados = await r.json();
+    const lista = Array.isArray(dados) ? dados : dados.times;
+    if (!Array.isArray(lista)) throw new Error("formato");
+    times = lista.slice().sort((a, b) =>
+      a.nome.localeCompare(b.nome, "pt-BR", { sensitivity: "base" }) || a.uf.localeCompare(b.uf));
+    const estados = new Set(times.map(t => t.uf)).size;
+    $("stats").textContent = `${times.length} times em ${estados} ${estados === 1 ? "estado" : "estados"}`;
+    $("contBtn").textContent = times.length;
+    $("btnAbrir").disabled = false;
+    desenharLista();
+  } catch (e) {
+    const s = $("stats");
+    s.className = "stats erro";
+    s.textContent = "Não consegui carregar o times.json. Se você abriu o arquivo direto do computador, use um servidor local (python -m http.server) ou publique no GitHub Pages.";
+  }
+}
+
+// ---------- Menu lateral ----------
+function abrirMenu() {
+  $("drawer").inert = false;
+  $("drawer").classList.add("open");
+  $("scrim").classList.add("open");
+  $("btnMenu").setAttribute("aria-expanded", "true");
+  $("busca").focus();
+}
+function fecharMenu() {
+  $("drawer").classList.remove("open");
+  $("scrim").classList.remove("open");
+  $("drawer").inert = true;
+  $("btnMenu").setAttribute("aria-expanded", "false");
+  $("btnMenu").focus();
+}
+
+function desenharLista() {
+  const termo = semAcento($("busca").value.trim());
+  const filtrados = times.filter(t => !termo ||
+    semAcento([t.nome, t.cidade, t.uf, ESTADOS[t.uf], t.sigla].join(" ")).includes(termo));
+  const lista = $("lista");
+  lista.replaceChildren();
+  $("qtd").textContent = termo ? `${filtrados.length} de ${times.length}` : `${times.length}`;
+
+  if (!filtrados.length) {
+    lista.append(el("div", "nada", "Nenhum time encontrado."));
+    return;
+  }
+  let letraAtual = "";
+  filtrados.forEach(t => {
+    const letra = semAcento(t.nome).charAt(0).toUpperCase();
+    if (letra !== letraAtual) { letraAtual = letra; lista.append(el("div", "letra", letra)); }
+    const b = el("button", "item");
+    b.type = "button";
+    const txt = el("span", "txt");
+    txt.append(el("span", "nome", t.nome), el("span", "sub", t.cidade || ESTADOS[t.uf] || ""));
+    b.append(badge(t, "sm"), txt, el("span", "uf-tag", t.uf));
+    b.onclick = () => abrirTime(t);
+    lista.append(b);
+  });
+}
+
+// ---------- Janela do time ----------
+function caixaImagem(titulo, src, legenda, rodape) {
+  const box = el("div", "kit");
+  box.append(el("span", "kit-t", titulo));
+  const b = el("button", "kit-img");
+  b.type = "button";
+  const vazio = () => { b.disabled = true; b.removeAttribute("aria-label"); b.replaceChildren(el("span", "kit-vazio", "Sem foto")); };
+  if (!src) vazio();
+  else {
+    b.setAttribute("aria-label", "Ampliar: " + titulo);
+    b.append(imagem(src, titulo, vazio));
+    b.onclick = () => abrirVisualizador(src, legenda);
+  }
+  box.append(b);
+  if (rodape) box.append(el("span", "kit-n", rodape));
+  return box;
+}
+
+function linhaInfo(dl, rotulo, valor) {
+  if (valor == null || valor === "") return;
+  const d = el("div");
+  d.append(el("dt", null, rotulo), el("dd", null, String(valor)));
+  dl.append(d);
+}
+
+function abrirTime(t) {
+  const card = $("card");
+  card.replaceChildren();
+
+  const fechar = el("button", "fechar", "×");
+  fechar.type = "button";
+  fechar.setAttribute("aria-label", "Fechar");
+  fechar.onclick = () => $("modal").close();
+
+  const escudo = badge(t, "lg", true);
+  if (t.escudo) escudo.onclick = () => abrirVisualizador(t.escudo, "Escudo do " + t.nome);
+  const titulo = el("h3", null, t.nome);
+  titulo.id = "mNome";
+  const local = el("p", "local", [t.cidade, t.uf].filter(Boolean).join(" · "));
+  card.append(fechar, escudo, titulo, local);
+
+  // Dados gerais
+  const sec1 = el("div", "sec");
+  sec1.append(el("h4", null, "Informações"));
+  const dl = el("dl", "info");
+  linhaInfo(dl, "Sigla", t.sigla);
+  linhaInfo(dl, "Cidade", t.cidade);
+  linhaInfo(dl, "Estado", `${ESTADOS[t.uf] || t.uf} (${t.uf})`);
+  linhaInfo(dl, "Região", REGIOES[t.regiao] || t.regiao);
+  linhaInfo(dl, "Fundação", t.fundacao);
+  linhaInfo(dl, "Série", t.serie ? "Série " + t.serie : null);
+  sec1.append(dl);
+  card.append(sec1);
+
+  // Federação
+  const fed = (t.federacao && typeof t.federacao === "object") ? t.federacao : {};
+  if (fed.sigla || fed.imagem) {
+    const sec = el("div", "sec");
+    sec.append(el("h4", null, "Federação"));
+    const linha = el("div", "fed");
+    if (fed.imagem) linha.append(imagem(fed.imagem, "Federação " + (fed.sigla || "")));
+    if (fed.sigla) linha.append(el("span", null, fed.sigla));
+    sec.append(linha);
+    card.append(sec);
+  }
+
+  // Cores
+  const secC = el("div", "sec");
+  secC.append(el("h4", null, "Cores"));
+  const cores = Array.isArray(t.cores) ? t.cores : [];
+  if (cores.length) {
+    const caixa = el("div", "cores");
+    cores.forEach(c => {
+      const chip = el("span", "cor");
+      chip.append(imagem(c, "", i => { i.remove(); chip.classList.add("sem-img"); }), document.createTextNode(nomeDaCor(c)));
+      caixa.append(chip);
+    });
+    secC.append(caixa);
+  } else {
+    secC.append(el("span", "vazio-txt", "Sem cores marcadas"));
+  }
+  card.append(secC);
+
+  // Uniformes e mascote
+  const u = t.uniformes || {};
+  const m = t.mascote || {};
+  const secU = el("div", "sec");
+  secU.append(el("h4", null, "Uniformes e mascote"));
+  const kits = el("div", "kits");
+  kits.append(
+    caixaImagem("Titular", u.titular, `${t.nome} – uniforme titular`),
+    caixaImagem("Reserva", u.reserva, `${t.nome} – uniforme reserva`),
+    caixaImagem("Mascote", m.imagem, `${t.nome} – mascote${m.nome ? " (" + m.nome + ")" : ""}`, m.nome)
+  );
+  secU.append(kits);
+  card.append(secU);
+
+  $("modal").showModal();
+}
+
+// ---------- Visualizador de imagem ----------
+function abrirVisualizador(src, legenda) {
+  $("vImg").src = src;
+  $("vImg").alt = legenda || "";
+  $("vLeg").textContent = legenda || "";
+  $("visualizador").showModal();
+}
+
+// ---------- Eventos ----------
+$("btnMenu").onclick = () => $("drawer").classList.contains("open") ? fecharMenu() : abrirMenu();
+$("btnAbrir").onclick = abrirMenu;
+$("btnFecharMenu").onclick = fecharMenu;
+$("scrim").onclick = fecharMenu;
+$("busca").addEventListener("input", desenharLista);
+$("modal").addEventListener("click", e => { if (e.target === $("modal")) $("modal").close(); });
+$("visualizador").addEventListener("click", () => $("visualizador").close());
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && !document.querySelector("dialog[open]") && $("drawer").classList.contains("open")) fecharMenu();
+});
+
+carregar();
+</script>
 </body>
 </html>
