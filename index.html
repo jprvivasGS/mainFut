@@ -40,6 +40,19 @@
   .cta { background: var(--green); color: #fff; border: 0; border-radius: 8px; padding: 12px 24px; font-weight: 700; box-shadow: 0 4px 12px rgba(35,134,54,.4); transition: background .2s, transform .1s; }
   .cta:hover { background: var(--green-hover); transform: scale(1.02); }
   .cta:disabled { opacity: .5; cursor: default; transform: none; }
+  .cta.discreto { background: var(--panel-bg); color: var(--text-color); border: 1px solid var(--border-color); box-shadow: none; }
+  .cta.discreto:hover:not(:disabled) { background: #1c232c; border-color: var(--muted); }
+
+  /* ---------- Opções de campeonato e copa ---------- */
+  .opcoes { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; width: min(660px, 100%); margin: 10px 0 6px; }
+  .opcao { position: relative; display: flex; flex-direction: column; gap: 6px; text-align: left; text-decoration: none; background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px 46px 16px 18px; transition: border-color .2s, transform .15s, box-shadow .2s; }
+  .opcao:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.4), 0 0 15px var(--accent-glow); }
+  .opcao .op-tit { font-size: 1.15rem; font-weight: 700; color: var(--heading); }
+  .opcao .op-desc { font-size: .85rem; color: var(--muted); }
+  .opcao .op-status { margin-top: 4px; font-size: .8rem; font-weight: 600; color: var(--text-color); }
+  .opcao .op-status.ok { color: #3fb950; }
+  .opcao .seta { position: absolute; top: 18px; right: 18px; font-size: 1.2rem; color: var(--accent); transition: transform .15s; }
+  .opcao:hover .seta { transform: translateX(3px); }
 
   /* ---------- Menu lateral ---------- */
   .scrim { position: fixed; inset: 0; background: rgba(0,0,0,.55); opacity: 0; pointer-events: none; transition: opacity .25s; z-index: 60; }
@@ -65,6 +78,7 @@
   .item .nome { font-size: .85rem; color: var(--heading); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .item .sub { font-size: .72rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .uf-tag { font-size: .72rem; font-weight: 700; color: var(--muted); border: 1px solid var(--border-color); border-radius: 4px; padding: 0 6px; }
+  .bandeira-sm { flex: none; height: 18px; width: auto; max-width: 30px; object-fit: contain; border-radius: 2px; box-shadow: 0 0 0 1px var(--border-color); }
   .nada { padding: 20px 8px; color: var(--muted); font-size: .85rem; }
 
   /* ---------- Escudo redondo ---------- */
@@ -86,6 +100,10 @@
   @keyframes pop { from { transform: scale(.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
   .card .fechar { position: absolute; top: 10px; right: 12px; }
   .card h3 { margin: 10px 0 0; font-size: 1.2rem; color: var(--heading); text-align: center; }
+  .selos { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 12px; }
+  .selos:empty { display: none; }
+  .selos img { height: 32px; width: auto; max-width: 64px; object-fit: contain; }
+  .selos .bandeira { border-radius: 3px; box-shadow: 0 0 0 1px var(--border-color); }
   .card .local { margin: 0 0 14px; font-size: .85rem; color: var(--muted); text-align: center; }
   .sec { width: 100%; border-top: 1px solid var(--border-color); padding-top: 14px; margin-top: 8px; }
   .sec h4 { margin: 0 0 10px; font-size: .72rem; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); }
@@ -97,8 +115,10 @@
   .fed img { width: 34px; height: 34px; object-fit: contain; }
   .fed span { color: var(--heading); font-weight: 600; }
   .cores { display: flex; flex-wrap: wrap; gap: 8px; }
-  .cor { display: inline-flex; align-items: center; gap: 6px; background: var(--node-bg); border: 1px solid var(--border-color); border-radius: 999px; padding: 3px 10px 3px 4px; font-size: .8rem; color: var(--heading); }
-  .cor img { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; }
+  .cor { display: inline-flex; align-items: center; gap: 8px; background: var(--node-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 4px 10px 4px 4px; font-size: .8rem; color: var(--heading); }
+  .cor-q { flex: none; width: 24px; height: 24px; border-radius: 5px; overflow: hidden; border: 1px solid rgba(255,255,255,.18); background: var(--bg-main); }
+  .cor-q img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .cor-hex { font-size: .7rem; color: var(--muted); font-variant-numeric: tabular-nums; }
   .cor.sem-img { padding-left: 10px; }
   .vazio-txt { font-size: .85rem; color: #6e7681; }
   .kits { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
@@ -146,7 +166,21 @@
   <h1>mainFut</h1>
   <p class="lead">Escudos, uniformes, mascotes e federações dos times da base.</p>
   <p class="stats" id="stats">Carregando base de times…</p>
-  <button class="cta" id="btnAbrir" disabled>Ver lista de times</button>
+  <div class="opcoes">
+    <a class="opcao" id="linkCampeonato" href="campeonato/">
+      <span class="op-tit">Criar campeonato</span>
+      <span class="op-desc">Cinco séries com 20 times, 38 rodadas e, no fim, os playoffs entre as regiões.</span>
+      <span class="op-status" id="statusCampeonato"></span>
+      <span class="seta" aria-hidden="true">→</span>
+    </a>
+    <a class="opcao" id="linkCopa" href="copa/">
+      <span class="op-tit">Criar copa</span>
+      <span class="op-desc">Chaveamento circular com confrontos clicáveis, uniformes e comemoração do campeão.</span>
+      <span class="op-status" id="statusCopa"></span>
+      <span class="seta" aria-hidden="true">→</span>
+    </a>
+  </div>
+  <button class="cta discreto" id="btnAbrir" disabled>Ver lista de times</button>
 </main>
 
 <dialog id="modal" aria-labelledby="mNome">
@@ -157,6 +191,7 @@
   <figure><img id="vImg" alt=""><figcaption id="vLeg"></figcaption></figure>
 </dialog>
 
+<script src="shared/hub-data.js"></script>
 <script>
 const ESTADOS = {
   AC:"Acre", AL:"Alagoas", AP:"Amapá", AM:"Amazonas", BA:"Bahia", CE:"Ceará", DF:"Distrito Federal",
@@ -187,6 +222,52 @@ function imagem(src, alt, aoFalhar) {
   i.src = src;
   return i;
 }
+// Tenta cada endereço da lista até um carregar (para nomes de arquivo com mais de uma grafia)
+function imagemTentando(lista, alt, aoFalhar) {
+  const i = new Image();
+  let n = 0;
+  i.alt = alt || "";
+  i.onerror = () => {
+    n++;
+    if (n < lista.length) i.src = lista[n];
+    else if (aoFalhar) aoFalhar(i); else i.remove();
+  };
+  i.src = lista[0];
+  return i;
+}
+// Bandeira do estado (bandeiras/UF.png); sem a imagem, mostra a sigla da UF
+function bandeira(t, classe) {
+  const estado = ESTADOS[t.uf] || t.uf;
+  const i = imagem(`bandeiras/${t.uf}.png`, "Bandeira de " + estado, img => img.replaceWith(el("span", "uf-tag", t.uf)));
+  i.className = classe;
+  i.title = estado;
+  return i;
+}
+// Cor predominante da imagem em hexadecimal (null se o navegador bloquear a leitura dos pixels)
+function hexDominante(img) {
+  try {
+    const lado = 32;
+    const c = document.createElement("canvas");
+    c.width = c.height = lado;
+    const ctx = c.getContext("2d", { willReadFrequently: true });
+    ctx.drawImage(img, 0, 0, lado, lado);
+    const px = ctx.getImageData(0, 0, lado, lado).data;
+    const grupos = new Map();
+    for (let i = 0; i < px.length; i += 4) {
+      if (px[i + 3] < 128) continue;                         // ignora transparência
+      const k = ((px[i] >> 4) << 8) | ((px[i + 1] >> 4) << 4) | (px[i + 2] >> 4);
+      const g = grupos.get(k) || { n: 0, r: 0, g: 0, b: 0 };
+      g.n++; g.r += px[i]; g.g += px[i + 1]; g.b += px[i + 2];
+      grupos.set(k, g);
+    }
+    let melhor = null;
+    grupos.forEach(g => { if (!melhor || g.n > melhor.n) melhor = g; });
+    if (!melhor) return null;
+    return "#" + [melhor.r, melhor.g, melhor.b]
+      .map(v => Math.round(v / melhor.n).toString(16).padStart(2, "0")).join("").toUpperCase();
+  } catch (e) { return null; }
+}
+
 function badge(t, tamanho, comoBotao) {
   const b = el(comoBotao ? "button" : "div", "badge " + tamanho);
   if (comoBotao) b.type = "button";
@@ -257,7 +338,7 @@ function desenharLista() {
     b.type = "button";
     const txt = el("span", "txt");
     txt.append(el("span", "nome", t.nome), el("span", "sub", t.cidade || ESTADOS[t.uf] || ""));
-    b.append(badge(t, "sm"), txt, el("span", "uf-tag", t.uf));
+    b.append(badge(t, "sm"), txt, bandeira(t, "bandeira-sm"));
     b.onclick = () => abrirTime(t);
     lista.append(b);
   });
@@ -302,7 +383,17 @@ function abrirTime(t) {
   const titulo = el("h3", null, t.nome);
   titulo.id = "mNome";
   const local = el("p", "local", [t.cidade, t.uf].filter(Boolean).join(" · "));
-  card.append(fechar, escudo, titulo, local);
+  // Bandeira do estado e símbolo da região, entre o escudo e o texto
+  const selos = el("div", "selos");
+  selos.append(bandeira(t, "bandeira"));
+  if (t.regiao) {
+    const rotulo = "Região " + (REGIOES[t.regiao] || t.regiao);
+    const arquivos = [...new Set([t.regiao.replace(/_/g, "-"), t.regiao])].map(r => `regiao/${r}.png`);
+    const simbolo = imagemTentando(arquivos, rotulo);
+    simbolo.title = rotulo;
+    selos.append(simbolo);
+  }
+  card.append(fechar, escudo, selos, titulo, local);
 
   // Dados gerais
   const sec1 = el("div", "sec");
@@ -337,7 +428,16 @@ function abrirTime(t) {
     const caixa = el("div", "cores");
     cores.forEach(c => {
       const chip = el("span", "cor");
-      chip.append(imagem(c, "", i => { i.remove(); chip.classList.add("sem-img"); }), document.createTextNode(nomeDaCor(c)));
+      const quadrado = el("span", "cor-q");
+      const img = imagem(c, "", () => { quadrado.remove(); chip.classList.add("sem-img"); });
+      img.onload = () => {                                   // mostra o hex lido da imagem
+        const hex = hexDominante(img);
+        if (!hex) return;
+        chip.append(el("span", "cor-hex", hex));
+        chip.title = nomeDaCor(c) + " " + hex;
+      };
+      quadrado.append(img);
+      chip.append(quadrado, document.createTextNode(nomeDaCor(c)));
       caixa.append(chip);
     });
     secC.append(caixa);
@@ -383,6 +483,35 @@ document.addEventListener("keydown", e => {
   if (e.key === "Escape" && !document.querySelector("dialog[open]") && $("drawer").classList.contains("open")) fecharMenu();
 });
 
+// ---------- Campeonato e Copa ----------
+// Endereços dos projetos, relativos a esta página (ajuste se as pastas tiverem outro nome).
+const SITES = { campeonato: "campeonato/", copa: "copa/" };
+
+// Lê o que os outros sites gravaram (contrato em shared/hub-data.js); sem o arquivo, fica sem status.
+function lerHub(chave) {
+  return (typeof HubData !== "undefined") ? HubData.get(chave) : null;
+}
+function mostrarOpcoes() {
+  const progresso = lerHub("campeonato:progresso");
+  const campeaoCamp = lerHub("campeonato:campeao");
+  const classificados = lerHub("campeonato:classificados");
+  const campeaoCopa = lerHub("copa:campeao");
+  const status = {
+    Campeonato: campeaoCamp ? [`Campeão dos playoffs: ${campeaoCamp.nome}`, true]
+      : progresso ? [`${progresso.concluidas} de ${progresso.total} temporadas concluídas`, false]
+      : ["Nenhuma temporada simulada ainda.", false],
+    Copa: campeaoCopa ? [`Campeão: ${campeaoCopa.nome}`, true]
+      : (classificados && classificados.length) ? [`${classificados.length} vagas diretas definidas pelo campeonato.`, false]
+      : ["Sorteio livre: nenhum classificado do campeonato ainda.", false]
+  };
+  Object.keys(status).forEach(nome => {
+    $("link" + nome).href = SITES[nome.toLowerCase()];
+    $("status" + nome).textContent = status[nome][0];
+    $("status" + nome).classList.toggle("ok", status[nome][1]);
+  });
+}
+
+mostrarOpcoes();
 carregar();
 </script>
 </body>
