@@ -40,6 +40,24 @@ input,select { background:var(--bg); border:1px solid var(--line); border-radius
 .erros { margin:0 0 12px; padding-left:18px; color:var(--red); font-size:.9rem; }
 #q-res p { margin:0 0 12px; }
 
+/* escolha manual dos times */
+.board { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:10px; margin-top:10px; }
+.col { background:var(--bg); border:1px dashed var(--line); border-radius:10px; display:flex; flex-direction:column; min-height:150px; }
+.col[data-col=fora] { grid-column:span 2; }
+@media (max-width:520px) { .col[data-col=fora] { grid-column:auto; } }
+.col.over { border-color:var(--acc); border-style:solid; background:rgba(56,139,253,.08); }
+.col.cheia { border-style:solid; border-color:#2f6f3e; }
+.col-h { padding:8px 10px; border-bottom:1px solid var(--line); display:flex; flex-direction:column; gap:6px; font-size:.85rem; color:var(--head); }
+.col-h small { color:var(--mut); font-size:.75rem; } .col.cheia .col-h small { color:#3fb950; }
+.col-h input { width:100%; }
+.linha { display:flex; flex-wrap:wrap; gap:6px; }
+.col-l { padding:6px; overflow-y:auto; max-height:340px; display:flex; flex-direction:column; gap:4px; flex:1; }
+.tchip { display:flex; align-items:center; gap:7px; padding:4px 8px; background:var(--node); border:1px solid var(--line); border-radius:8px; font-size:.78rem; cursor:grab; user-select:none; }
+.tchip span { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.tchip .esc { flex:none; overflow:visible; }
+.tchip small { color:var(--mut); font-size:.68rem; }
+.tchip.sel { border-color:var(--acc); box-shadow:inset 0 0 0 1px var(--acc); background:rgba(56,139,253,.14); }
+
 /* temporada */
 .barra { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-bottom:14px; }
 .barra .esp { flex:1; }

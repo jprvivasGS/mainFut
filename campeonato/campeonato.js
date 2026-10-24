@@ -10,6 +10,7 @@ const h = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&l
 const rnd = n => Math.floor(Math.random() * n);
 const embaralhar = a => { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = rnd(i + 1); [b[i], b[j]] = [b[j], b[i]]; } return b; };
 const sigla = t => t.sigla || t.nome.slice(0, 3).toUpperCase();
+const sem = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
 let TIMES = [], T = new Map();          // base de times e busca por id
 let S = null;                            // competição em andamento (null = ainda no questionário)
@@ -140,6 +141,9 @@ function qRecalcular() {
   const n = pool().length, max = Math.max(1, Math.floor(n / 4));
   Q.nd = Math.min(Math.max(Q.nd || 1, 1), max);
   Q.tam = tamPadrao(n, Q.nd); Q.acc = accPadrao(Q.tam);
+  const livres = new Set(pool().map(t => t.id));
+  Q.alloc = Q.tam.map((t, i) => (Q.alloc[i] || []).filter(id => livres.has(id)).slice(0, t));
+  Q.sel.clear();
 }
 function qErros() {
   const e = [], n = pool().length, max = Math.floor(n / 4), soma = Q.tam.reduce((a, b) => a + b, 0);
@@ -148,6 +152,10 @@ function qErros() {
   Q.tam.forEach((t, i) => { if (!(t >= 4) || t % 2) e.push(`Série ${LETRAS[i]}: use um número par de times, a partir de 4.`); });
   if (soma > n) e.push(`As divisões somam ${soma} times, mas só há ${n} disponíveis.`);
   if (Q.pe > Q.pv) e.push("O empate não pode valer mais pontos que a vitória.");
+  if (Q.dist === "manual") {
+    const falta = Q.tam.map((t, i) => [i, (Q.alloc[i] || []).length]).filter(([i, q]) => q !== Q.tam[i]);
+    if (falta.length) e.push("Complete as séries: " + falta.slice(0, 4).map(([i, q]) => `Série ${LETRAS[i]} (${q}/${Q.tam[i]})`).join(", ") + (falta.length > 4 ? ` e mais ${falta.length - 4}` : "") + ".");
+  }
   Q.acc.forEach((a, k) => { if (!(a >= 0)) e.push(`Acesso entre as séries ${LETRAS[k]} e ${LETRAS[k + 1]}: informe um número válido.`); });
   Q.tam.forEach((t, i) => {              // quem sobe e quem desce na mesma série não pode passar do tamanho dela
     const mov = (i > 0 ? Q.acc[i - 1] : 0) + (i < Q.nd - 1 ? Q.acc[i] : 0);
@@ -157,7 +165,7 @@ function qErros() {
 }
 function questionario() {
   $("ano").hidden = true;
-  if (!Q) { Q = { reg: [...new Set(TIMES.map(t => t.regiao))], nd: 0, tam: [], acc: [], pv: 3, pe: 1, turnos: 2, sorteio: true }; Q.nd = Math.max(1, Math.round(pool().length / 20)); qRecalcular(); }
+  if (!Q) { Q = { reg: [...new Set(TIMES.map(t => t.regiao))], nd: 0, tam: [], acc: [], pv: 3, pe: 1, turnos: 2, dist: "sorteio", alloc: [], sel: new Set(), busca: "" }; Q.nd = Math.max(1, Math.round(pool().length / 20)); qRecalcular(); }
   const regs = [...new Set(TIMES.map(t => t.regiao))];
   $("app").innerHTML = `<div class="quest">
    <section class="card"><h2><span class="n">1</span>Quais times vão jogar?</h2>
@@ -172,9 +180,10 @@ function questionario() {
     <label>Pontos por vitória<input type="number" id="q-pv" min="1" max="5" value="${Q.pv}"></label>
     <label>Pontos por empate<input type="number" id="q-pe" min="0" max="3" value="${Q.pe}"></label>
     <label>Formato<select id="q-tn"><option value="2">Turno e returno</option><option value="1">Turno único</option></select></label>
-    <label>Distribuição dos times<select id="q-ds"><option value="1">Sorteio aleatório</option><option value="0">Ordem da base</option></select></label></div></section>
+    <label>Distribuição dos times<select id="q-ds"><option value="sorteio">Sorteio aleatório</option><option value="base">Ordem da base</option><option value="manual">Escolher manualmente</option></select></label></div></section>
+   <section class="card" id="q-c5" hidden><h2><span class="n">5</span>Monte as séries</h2><div id="q-board"></div></section>
    <section class="card"><div id="q-res"></div><button class="b verde" id="q-go" data-a="q-go">Começar competição</button></section></div>`;
-  $("q-tn").value = Q.turnos; $("q-ds").value = Q.sorteio ? "1" : "0";
+  $("q-tn").value = Q.turnos; $("q-ds").value = Q.dist; $("q-c5").hidden = Q.dist !== "manual";
   qParciais();
 }
 function qParciais() {                   // redesenha só o que depende das respostas anteriores
@@ -186,6 +195,7 @@ function qParciais() {                   // redesenha só o que depende das resp
   $("q-c3").hidden = Q.nd < 2;
   $("q-acc").innerHTML = Q.acc.map((a, k) => `<label>Série ${LETRAS[k]} ↔ ${LETRAS[k + 1]}<input type="number" data-acc="${k}" min="0" value="${a}"></label>`).join("");
   qRes();
+  if (Q.dist === "manual") qBoard();
   const novo = chave && document.querySelector(`[data-${chave}="${f.dataset[chave]}"]`);
   if (novo) novo.focus();                // devolve o foco ao mesmo campo depois de refeito
 }
@@ -195,10 +205,72 @@ function qRes() {
     : `<p>Tudo certo: ${Q.nd} ${Q.nd > 1 ? "divisões" : "divisão"} (${Q.tam.join(" + ")} times)${fora > 0 ? `, ${fora} ${fora > 1 ? "times ficam" : "time fica"} de fora` : ""}.</p>`;
   $("q-go").disabled = e.length > 0;
 }
+/* ---------- Escolha manual: arrastar ou selecionar times para cada série ---------- */
+const nomeOrd = (a, b) => T.get(a).nome.localeCompare(T.get(b).nome, "pt-BR") || T.get(a).uf.localeCompare(T.get(b).uf);
+const tchip = id => {
+  const t = T.get(id), s = Q.sel.has(id);
+  return `<div class="tchip${s ? " sel" : ""}" draggable="true" tabindex="0" role="button" aria-pressed="${s}" data-id="${h(id)}">${esc(t)}<span>${h(t.nome)}</span><small>${h(t.uf)}</small></div>`;
+};
+function qLivres() {                     // times ainda sem série, filtrados pela busca
+  const usados = new Set(Q.alloc.flat()), termo = sem(Q.busca.trim());
+  return pool().map(t => t.id).filter(id => !usados.has(id) && (!termo || sem(`${T.get(id).nome} ${T.get(id).uf} ${sigla(T.get(id))}`).includes(termo)));
+}
+function qForaLista() {
+  const total = pool().length - Q.alloc.flat().length, l = qLivres();
+  $("fora-n").textContent = l.length === total ? total : `${l.length} de ${total}`;
+  $("fora-lista").innerHTML = l.map(tchip).join("") || `<p class="dica">Nenhum time aqui.</p>`;
+}
+function qSelInfo() {
+  const n = Q.sel.size;
+  $("q-selinfo").textContent = n ? `${n} selecionado${n > 1 ? "s" : ""}` : "Clique nos times para selecionar e use “Mover selecionados”, ou arraste.";
+  document.querySelectorAll("#q-board [data-a=q-mover]").forEach(b => b.disabled = !n);
+}
+function qBoard() {
+  const st = $("fora-lista") ? $("fora-lista").scrollTop : 0;
+  $("q-board").innerHTML = `<div class="acoes"><button class="b sim" data-a="q-sortear">🎲 Sortear os que faltam</button><button class="b" data-a="q-esvaziar">Esvaziar séries</button><span class="dica" id="q-selinfo"></span></div>
+   <div class="board"><div class="col" data-col="fora"><div class="col-h"><b>Fora da competição (<span id="fora-n"></span>)</b>
+     <input id="q-busca" type="search" placeholder="Buscar time" aria-label="Buscar time" value="${h(Q.busca)}">
+     <div class="linha"><button class="b peq" data-a="q-selvis">Selecionar listados</button><button class="b peq" data-a="q-mover" data-v="fora">Devolver</button></div></div><div class="col-l" id="fora-lista"></div></div>
+    ${Q.alloc.map((l, i) => `<div class="col${l.length === Q.tam[i] ? " cheia" : ""}" data-col="${i}"><div class="col-h"><b>Série ${LETRAS[i]} <small>${l.length}/${Q.tam[i]}</small></b>
+     <button class="b peq" data-a="q-mover" data-v="${i}">Mover selecionados</button></div><div class="col-l">${[...l].sort(nomeOrd).map(tchip).join("")}</div></div>`).join("")}</div>`;
+  qForaLista(); $("fora-lista").scrollTop = st; qSelInfo();
+}
+function qColunas() {                   // atualiza contagens e times das séries sem trocar os botões (não perde cliques)
+  document.querySelectorAll("#q-board .col").forEach(col => {
+    const i = col.dataset.col; if (i === "fora") return;
+    const l = Q.alloc[i] || [];
+    col.classList.toggle("cheia", l.length === Q.tam[i]);
+    col.querySelector(".col-h small").textContent = `${l.length}/${Q.tam[i]}`;
+    col.querySelector(".col-l").innerHTML = [...l].sort(nomeOrd).map(tchip).join("");
+  });
+  qForaLista(); qSelInfo();
+}
+function qMover(ids, col) {              // col = "fora" ou o índice da série
+  const dest = col === "fora" ? -1 : +col;
+  let mover = ids.filter(id => !(dest >= 0 && Q.alloc[dest].includes(id)));
+  if (dest >= 0) {
+    const livre = Q.tam[dest] - Q.alloc[dest].length;
+    if (mover.length > livre) { aviso(`A Série ${LETRAS[dest]} só tem ${livre} vaga${livre === 1 ? "" : "s"} livre${livre === 1 ? "" : "s"}.`, true); mover = mover.slice(0, Math.max(livre, 0)); }
+  }
+  Q.alloc.forEach(l => mover.forEach(id => { const i = l.indexOf(id); if (i >= 0) l.splice(i, 1); }));
+  if (dest >= 0) Q.alloc[dest].push(...mover);
+  Q.sel.clear(); qBoard(); qRes();
+}
+function qSortearFaltantes() {           // completa as vagas abertas com times que estão fora
+  const livres = embaralhar(pool().map(t => t.id).filter(id => !Q.alloc.some(l => l.includes(id))));
+  Q.alloc.forEach((l, i) => { while (l.length < Q.tam[i] && livres.length) l.push(livres.pop()); });
+  Q.sel.clear(); qBoard(); qRes();
+}
+function qPick(c) {
+  const id = c.dataset.id, marcar = !Q.sel.has(id);
+  marcar ? Q.sel.add(id) : Q.sel.delete(id);
+  c.classList.toggle("sel", marcar); c.setAttribute("aria-pressed", marcar); qSelInfo();
+}
+
 function comecar() {
-  const ids = (Q.sorteio ? embaralhar : x => x)(pool().map(t => t.id)); let p = 0;
+  const ids = (Q.dist === "sorteio" ? embaralhar : x => x)(pool().map(t => t.id)); let p = 0;
   S = { cfg: { pv: Q.pv, pe: Q.pe, turnos: Q.turnos, acc: Q.acc.slice(0, Q.nd - 1) }, ano: 1, deducoes: [], historico: [],
-        divs: Q.tam.map(t => ids.slice(p, p += t)) };
+        divs: Q.dist === "manual" ? Q.alloc.map(l => embaralhar(l)) : Q.tam.map(t => ids.slice(p, p += t)) };
   montarFix(); ui = { aba: "temporada", div: 0, rodada: 1 }; salvarLocal(); desenhar();
 }
 
@@ -285,6 +357,10 @@ function acao(a, v) {
   const d = ui.div;
   switch (a) {
     case "q-go": return comecar();
+    case "q-sortear": return qSortearFaltantes();
+    case "q-esvaziar": Q.alloc = Q.alloc.map(() => []); Q.sel.clear(); qBoard(); return qRes();
+    case "q-mover": return qMover([...Q.sel], v);
+    case "q-selvis": qLivres().forEach(id => Q.sel.add(id)); return qBoard();
     case "aba": ui.aba = v; return desenhar();
     case "div": ui.div = +v; ui.rodada = 1; return desenhar();
     case "prev": case "next": ui.rodada = Math.min(Math.max(ui.rodada + (a === "next" ? 1 : -1), 1), S.fix[d].length); return desenharRodada();
@@ -305,17 +381,38 @@ function acao(a, v) {
   }
   salvarLocal(); desenhar();
 }
-$("app").addEventListener("click", e => { const b = e.target.closest("[data-a]"); if (b && !b.disabled) acao(b.dataset.a, b.dataset.v); });
+$("app").addEventListener("click", e => {
+  const c = e.target.closest(".tchip"); if (c) return qPick(c);
+  const b = e.target.closest("[data-a]"); if (b && !b.disabled) acao(b.dataset.a, b.dataset.v);
+});
+$("app").addEventListener("input", e => { if (e.target.id === "q-busca") { Q.busca = e.target.value; qForaLista(); } });
+$("app").addEventListener("keydown", e => { if ((e.key === "Enter" || e.key === " ") && e.target.classList && e.target.classList.contains("tchip")) { e.preventDefault(); qPick(e.target); } });
+$("app").addEventListener("dragstart", e => {                 // arrastar um time (ou todos os selecionados)
+  const c = e.target.closest && e.target.closest(".tchip"); if (!c) return;
+  e.dataTransfer.setData("text/plain", JSON.stringify(Q.sel.has(c.dataset.id) ? [...Q.sel] : [c.dataset.id]));
+  e.dataTransfer.effectAllowed = "move";
+});
+$("app").addEventListener("dragover", e => {
+  const col = e.target.closest && e.target.closest(".col"); if (!col) return;
+  e.preventDefault();
+  document.querySelectorAll(".col.over").forEach(x => x !== col && x.classList.remove("over")); col.classList.add("over");
+});
+$("app").addEventListener("drop", e => {
+  const col = e.target.closest && e.target.closest(".col"); if (!col) return;
+  e.preventDefault(); document.querySelectorAll(".col.over").forEach(x => x.classList.remove("over"));
+  try { qMover(JSON.parse(e.dataTransfer.getData("text/plain")), col.dataset.col); } catch (x) { /* arrasto de outra coisa: ignora */ }
+});
+$("app").addEventListener("dragend", () => document.querySelectorAll(".col.over").forEach(x => x.classList.remove("over")));
 $("app").addEventListener("change", e => {
   const el = e.target, d = el.dataset, v = +el.value;
   if (d.reg) { Q.reg = el.checked ? [...Q.reg, d.reg] : Q.reg.filter(r => r !== d.reg); qRecalcular(); $("q-nd").value = Q.nd; setTimeout(qParciais, 0); }
   else if (el.id === "q-nd") { if ((v || 1) !== Q.nd) { Q.nd = v || 1; qRecalcular(); setTimeout(qParciais, 0); } el.value = Q.nd; }
-  else if (d.tam) { Q.tam[d.tam] = v; qRes(); }
+  else if (d.tam) { Q.tam[d.tam] = v; Q.alloc[d.tam] = (Q.alloc[d.tam] || []).slice(0, v || 0); if (Q.dist === "manual") qColunas(); qRes(); }
   else if (d.acc) { Q.acc[d.acc] = v; qRes(); }
   else if (el.id === "q-pv") { Q.pv = v; qRes(); }
   else if (el.id === "q-pe") { Q.pe = v; qRes(); }
   else if (el.id === "q-tn") Q.turnos = v;
-  else if (el.id === "q-ds") Q.sorteio = el.value === "1";
+  else if (el.id === "q-ds") { Q.dist = el.value; $("q-c5").hidden = Q.dist !== "manual"; if (Q.dist === "manual") qBoard(); qRes(); }
   else if (d.j) {                        // placar digitado à mão
     const m = S.fix[ui.div][ui.rodada - 1][+d.j];
     m[d.l === "c" ? "gc" : "gf"] = el.value === "" ? null : Math.max(0, parseInt(el.value));
