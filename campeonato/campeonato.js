@@ -348,7 +348,7 @@ function vTemporada() {
     <span class="anos"><input id="nAnos" type="number" min="1" max="100" value="5" aria-label="Quantidade de anos"><button class="b" data-a="anos">Simular anos</button></span></div>
    <div class="grid">
     <section class="card"><div class="ctit"><span id="titulo"></span><button class="b peq" data-a="limpar">Limpar série</button></div>
-     <div class="rolagem"><table><thead><tr><th>Clube</th><th>P</th><th>J</th><th>V</th><th>E</th><th>D</th><th>GP</th><th>GC</th><th>SG</th>${(S.cfg.comps || []).length ? "<th>Vaga</th>" : ""}</tr></thead><tbody id="tabela"></tbody></table></div>
+     <div class="rolagem"><table><thead><tr><th>Clube</th><th>P</th><th>J</th><th>V</th><th>E</th><th>D</th><th>GP</th><th>GC</th><th>SG</th>${(S.cfg.comps || []).length ? "<th><span class=\"so-leitor\">Vaga externa</span></th>" : ""}</tr></thead><tbody id="tabela"></tbody></table></div>
      <div class="legenda" id="legenda"></div></section>
     <section class="card"><div class="ctit">Confrontos</div>
      <div class="rod"><button class="b peq" data-a="prev" id="bp">❮</button><span id="rod-label"></span><button class="b peq" data-a="next" id="bn">❯</button></div>
@@ -363,9 +363,12 @@ function desenharTabela() {
   const sobe = d > 0 ? n[d - 1] : 0, desce = d < ult ? n[d] : 0;
   $("titulo").textContent = `Série ${LETRAS[d]}`;
   $("tabela").innerHTML = L.map((x, i) => {
-    const z = d === 0 && i === 0 ? "z-top" : i < sobe ? "z-up" : desce && i >= L.length - desce ? "z-down" : "";
-    return `<tr class="${z}"><td><div class="cl"><span class="pos">${i + 1}</span>${esc(x.t)}<span>${h(x.t.nome)}</span><span class="uf">${h(x.t.uf)}</span></div></td>
-      <td><strong>${x.P}</strong>${x.ded ? `<span class="ded" title="Pontos deduzidos">−${x.ded}</span>` : ""}</td><td>${x.J}</td><td>${x.V}</td><td>${x.E}</td><td>${x.D}</td><td>${x.GP}</td><td>${x.GC}</td><td>${x.SG}</td>${K ? `<td>${pill(K.por.get(x.t.id))}<button class="mini" data-a="ext-sel" data-v="${h(x.t.id)}" title="Marcar vaga externa" aria-label="Marcar vaga externa para ${h(x.t.nome)}">🏆</button></td>` : ""}</tr>`;
+    const q = K && K.por.get(x.t.id);
+    const zona = d === 0 && i === 0 ? "var(--gold)" : i < sobe ? "#3fb950" : desce && i >= L.length - desce ? "var(--red)" : "";
+    const vaga = q ? COR_COMP[q.c % COR_COMP.length] : "";
+    const barra = zona && vaga ? `inset 3px 0 0 ${zona}, inset 6px 0 0 ${vaga}` : zona || vaga ? `inset 3px 0 0 ${zona || vaga}` : "";
+    return `<tr><td style="box-shadow:${barra || "none"}" title="${q ? h(descVaga(q)) : ""}"><div class="cl"><span class="pos">${i + 1}</span>${esc(x.t)}<span>${h(x.t.nome)}</span><span class="uf">${h(x.t.uf)}</span></div></td>
+      <td><strong>${x.P}</strong>${x.ded ? `<span class="ded" title="Pontos deduzidos">−${x.ded}</span>` : ""}</td><td>${x.J}</td><td>${x.V}</td><td>${x.E}</td><td>${x.D}</td><td>${x.GP}</td><td>${x.GC}</td><td>${x.SG}</td>${K ? `<td><button class="mini" data-a="ext-sel" data-v="${h(x.t.id)}" title="Marcar vaga externa" aria-label="Marcar vaga externa para ${h(x.t.nome)}">🏆</button></td>` : ""}</tr>`;
   }).join("");
   $("legenda").innerHTML = [d === 0 && ["z-top", "Campeão"], sobe && ["z-up", `Acesso (${sobe})`], desce && ["z-down", `Rebaixamento (${desce})`]]
     .filter(Boolean).map(([c, t]) => `<span><i class="${c}"></i>${t}</span>`).join("")
@@ -373,11 +376,9 @@ function desenharTabela() {
   desenharClassif(K);
 }
 const COR_COMP = ["#58a6ff", "#f0883e", "#bc8cff", "#3fb950", "#d29922", "#f778ba"];
-function pill(q) {                       // etiqueta da vaga na tabela
-  if (!q) return "";
+function descVaga(q) {                   // texto da dica ao passar o mouse na barra colorida
   const c = S.cfg.comps[q.c];
-  const t = q.tipo === "externa" ? "vaga externa" + (q.motivo ? ": " + q.motivo : "") : q.herdou ? `herdou a vaga (${q.pos}º colocado)` : `${q.pos}º colocado`;
-  return `<span class="vaga${q.tipo === "externa" ? " ext" : ""}${q.herdou ? " her" : ""}" style="--c:${COR_COMP[q.c % COR_COMP.length]}" title="${h(c.nome + " – " + t)}">${h(c.sigla || c.nome.slice(0, 3).toUpperCase())}</span>`;
+  return c.nome + " – " + (q.tipo === "externa" ? "vaga externa" + (q.motivo ? ": " + q.motivo : "") : q.herdou ? `herdou a vaga (${q.pos}º colocado)` : `${q.pos}º colocado`);
 }
 function desenharClassif(K) {
   const el = $("classif"); if (!el || !K) return;
