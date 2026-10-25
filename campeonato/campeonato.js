@@ -72,11 +72,36 @@ function tabela(d) {
   return L.sort((a, b) => b.P - a.P || b.V - a.V || b.SG - a.SG || b.GP - a.GP || a.t.nome.localeCompare(b.t.nome, "pt-BR"));
 }
 
+/* ---------- Vagas internacionais (recalculadas a cada mudança) ---------- */
+function classificar() {
+  const comps = S.cfg.comps || [];
+  if (!comps.length) return null;
+  const rank = tabela(0).map(x => x.t.id), ja = new Map(), lista = comps.map(() => []);
+  let ini = 0;                           // posições já "reservadas" pelas competições anteriores
+  comps.forEach((c, ci) => {
+    let vagas = c.vagas;
+    S.ext.filter(x => x.comp === ci && T.has(x.id)).forEach(x => {
+      if (ja.has(x.id)) { vagas++; return; }                           // já tem vaga melhor: esta passa para o próximo da fila
+      const q = { c: ci, id: x.id, tipo: "externa", motivo: x.motivo };
+      ja.set(x.id, q); lista[ci].push(q);
+    });
+    rank.forEach((id, i) => {            // o time externo não ocupa vaga da tabela, então o próximo colocado herda
+      if (vagas <= 0 || ja.has(id)) return;
+      const q = { c: ci, id, tipo: "liga", pos: i + 1, herdou: i + 1 > ini + c.vagas };
+      ja.set(id, q); lista[ci].push(q); vagas--;
+    });
+    lista[ci].sort((a, b) => (a.tipo === "externa") - (b.tipo === "externa") || (a.pos || 0) - (b.pos || 0));
+    ini += c.vagas;
+  });
+  return { comps: lista, por: ja };
+}
+
 /* ---------- Fim de temporada: acesso e descenso ---------- */
 function encerrar() {
-  const rank = S.divs.map((_, d) => tabela(d)), ids = rank.map(l => l.map(x => x.t.id)), n = S.cfg.acc;
+  const K = classificar(), rank = S.divs.map((_, d) => tabela(d)), ids = rank.map(l => l.map(x => x.t.id)), n = S.cfg.acc;
   const reg = {
     ano: S.ano,
+    classif: K ? K.comps.map(l => l.map(q => [q.id, q.tipo])) : [],
     divs: rank.map(l => l.map(x => [x.t.id, x.P])),
     sobem: n.map((q, k) => ids[k + 1].slice(0, q)),                     // topo da divisão k+1 sobe
     descem: n.map((q, k) => ids[k].slice(ids[k].length - q))            // fim da divisão k desce
@@ -86,7 +111,7 @@ function encerrar() {
     const sobe = d > 0 ? n[d - 1] : 0, desce = d < ids.length - 1 ? n[d] : 0;
     return embaralhar([...l.slice(sobe, l.length - desce), ...(d > 0 ? reg.descem[d - 1] : []), ...(d < ids.length - 1 ? reg.sobem[d] : [])]);
   });
-  S.ano++; S.deducoes = []; montarFix();
+  S.ano++; S.deducoes = []; S.ext = []; montarFix();
 }
 function simularAnos() {
   const k = Math.min(Math.max(parseInt($("nAnos").value) || 1, 1), 100);
@@ -97,14 +122,15 @@ function simularAnos() {
 
 /* ---------- Save ---------- */
 function paraJSON() {                    // só os placares: as rodadas são refeitas a partir da ordem dos times
-  return { versao: 1, ano: S.ano, cfg: S.cfg, divs: S.divs, deducoes: S.deducoes, historico: S.historico,
+  return { versao: 1, ano: S.ano, cfg: S.cfg, divs: S.divs, deducoes: S.deducoes, ext: S.ext, historico: S.historico,
     placar: S.fix.map(rs => rs.flatMap(r => r.map(m => (m.gc == null || m.gf == null) ? null : [m.gc, m.gf]))) };
 }
 function deJSON(o) {
   if (!o || !Array.isArray(o.divs) || !o.cfg) throw new Error("Arquivo de save inválido.");
   const falta = o.divs.flat().filter(id => !T.has(id));
   if (falta.length) throw new Error("A base não tem mais estes times: " + falta.slice(0, 5).join(", "));
-  S = { cfg: o.cfg, ano: o.ano, divs: o.divs, deducoes: o.deducoes || [], historico: o.historico || [] };
+  S = { cfg: o.cfg, ano: o.ano, divs: o.divs, deducoes: o.deducoes || [], ext: o.ext || [], historico: o.historico || [] };
+  S.cfg.comps = S.cfg.comps || [];       // saves antigos não tinham competições
   montarFix();
   S.fix.forEach((rs, d) => rs.flat().forEach((m, i) => { const p = o.placar?.[d]?.[i]; if (p) { m.gc = p[0]; m.gf = p[1]; } }));
   ui = { aba: "temporada", div: 0, rodada: 1 };
@@ -144,6 +170,8 @@ function qRecalcular() {
   const livres = new Set(pool().map(t => t.id));
   Q.alloc = Q.tam.map((t, i) => (Q.alloc[i] || []).filter(id => livres.has(id)).slice(0, t));
   Q.sel.clear();
+  let resto = Q.tam[0] || 0;             // as vagas internacionais não podem passar do tamanho da Série A
+  Q.comps.forEach(c => { c.vagas = Math.min(c.vagas, resto); resto -= c.vagas; });
 }
 function qErros() {
   const e = [], n = pool().length, max = Math.floor(n / 4), soma = Q.tam.reduce((a, b) => a + b, 0);
@@ -152,6 +180,12 @@ function qErros() {
   Q.tam.forEach((t, i) => { if (!(t >= 4) || t % 2) e.push(`Série ${LETRAS[i]}: use um número par de times, a partir de 4.`); });
   if (soma > n) e.push(`As divisões somam ${soma} times, mas só há ${n} disponíveis.`);
   if (Q.pe > Q.pv) e.push("O empate não pode valer mais pontos que a vitória.");
+  Q.comps.forEach((c, i) => {
+    if (!c.nome.trim()) e.push(`Competição ${i + 1}: informe o nome.`);
+    if (!Number.isInteger(c.vagas) || c.vagas < 0) e.push(`${c.nome || "Competição " + (i + 1)}: informe um número de vagas válido.`);
+  });
+  const pedidas = Q.comps.reduce((a, c) => a + (c.vagas || 0), 0);
+  if (pedidas > (Q.tam[0] || 0)) e.push(`As competições pedem ${pedidas} vagas, mas a Série A só tem ${Q.tam[0] || 0} times.`);
   if (Q.dist === "manual") {
     const falta = Q.tam.map((t, i) => [i, (Q.alloc[i] || []).length]).filter(([i, q]) => q !== Q.tam[i]);
     if (falta.length) e.push("Complete as séries: " + falta.slice(0, 4).map(([i, q]) => `Série ${LETRAS[i]} (${q}/${Q.tam[i]})`).join(", ") + (falta.length > 4 ? ` e mais ${falta.length - 4}` : "") + ".");
@@ -165,7 +199,8 @@ function qErros() {
 }
 function questionario() {
   $("ano").hidden = true;
-  if (!Q) { Q = { reg: [...new Set(TIMES.map(t => t.regiao))], nd: 0, tam: [], acc: [], pv: 3, pe: 1, turnos: 2, dist: "sorteio", alloc: [], sel: new Set(), busca: "" }; Q.nd = Math.max(1, Math.round(pool().length / 20)); qRecalcular(); }
+  if (!Q) { Q = { reg: [...new Set(TIMES.map(t => t.regiao))], nd: 0, tam: [], acc: [], pv: 3, pe: 1, turnos: 2, dist: "sorteio", alloc: [], sel: new Set(), busca: "",
+    comps: [{ nome: "Libertadores", vagas: 4 }, { nome: "Sul-Americana", vagas: 6 }] }; Q.nd = Math.max(1, Math.round(pool().length / 20)); qRecalcular(); }
   const regs = [...new Set(TIMES.map(t => t.regiao))];
   $("app").innerHTML = `<div class="quest">
    <section class="card"><h2><span class="n">1</span>Quais times vão jogar?</h2>
@@ -176,28 +211,47 @@ function questionario() {
     <p class="dica" id="q-max"></p><div class="campos" id="q-tam"></div></section>
    <section class="card" id="q-c3"><h2><span class="n">3</span>Acesso e descenso</h2>
     <p class="dica">O mesmo número sobe da divisão de baixo e desce da de cima, para as duas sempre manterem o tamanho.</p><div class="campos" id="q-acc"></div></section>
-   <section class="card"><h2><span class="n">4</span>Regras da tabela</h2><div class="campos">
+   <section class="card"><h2><span class="n">4</span>Competições internacionais</h2>
+    <p class="dica">As vagas saem da tabela da Série A, em ordem: a primeira competição fica com os melhores colocados. Na temporada você marca quem ganha vaga por fora e o próximo da fila herda a vaga.</p>
+    <div class="campos"><label>Quantas competições<input type="number" id="q-nc" min="0" max="6" value="${Q.comps.length}"></label></div>
+    <div class="campos" id="q-comps"></div></section>
+   <section class="card"><h2><span class="n">5</span>Regras da tabela</h2><div class="campos">
     <label>Pontos por vitória<input type="number" id="q-pv" min="1" max="5" value="${Q.pv}"></label>
     <label>Pontos por empate<input type="number" id="q-pe" min="0" max="3" value="${Q.pe}"></label>
     <label>Formato<select id="q-tn"><option value="2">Turno e returno</option><option value="1">Turno único</option></select></label>
     <label>Distribuição dos times<select id="q-ds"><option value="sorteio">Sorteio aleatório</option><option value="base">Ordem da base</option><option value="manual">Escolher manualmente</option></select></label></div></section>
-   <section class="card" id="q-c5" hidden><h2><span class="n">5</span>Monte as séries</h2><div id="q-board"></div></section>
+   <section class="card" id="q-c5" hidden><h2><span class="n">6</span>Monte as séries</h2><div id="q-board"></div></section>
    <section class="card"><div id="q-res"></div><button class="b verde" id="q-go" data-a="q-go">Começar competição</button></section></div>`;
   $("q-tn").value = Q.turnos; $("q-ds").value = Q.dist; $("q-c5").hidden = Q.dist !== "manual";
   qParciais();
 }
 function qParciais() {                   // redesenha só o que depende das respostas anteriores
-  const f = document.activeElement, chave = f && f.dataset && (f.dataset.tam != null ? "tam" : f.dataset.acc != null ? "acc" : null);
+  if (!$("q-pool")) return;               // o questionário já saiu da tela (ex.: clicou em Começar logo depois de editar)
+  const f = document.activeElement, chave = f && f.dataset && ["tam", "acc", "cn", "cv"].find(k => f.dataset[k] != null);
   const n = pool().length;
   $("q-pool").textContent = `${n} times selecionados.`;
   $("q-max").textContent = `Com ${n} times dá para ter até ${Math.floor(n / 4)} divisões (cada uma precisa de pelo menos 4 times).`;
   $("q-tam").innerHTML = Q.tam.map((t, i) => `<label>Times na Série ${LETRAS[i]}<input type="number" data-tam="${i}" min="4" step="2" value="${t}"></label>`).join("");
   $("q-c3").hidden = Q.nd < 2;
   $("q-acc").innerHTML = Q.acc.map((a, k) => `<label>Série ${LETRAS[k]} ↔ ${LETRAS[k + 1]}<input type="number" data-acc="${k}" min="0" value="${a}"></label>`).join("");
+  qComps();
   qRes();
   if (Q.dist === "manual") qBoard();
   const novo = chave && document.querySelector(`[data-${chave}="${f.dataset[chave]}"]`);
   if (novo) novo.focus();                // devolve o foco ao mesmo campo depois de refeito
+}
+function qHints() {                      // mostra quais posições da tabela cada competição pega
+  let ini = 0;
+  Q.comps.forEach((c, i) => {
+    const el = document.querySelector(`[data-h="${i}"]`), v = c.vagas || 0;
+    if (el) el.textContent = v ? `Posições ${ini + 1}º ao ${ini + v}º da Série A` : "Sem vagas pela tabela";
+    ini += v;
+  });
+}
+function qComps() {
+  $("q-comps").innerHTML = Q.comps.map((c, i) => `<div class="comp-q"><label>Competição ${i + 1}<input data-cn="${i}" maxlength="30" value="${h(c.nome)}"></label>
+    <label>Vagas pela tabela<input type="number" data-cv="${i}" min="0" value="${c.vagas}"></label><small class="dica" data-h="${i}"></small></div>`).join("");
+  qHints();
 }
 function qRes() {
   const e = qErros(), soma = Q.tam.reduce((a, b) => a + b, 0), fora = pool().length - soma;
@@ -269,7 +323,9 @@ function qPick(c) {
 
 function comecar() {
   const ids = (Q.dist === "sorteio" ? embaralhar : x => x)(pool().map(t => t.id)); let p = 0;
-  S = { cfg: { pv: Q.pv, pe: Q.pe, turnos: Q.turnos, acc: Q.acc.slice(0, Q.nd - 1) }, ano: 1, deducoes: [], historico: [],
+  S = { cfg: { pv: Q.pv, pe: Q.pe, turnos: Q.turnos, acc: Q.acc.slice(0, Q.nd - 1),
+          comps: Q.comps.map(c => ({ nome: c.nome.trim(), sigla: c.nome.trim().slice(0, 3).toUpperCase(), vagas: c.vagas })) },
+        ano: 1, deducoes: [], ext: [], historico: [],
         divs: Q.dist === "manual" ? Q.alloc.map(l => embaralhar(l)) : Q.tam.map(t => ids.slice(p, p += t)) };
   montarFix(); ui = { aba: "temporada", div: 0, rodada: 1 }; salvarLocal(); desenhar();
 }
@@ -292,25 +348,56 @@ function vTemporada() {
     <span class="anos"><input id="nAnos" type="number" min="1" max="100" value="5" aria-label="Quantidade de anos"><button class="b" data-a="anos">Simular anos</button></span></div>
    <div class="grid">
     <section class="card"><div class="ctit"><span id="titulo"></span><button class="b peq" data-a="limpar">Limpar série</button></div>
-     <div class="rolagem"><table><thead><tr><th>Clube</th><th>P</th><th>J</th><th>V</th><th>E</th><th>D</th><th>GP</th><th>GC</th><th>SG</th></tr></thead><tbody id="tabela"></tbody></table></div>
+     <div class="rolagem"><table><thead><tr><th>Clube</th><th>P</th><th>J</th><th>V</th><th>E</th><th>D</th><th>GP</th><th>GC</th><th>SG</th>${(S.cfg.comps || []).length ? "<th>Vaga</th>" : ""}</tr></thead><tbody id="tabela"></tbody></table></div>
      <div class="legenda" id="legenda"></div></section>
     <section class="card"><div class="ctit">Confrontos</div>
      <div class="rod"><button class="b peq" data-a="prev" id="bp">❮</button><span id="rod-label"></span><button class="b peq" data-a="next" id="bn">❯</button></div>
      <div id="jogos"></div></section></div>
-   <section class="card">${htmlPunicoes()}</section>`;
+   ${(S.cfg.comps || []).length ? `<section class="card" id="classif"></section>` : ""}
+   <section class="card">${htmlPunicoes()}</section>
+   ${(S.cfg.comps || []).length ? `<section class="card">${htmlExterno()}</section>` : ""}`;
   desenharTabela(); desenharRodada();
 }
 function desenharTabela() {
-  const d = ui.div, L = tabela(d), n = S.cfg.acc, ult = S.divs.length - 1;
+  const d = ui.div, L = tabela(d), K = classificar(), n = S.cfg.acc, ult = S.divs.length - 1;
   const sobe = d > 0 ? n[d - 1] : 0, desce = d < ult ? n[d] : 0;
   $("titulo").textContent = `Série ${LETRAS[d]}`;
   $("tabela").innerHTML = L.map((x, i) => {
     const z = d === 0 && i === 0 ? "z-top" : i < sobe ? "z-up" : desce && i >= L.length - desce ? "z-down" : "";
     return `<tr class="${z}"><td><div class="cl"><span class="pos">${i + 1}</span>${esc(x.t)}<span>${h(x.t.nome)}</span><span class="uf">${h(x.t.uf)}</span></div></td>
-      <td><strong>${x.P}</strong>${x.ded ? `<span class="ded" title="Pontos deduzidos">−${x.ded}</span>` : ""}</td><td>${x.J}</td><td>${x.V}</td><td>${x.E}</td><td>${x.D}</td><td>${x.GP}</td><td>${x.GC}</td><td>${x.SG}</td></tr>`;
+      <td><strong>${x.P}</strong>${x.ded ? `<span class="ded" title="Pontos deduzidos">−${x.ded}</span>` : ""}</td><td>${x.J}</td><td>${x.V}</td><td>${x.E}</td><td>${x.D}</td><td>${x.GP}</td><td>${x.GC}</td><td>${x.SG}</td>${K ? `<td>${pill(K.por.get(x.t.id))}<button class="mini" data-a="ext-sel" data-v="${h(x.t.id)}" title="Marcar vaga externa" aria-label="Marcar vaga externa para ${h(x.t.nome)}">🏆</button></td>` : ""}</tr>`;
   }).join("");
   $("legenda").innerHTML = [d === 0 && ["z-top", "Campeão"], sobe && ["z-up", `Acesso (${sobe})`], desce && ["z-down", `Rebaixamento (${desce})`]]
-    .filter(Boolean).map(([c, t]) => `<span><i class="${c}"></i>${t}</span>`).join("");
+    .filter(Boolean).map(([c, t]) => `<span><i class="${c}"></i>${t}</span>`).join("")
+    + (K ? S.cfg.comps.map((c, i) => `<span><i style="background:${COR_COMP[i % COR_COMP.length]}"></i>${h(c.nome)}</span>`).join("") : "");
+  desenharClassif(K);
+}
+const COR_COMP = ["#58a6ff", "#f0883e", "#bc8cff", "#3fb950", "#d29922", "#f778ba"];
+function pill(q) {                       // etiqueta da vaga na tabela
+  if (!q) return "";
+  const c = S.cfg.comps[q.c];
+  const t = q.tipo === "externa" ? "vaga externa" + (q.motivo ? ": " + q.motivo : "") : q.herdou ? `herdou a vaga (${q.pos}º colocado)` : `${q.pos}º colocado`;
+  return `<span class="vaga${q.tipo === "externa" ? " ext" : ""}${q.herdou ? " her" : ""}" style="--c:${COR_COMP[q.c % COR_COMP.length]}" title="${h(c.nome + " – " + t)}">${h(c.sigla || c.nome.slice(0, 3).toUpperCase())}</span>`;
+}
+function desenharClassif(K) {
+  const el = $("classif"); if (!el || !K) return;
+  el.innerHTML = `<h3>Competições internacionais</h3><p class="dica">Vagas pela tabela da Série A. Quem ganha vaga por fora (★) libera a posição na tabela e o próximo da fila herda a vaga.</p>
+   <div class="comps">${S.cfg.comps.map((c, i) => `<div class="comp-col"><h4><i style="background:${COR_COMP[i % COR_COMP.length]}"></i>${h(c.nome)} <small>${K.comps[i].length} ${K.comps[i].length === 1 ? "vaga" : "vagas"}</small></h4><ol>${
+     K.comps[i].map(q => { const t = T.get(q.id); return `<li>${esc(t)}<span>${h(t.nome)} <small>${h(t.uf)}</small></span>${q.tipo === "externa" ? `<small>★ externa${q.motivo ? " · " + h(q.motivo) : ""}</small>` : `<small>${q.pos}º${q.herdou ? " · herdou" : ""}</small>`}</li>`; }).join("") || `<li class="vazio">Sem times.</li>`}</ol></div>`).join("")}</div>`;
+}
+function htmlExterno() {
+  const comps = S.cfg.comps;
+  const grupos = S.divs.map((l, d) => `<optgroup label="Série ${LETRAS[d]}">${[...l].map(id => T.get(id)).sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"))
+    .map(t => `<option value="${h(t.id)}"${t.id === ui.extSel ? " selected" : ""}>${h(t.nome)} (${h(t.uf)})</option>`).join("")}</optgroup>`).join("");
+  return `<h3>Vagas externas</h3><p class="dica">Marque quem ganha vaga fora da tabela (campeão de copa, da competição de baixo…). Se o time já estiver numa vaga melhor, ela passa para o próximo da fila.</p>
+   <div class="pun"><select id="ext-time" aria-label="Time">${grupos}</select><select id="ext-comp" aria-label="Competição">${comps.map((c, i) => `<option value="${i}">${h(c.nome)}</option>`).join("")}</select>
+    <input id="ext-mot" placeholder="Como ganhou (opcional)" maxlength="60"><button class="b" data-a="ext-add">Marcar</button></div>
+   <ul class="lista-pun">${S.ext.map((x, i) => `<li>${esc(T.get(x.id))}<span><b>${h(T.get(x.id).nome)}</b> → ${h(comps[x.comp] ? comps[x.comp].nome : "?")}${x.motivo ? " · " + h(x.motivo) : ""}</span><button class="b peq" data-a="ext-del" data-v="${i}" aria-label="Remover vaga externa">×</button></li>`).join("") || `<li class="vazio">Nenhuma vaga externa marcada.</li>`}</ul>`;
+}
+function marcarExterno() {
+  const id = $("ext-time").value, comp = +$("ext-comp").value, motivo = $("ext-mot").value.trim();
+  if (S.ext.some(x => x.id === id && x.comp === comp)) return aviso("Esse time já tem vaga externa nessa competição.", true);
+  S.ext.push({ id, comp, motivo }); salvarLocal(); desenhar(); aviso("Vaga externa marcada.");
 }
 function desenharRodada() {
   const R = S.fix[ui.div], r = Math.min(ui.rodada, R.length); ui.rodada = r;
@@ -334,6 +421,8 @@ function htmlPunicoes() {
     <input id="pun-mot" placeholder="Motivo (opcional)" maxlength="60"><button class="b" data-a="pun-add">Aplicar</button></div>
    <ul class="lista-pun">${lista.map(x => `<li>${esc(T.get(x.id))}<span><b>${h(T.get(x.id).nome)}</b> −${x.pts} pts${x.motivo ? " · " + h(x.motivo) : ""}</span><button class="b peq" data-a="pun-del" data-v="${x.i}" aria-label="Remover punição">×</button></li>`).join("") || `<li class="vazio">Nenhuma punição nesta série.</li>`}</ul>`;
 }
+const histComps = a => (S.cfg.comps || []).map((c, ci) => a.classif && a.classif[ci] && a.classif[ci].length
+  ? `<p><b>${h(c.nome)}</b> · ${a.classif[ci].map(([id, t]) => (T.get(id) ? h(T.get(id).nome) : h(id)) + (t === "externa" ? " ★" : "")).join(", ")}</p>` : "").join("");
 function vHistorico() {
   const H = S.historico, nome = id => T.get(id) ? h(T.get(id).nome) : h(id);
   if (!H.length) { $("conteudo").innerHTML = `<section class="card"><p class="vazio">Nenhuma temporada encerrada ainda. Simule uma temporada e clique em “Encerrar temporada”.</p></section>`; return; }
@@ -343,7 +432,7 @@ function vHistorico() {
    [...H].reverse().map(a => `<details class="card"><summary>Temporada ${a.ano} — campeão: ${nome(a.divs[0][0][0])}</summary>${a.divs.map((l, d) =>
      `<p><b>Série ${LETRAS[d]}</b> · ${l.slice(0, 3).map(([id, p], i) => `${i + 1}º ${nome(id)} (${p})`).join(" · ")}` +
      `${d < a.descem.length && a.descem[d].length ? `<br><small>Descem: ${a.descem[d].map(nome).join(", ")}</small>` : ""}` +
-     `${d > 0 && a.sobem[d - 1].length ? `<br><small>Sobem: ${a.sobem[d - 1].map(nome).join(", ")}</small>` : ""}</p>`).join("")}</details>`).join("");
+     `${d > 0 && a.sobem[d - 1].length ? `<br><small>Sobem: ${a.sobem[d - 1].map(nome).join(", ")}</small>` : ""}</p>`).join("")}${histComps(a)}</details>`).join("");
 }
 function punir() {
   const id = $("pun-time").value, pts = parseInt($("pun-pts").value), motivo = $("pun-mot").value.trim();
@@ -370,6 +459,9 @@ function acao(a, v) {
     case "encerrar": encerrar(); ui.rodada = 1; aviso(`Temporada ${S.ano - 1} encerrada. Times promovidos e rebaixados.`); break;
     case "anos": return simularAnos();
     case "limpar": if (!confirm(`Limpar todos os resultados da Série ${LETRAS[d]}?`)) return; S.fix[d].forEach(r => r.forEach(m => { m.gc = null; m.gf = null; })); break;
+    case "ext-sel": ui.extSel = v; desenhar(); { const el = $("ext-comp"); if (el) { el.scrollIntoView({ block: "center" }); el.focus(); } } ui.extSel = null; return;
+    case "ext-add": return marcarExterno();
+    case "ext-del": S.ext.splice(+v, 1); break;
     case "pun-add": return punir();
     case "pun-del": S.deducoes.splice(+v, 1); break;
     case "salvar": return baixar();
@@ -409,6 +501,15 @@ $("app").addEventListener("change", e => {
   else if (el.id === "q-nd") { if ((v || 1) !== Q.nd) { Q.nd = v || 1; qRecalcular(); setTimeout(qParciais, 0); } el.value = Q.nd; }
   else if (d.tam) { Q.tam[d.tam] = v; Q.alloc[d.tam] = (Q.alloc[d.tam] || []).slice(0, v || 0); if (Q.dist === "manual") qColunas(); qRes(); }
   else if (d.acc) { Q.acc[d.acc] = v; qRes(); }
+  else if (el.id === "q-nc") {           // muda a quantidade de competições
+    const n = Math.min(Math.max(v || 0, 0), 6); el.value = n;
+    if (n === Q.comps.length) return;
+    while (Q.comps.length > n) Q.comps.pop();
+    while (Q.comps.length < n) Q.comps.push({ nome: `Competição ${Q.comps.length + 1}`, vagas: 2 });
+    setTimeout(qParciais, 0);
+  }
+  else if (d.cn) { Q.comps[d.cn].nome = el.value; qRes(); }
+  else if (d.cv) { Q.comps[d.cv].vagas = parseInt(el.value); qHints(); qRes(); }
   else if (el.id === "q-pv") { Q.pv = v; qRes(); }
   else if (el.id === "q-pe") { Q.pe = v; qRes(); }
   else if (el.id === "q-tn") Q.turnos = v;
