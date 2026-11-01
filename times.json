@@ -2623,9 +2623,9 @@
       }
     },
     {
-      "id": "bom-dosco-mt",
-      "nome": "Bom Dosco",
-      "sigla": "BDC",
+      "id": "dom-bosco-mt",
+      "nome": "Dom Bosco",
+      "sigla": "DBC",
       "uf": "MT",
       "regiao": "centro_oeste",
       "cidade": "Cuiabá",
@@ -2635,18 +2635,18 @@
       },
       "serie": null,
       "fundacao": 1925,
-      "escudo": "escudos/bom-dosco-mt.png",
+      "escudo": "escudos/dom-bosco-mt.png",
       "cores": [
         "cores/azul.png",
         "cores/branco.png"
       ],
       "mascote": {
         "nome": "Leão da Colina",
-        "imagem": "mascotes/bom-dosco-mt.png"
+        "imagem": "mascotes/dom-bosco-mt.png"
       },
       "uniformes": {
-        "titular": "uniformes/bom-dosco-mt-1.png",
-        "reserva": "uniformes/bom-dosco-mt-2.png"
+        "titular": "uniformes/dom-bosco-mt-1.png",
+        "reserva": "uniformes/dom-bosco-mt-2.png"
       }
     },
     {
