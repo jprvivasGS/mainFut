@@ -1069,8 +1069,8 @@
       }
     },
     {
-      "id": "yipiranga-ba",
-      "nome": "Yipiranga",
+      "id": "ypiranga-ba",
+      "nome": "Ypiranga",
       "sigla": "YPS",
       "uf": "BA",
       "regiao": "nordeste",
@@ -1081,18 +1081,18 @@
       },
       "serie": null,
       "fundacao": 1906,
-      "escudo": "escudos/yipiranga-ba.png",
+      "escudo": "escudos/ypiranga-ba.png",
       "cores": [
         "cores/preto.png",
         "cores/amarelo.png"
       ],
       "mascote": {
         "nome": "Canário",
-        "imagem": "mascotes/yipiranga-ba.png"
+        "imagem": "mascotes/ypiranga-ba.png"
       },
       "uniformes": {
-        "titular": "uniformes/yipiranga-ba-1.png",
-        "reserva": "uniformes/yipiranga-ba-2.png"
+        "titular": "uniformes/ypiranga-ba-1.png",
+        "reserva": "uniformes/ypiranga-ba-2.png"
       }
     },
     {
