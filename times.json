@@ -1231,8 +1231,8 @@
       }
     },
     {
-      "id": "gurany-de-sobral-ce",
-      "nome": "Gurany",
+      "id": "guarany-ce",
+      "nome": "Guarany",
       "sigla": "GRY",
       "uf": "CE",
       "regiao": "nordeste",
@@ -1243,18 +1243,18 @@
       },
       "serie": null,
       "fundacao": 1938,
-      "escudo": "escudos/gurany-de-sobral-ce.png",
+      "escudo": "escudos/guarany-ce.png",
       "cores": [
         "cores/preto.png",
         "cores/vermelho.png"
       ],
       "mascote": {
         "nome": "Cacique",
-        "imagem": "mascotes/gurany-de-sobral-ce.png"
+        "imagem": "mascotes/guarany-ce.png"
       },
       "uniformes": {
-        "titular": "uniformes/gurany-de-sobral-ce-1.png",
-        "reserva": "uniformes/gurany-de-sobral-ce-2.png"
+        "titular": "uniformes/guarany-ce-1.png",
+        "reserva": "uniformes/guarany-ce-2.png"
       }
     },
     {
