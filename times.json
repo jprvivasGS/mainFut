@@ -635,7 +635,7 @@
     {
       "id": "sao-raimundo-am",
       "nome": "São Raimundo",
-      "sigla": "SRM",
+      "sigla": "SRA",
       "uf": "AM",
       "regiao": "norte",
       "cidade": "Manaus",
@@ -767,7 +767,7 @@
     {
       "id": "santana-ap",
       "nome": "Santana",
-      "sigla": "SAN",
+      "sigla": "STN",
       "uf": "AP",
       "regiao": "norte",
       "cidade": "Macapá",
@@ -1098,7 +1098,7 @@
     {
       "id": "atletico-ce",
       "nome": "Atlético",
-      "sigla": "ATC",
+      "sigla": "ACE",
       "uf": "CE",
       "regiao": "nordeste",
       "cidade": "Fortaleza",
@@ -1615,7 +1615,7 @@
     {
       "id": "porto-vitoria-es",
       "nome": "Porto Vitória",
-      "sigla": "PTV",
+      "sigla": "PVT",
       "uf": "ES",
       "regiao": "sudeste",
       "cidade": "Vitória",
@@ -1861,7 +1861,7 @@
     {
       "id": "goiatuba-go",
       "nome": "Goiatuba",
-      "sigla": "GON",
+      "sigla": "GTB",
       "uf": "GO",
       "regiao": "centro_oeste",
       "cidade": "Goiatuba",
@@ -2598,7 +2598,7 @@
     {
       "id": "ubiratan-ms",
       "nome": "Ubiratan",
-      "sigla": "UBR",
+      "sigla": "UBT",
       "uf": "MS",
       "regiao": "centro_oeste",
       "cidade": "Dourados",
@@ -2899,7 +2899,7 @@
     {
       "id": "castanhal-pa",
       "nome": "Castanhal",
-      "sigla": "CTL",
+      "sigla": "CNH",
       "uf": "PA",
       "regiao": "norte",
       "cidade": "Castanhal",
@@ -3747,7 +3747,7 @@
     {
       "id": "cascavel-pr",
       "nome": "Cascavel",
-      "sigla": "CSC",
+      "sigla": "CVL",
       "uf": "PR",
       "regiao": "sul",
       "cidade": "Cascavel",
@@ -4316,7 +4316,7 @@
     {
       "id": "potiguar-rn",
       "nome": "Potiguar",
-      "sigla": "PTG",
+      "sigla": "PTR",
       "uf": "RN",
       "regiao": "nordeste",
       "cidade": "Mossoró",
