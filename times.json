@@ -876,7 +876,7 @@
       }
     },
     {
-      "id": "atletico-de-alagoinhas-ba",
+      "id": "atletico-ba",
       "nome": "Atlético",
       "sigla": "ALG",
       "uf": "BA",
@@ -888,7 +888,7 @@
       },
       "serie": null,
       "fundacao": 1970,
-      "escudo": "escudos/atletico-de-alagoinhas-ba.png",
+      "escudo": "escudos/atletico-ba.png",
       "cores": [
         "cores/preto.png",
         "cores/branco.png",
@@ -896,11 +896,11 @@
       ],
       "mascote": {
         "nome": "Carcará",
-        "imagem": "mascotes/atletico-de-alagoinhas-ba.png"
+        "imagem": "mascotes/atletico-ba.png"
       },
       "uniformes": {
-        "titular": "uniformes/atletico-de-alagoinhas-ba-1.png",
-        "reserva": "uniformes/atletico-de-alagoinhas-ba-2.png"
+        "titular": "uniformes/atletico-ba-1.png",
+        "reserva": "uniformes/atletico-ba-2.png"
       }
     },
     {
@@ -1859,30 +1859,30 @@
       }
     },
     {
-      "id": "goianesia-go",
-      "nome": "Goianésia",
+      "id": "goiatuba-go",
+      "nome": "Goiatuba",
       "sigla": "GON",
       "uf": "GO",
       "regiao": "centro_oeste",
-      "cidade": "1955",
+      "cidade": "Goiatuba",
       "federacao": {
         "sigla": "FFGO",
         "imagem": "federacao/GO.png"
       },
       "serie": "C",
-      "fundacao": 1955,
-      "escudo": "escudos/goianesia-go.png",
+      "fundacao": 1970,
+      "escudo": "escudos/goiatuba-go.png",
       "cores": [
         "cores/azul.png",
         "cores/branco.png"
       ],
       "mascote": {
         "nome": "Azulão",
-        "imagem": "mascotes/goianesia-go.png"
+        "imagem": "mascotes/goiatuba-go.png"
       },
       "uniformes": {
-        "titular": "uniformes/goianesia-go-1.png",
-        "reserva": "uniformes/goianesia-go-2.png"
+        "titular": "uniformes/goiatuba-go-1.png",
+        "reserva": "uniformes/goiatuba-go-2.png"
       }
     },
     {
@@ -5323,9 +5323,9 @@
       }
     },
     {
-      "id": "doerense-se",
-      "nome": "Doerense",
-      "sigla": "DOE",
+      "id": "dorense-se",
+      "nome": "Dorense",
+      "sigla": "DOR",
       "uf": "SE",
       "regiao": "nordeste",
       "cidade": "Nossa Senhora das Dores",
@@ -5335,18 +5335,18 @@
       },
       "serie": null,
       "fundacao": 1948,
-      "escudo": "escudos/doerense-se.png",
+      "escudo": "escudos/dorense-se.png",
       "cores": [
         "cores/branco.png",
         "cores/vermelho.png"
       ],
       "mascote": {
         "nome": "Touro",
-        "imagem": "mascotes/doerense-se.png"
+        "imagem": "mascotes/dorense-se.png"
       },
       "uniformes": {
-        "titular": "uniformes/doerense-se-1.png",
-        "reserva": "uniformes/doerense-se-2.png"
+        "titular": "uniformes/dorense-se-1.png",
+        "reserva": "uniformes/dorense-se-2.png"
       }
     },
     {
