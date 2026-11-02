@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Copa Nacional – mainFut</title>
+<link rel="stylesheet" href="copa.css">
+</head>
+<body>
+<header class="topo">
+  <img id="logo" alt="">
+  <h1>Copa Nacional</h1>
+  <span class="chip" id="chip" hidden></span>
+  <a class="voltar" href="../">← mainFut</a>
+</header>
+<main id="app"><p class="vazio">Carregando times…</p></main>
+<div class="aviso" id="aviso" role="status"></div>
+
+<!-- Confronto: placar, pênaltis e quem avança -->
+<dialog id="jogoDlg" aria-labelledby="jogoTit"><div class="dlg" id="jogoBox"></div></dialog>
+
+<!-- Ficha do time (uniformes, mascote e campanha na copa) -->
+<dialog id="timeDlg" aria-label="Ficha do time"><div class="dlg" id="timeBox"></div></dialog>
+
+<!-- Uniforme ampliado -->
+<dialog id="imgDlg" aria-label="Imagem ampliada"><img id="imgGrande" alt=""></dialog>
+
+<!-- Comemoração do campeão -->
+<div id="festa" hidden>
+  <canvas id="fogos"></canvas>
+  <div class="festa-card">
+    <div class="festa-esc" id="festaEsc"></div>
+    <p class="festa-sub">🏆 CAMPEÃO DA COPA 🏆</p>
+    <h2 id="festaNome"></h2>
+    <p class="festa-sub" id="festaLocal"></p>
+    <div class="festa-bt">
+      <button class="b" data-a="festa-fechar">Ver chaveamento</button>
+      <button class="b verde" data-a="nova">Nova copa</button>
+    </div>
+  </div>
+</div>
+
+<script src="copa.js"></script>
+</body>
+</html>

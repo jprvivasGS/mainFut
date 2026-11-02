@@ -1,0 +1,177 @@
+/* Copa Nacional – mainFut
+   Mesmo visual do Campeonato (cores, cartões, botões) + o desenho circular da Copa antiga. */
+:root { --bg:#0d1117; --panel:#161b22; --line:#30363d; --txt:#c9d1d9; --head:#f0f6fc; --mut:#8b949e; --node:#21262d;
+  --acc:#58a6ff; --verde:#238636; --verde2:#2ea043; --red:#f85149; --gold:#d29922; --ok:#3fb950;
+  --font:"Segoe UI",-apple-system,BlinkMacSystemFont,Roboto,Helvetica,Arial,sans-serif; }
+* { box-sizing:border-box; }
+html { color-scheme:dark; }
+body { margin:0; background:var(--bg); color:var(--txt); font:15px/1.5 var(--font); }
+button,input,select { font:inherit; color:inherit; }
+:focus-visible { outline:2px solid var(--acc); outline-offset:2px; }
+h2,h3 { color:var(--head); margin:0 0 10px; }
+h2 { font-size:1.05rem; display:flex; align-items:center; gap:10px; }
+h3 { font-size:.95rem; }
+
+/* ---------- Topo e cartões ---------- */
+.topo { display:flex; align-items:center; gap:14px; padding:12px 20px; background:#090c10; border-bottom:2px solid var(--verde); }
+.topo img { height:44px; width:auto; }
+.topo h1 { margin:0; font-size:1.3rem; color:var(--head); }
+.chip { background:var(--node); border:1px solid var(--line); border-radius:999px; padding:1px 12px; font-size:.8rem; color:var(--head); }
+.voltar { margin-left:auto; color:var(--mut); text-decoration:none; font-size:.85rem; }
+.voltar:hover { color:var(--head); }
+main { max-width:1500px; margin:0 auto; padding:18px 16px 70px; }
+.quest { max-width:1000px; margin:0 auto; }
+.card { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:16px; margin-bottom:16px; }
+.card[hidden] { display:none; }
+.vazio,.dica { color:var(--mut); font-size:.85rem; margin:6px 0 0; }
+
+/* ---------- Botões e campos ---------- */
+.b { background:var(--node); border:1px solid var(--line); border-radius:6px; padding:8px 14px; font-weight:700; font-size:.85rem; cursor:pointer; }
+.b:hover:not(:disabled) { border-color:var(--mut); }
+.b:disabled { opacity:.45; cursor:default; }
+.b.verde { background:var(--verde); border-color:var(--verde); color:#fff; }
+.b.verde:hover:not(:disabled) { background:var(--verde2); }
+.b.sim { border-color:var(--acc); color:var(--acc); }
+.b.peq { padding:3px 10px; }
+.b.perigo:hover:not(:disabled) { border-color:var(--red); color:var(--red); }
+input,select { background:var(--bg); border:1px solid var(--line); border-radius:6px; padding:7px 10px; min-width:0; }
+
+/* ---------- Questionário ---------- */
+.n { width:26px; height:26px; border-radius:50%; background:var(--verde); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:.85rem; }
+.opts { display:flex; flex-wrap:wrap; gap:8px; }
+.opt { display:inline-flex; align-items:center; gap:6px; background:var(--node); border:1px solid var(--line); border-radius:8px; padding:6px 12px; cursor:pointer; }
+.campos { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin-top:8px; }
+.campos label { display:flex; flex-direction:column; gap:4px; font-size:.8rem; color:var(--mut); }
+.campos label[hidden] { display:none; }
+.campos label.linha-chk { flex-direction:row; align-items:center; gap:8px; align-self:end; padding-bottom:8px; }
+.linha { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:10px; }
+.erros { margin:0 0 12px; padding-left:18px; color:var(--red); font-size:.9rem; }
+#q-res p { margin:0 0 12px; }
+#q-res .fases { color:var(--head); font-weight:700; }
+
+/* escolha manual dos times */
+.board { background:var(--bg); border:1px dashed var(--line); border-radius:10px; margin-top:12px; }
+.board-h { padding:10px; border-bottom:1px solid var(--line); display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+.board-h input { flex:1; min-width:160px; }
+.board-l { padding:8px; max-height:380px; overflow-y:auto; display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:6px; }
+.tchip { display:flex; align-items:center; gap:7px; padding:4px 8px; background:var(--node); border:1px solid var(--line); border-radius:8px; font-size:.78rem; cursor:pointer; user-select:none; }
+.tchip span { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.tchip small { color:var(--mut); font-size:.68rem; }
+.tchip.sel { border-color:var(--acc); box-shadow:inset 0 0 0 1px var(--acc); background:rgba(56,139,253,.14); }
+
+/* ---------- Escudo ---------- */
+.esc { flex:none; width:26px; height:26px; display:inline-flex; align-items:center; justify-content:center; }
+.esc img { max-width:100%; max-height:100%; object-fit:contain; }
+.esc b { font-size:.6rem; color:var(--mut); }
+
+/* ---------- Tela da copa ---------- */
+.layout { display:grid; grid-template-columns:300px minmax(0,1fr); gap:16px; align-items:start; }
+@media (max-width:900px) { .layout { grid-template-columns:1fr; } }
+.lista { margin:0; display:flex; flex-direction:column; gap:8px; max-height:calc(min(80vh,900px) + 150px); }
+@media (max-width:900px) { .lista { max-height:320px; } }
+.lista input { width:100%; }
+.lista-l { overflow-y:auto; display:flex; flex-direction:column; gap:2px; }
+.titem { display:flex; align-items:center; gap:8px; width:100%; text-align:left; background:none; border:0; border-radius:6px; padding:5px 6px; cursor:pointer; font-size:.82rem; }
+.titem:hover { background:rgba(255,255,255,.05); }
+.titem span { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.titem small { color:var(--mut); font-size:.68rem; }
+.titem i { width:8px; height:8px; border-radius:50%; background:var(--ok); flex:none; }
+.titem.fora { opacity:.45; } .titem.fora i { background:var(--red); }
+.titem.camp i { background:var(--gold); box-shadow:0 0 6px var(--gold); }
+
+.acoes { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-bottom:10px; }
+.acoes .esp { flex:1; }
+#status { margin:0 0 8px; font-size:.85rem; color:var(--mut); }
+#status b { color:var(--head); }
+.legenda { display:flex; flex-wrap:wrap; gap:6px 14px; margin-bottom:10px; font-size:.75rem; color:var(--mut); }
+.legenda span { display:inline-flex; align-items:center; gap:5px; }
+.legenda i { width:10px; height:10px; border-radius:50%; border:2px solid var(--c); display:inline-block; }
+.legenda .ok { color:var(--ok); }
+
+/* ---------- Arena circular (zoom e arrasto) ---------- */
+.vp { position:relative; height:min(80vh,900px); min-height:420px; background:var(--panel); border:1px solid var(--line); border-radius:16px;
+  overflow:hidden; cursor:grab; touch-action:none; box-shadow:0 8px 32px rgba(0,0,0,.4); }
+.vp.arrastando { cursor:grabbing; }
+#arena { position:absolute; left:0; top:0; transform-origin:0 0; }
+#svg { position:absolute; left:0; top:0; pointer-events:none; }
+.zoom { position:absolute; top:12px; right:12px; z-index:40; display:flex; flex-direction:column; background:var(--panel); border:1px solid var(--line); border-radius:8px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,.3); }
+.zoom button { background:none; border:0; padding:9px 14px; font-weight:700; cursor:pointer; }
+.zoom button:hover { background:rgba(255,255,255,.08); }
+
+/* linhas dos confrontos (clique para abrir o placar) */
+.jg .v { stroke:rgba(255,255,255,.22); stroke-width:1.5; fill:none; transition:stroke .2s,stroke-width .2s; pointer-events:none; }
+.jg.pronto .v { stroke:rgba(255,255,255,.5); }
+.jg:hover .v { stroke:var(--acc); stroke-width:3; }
+.jg.feito .dest, .jg.feito.w1 .l1, .jg.feito.w2 .l2 { stroke:var(--ok); stroke-width:2.5; }
+.jg .hit { stroke:transparent; stroke-width:18; fill:none; pointer-events:stroke; cursor:pointer; }
+
+/* escudos no círculo */
+.no { position:absolute; transform:translate(-50%,-50%); width:30px; height:30px; border-radius:50%; background:var(--node);
+  border:2px solid var(--c,#484f58); display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:5;
+  box-shadow:0 4px 10px rgba(0,0,0,.3); }
+.no::after { content:""; position:absolute; inset:-7px; }              /* área de clique maior que o escudo */
+.no .esc { width:20px; height:20px; }
+.no:hover { border-color:var(--acc); transform:translate(-50%,-50%) scale(1.45); z-index:25; box-shadow:0 0 15px rgba(56,139,253,.3); }
+.no.vence { background:#116329; border-color:var(--ok); }
+.no.fora { filter:grayscale(1); opacity:.2; }
+.no.espera { border-style:dashed; opacity:.35; cursor:default; }
+.svg-padrao { width:14px; height:14px; fill:var(--mut); }
+
+.campeao { position:absolute; transform:translate(-50%,-50%); z-index:30; display:flex; align-items:center; justify-content:center; gap:6px;
+  max-width:130px; padding:8px 14px; border-radius:30px; border:2px solid var(--red); color:#fff; font-size:.8rem; font-weight:700; cursor:default;
+  background:linear-gradient(135deg,#da3633,#b62324); box-shadow:0 6px 20px rgba(218,54,51,.4); }
+.campeao span:last-child { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.campeao.tem { cursor:pointer; }
+.campeao .esc { width:20px; height:20px; }
+
+/* ---------- Janelas ---------- */
+dialog { background:var(--panel); color:var(--txt); border:1px solid var(--line); border-radius:14px; padding:0; width:min(560px,94vw); max-height:92vh; box-shadow:0 16px 40px rgba(0,0,0,.6); }
+dialog::backdrop { background:rgba(0,0,0,.7); backdrop-filter:blur(4px); }
+.dlg { padding:20px; position:relative; }
+.fechar { position:absolute; top:10px; right:12px; background:none; border:0; font-size:1.3rem; color:var(--mut); cursor:pointer; }
+.fechar:hover { color:var(--red); }
+.fase-tag { font-size:.75rem; color:var(--mut); text-transform:uppercase; letter-spacing:.5px; }
+.duelo { display:grid; grid-template-columns:1fr auto 1fr; gap:10px; align-items:center; margin:12px 0; text-align:center; }
+.lado { display:flex; flex-direction:column; align-items:center; gap:4px; color:var(--head); font-weight:700; cursor:pointer; padding:6px; border-radius:8px; }
+.lado:hover { background:rgba(255,255,255,.05); }
+.lado .esc { width:48px; height:48px; } .lado small { color:var(--mut); font-weight:400; }
+.vs { color:var(--mut); font-weight:700; }
+.perna { margin-bottom:10px; }
+.perna small { color:var(--mut); font-size:.72rem; text-transform:uppercase; }
+.pl { display:grid; grid-template-columns:1fr auto auto auto 1fr; gap:8px; align-items:center; }
+.pl .eq { display:flex; align-items:center; gap:6px; font-size:.8rem; font-weight:700; min-width:0; }
+.pl .eq.casa { justify-content:flex-end; }
+.pl .eq span.nm { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pl input { width:52px; text-align:center; padding:6px 0; }
+.pen { border-top:1px dashed var(--line); padding-top:10px; margin-top:4px; }
+.msg { margin:12px 0; padding:8px 12px; border-radius:8px; background:var(--node); font-size:.85rem; }
+.msg.ok { border-left:3px solid var(--ok); color:var(--head); } .msg.av { border-left:3px solid var(--gold); }
+.dlg .acoes { margin:14px 0 0; }
+.ficha { display:flex; align-items:center; gap:14px; margin-bottom:12px; }
+.ficha .esc { width:64px; height:64px; } .ficha h3 { font-size:1.15rem; margin:0; } .ficha p { margin:0; color:var(--mut); font-size:.85rem; }
+.kits { display:flex; gap:10px; margin:10px 0 14px; flex-wrap:wrap; }
+.kit { flex:1; min-width:100px; background:var(--node); border:1px solid var(--line); border-radius:10px; padding:8px; text-align:center; font-size:.7rem; color:var(--mut); text-transform:uppercase; }
+.kit div { height:90px; margin-top:6px; display:flex; align-items:center; justify-content:center; cursor:zoom-in; }
+.kit img { max-width:100%; max-height:100%; object-fit:contain; }
+.camp-l { list-style:none; margin:6px 0 0; padding:0; font-size:.82rem; }
+.camp-l li { padding:5px 0; border-bottom:1px solid var(--line); display:flex; gap:8px; }
+.camp-l li small { color:var(--mut); min-width:120px; }
+#imgDlg { width:auto; max-width:92vw; background:none; border:0; box-shadow:none; }
+#imgGrande { display:block; max-width:90vw; max-height:88vh; border-radius:12px; cursor:zoom-out; }
+
+/* ---------- Comemoração ---------- */
+#festa { position:fixed; inset:0; z-index:9999; background:rgba(13,17,23,.75); backdrop-filter:blur(5px); display:flex; align-items:center; justify-content:center; }
+#festa[hidden] { display:none; }
+#fogos { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+.festa-card { position:relative; background:var(--panel); border:2px solid var(--ok); border-radius:20px; padding:30px; width:min(380px,92vw); text-align:center;
+  box-shadow:0 20px 60px rgba(0,0,0,.8),0 0 30px rgba(63,185,80,.3); display:flex; flex-direction:column; align-items:center; gap:10px; }
+.festa-card h2 { font-size:1.5rem; justify-content:center; margin:0; }
+.festa-sub { margin:0; color:var(--mut); font-size:.9rem; }
+.festa-esc { width:90px; height:90px; border-radius:50%; background:var(--node); border:2px solid var(--ok); display:flex; align-items:center; justify-content:center; box-shadow:0 0 20px rgba(63,185,80,.4); }
+.festa-esc .esc { width:60px; height:60px; }
+.festa-bt { display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; justify-content:center; }
+
+.aviso { position:fixed; left:50%; bottom:20px; transform:translate(-50%,20px); background:var(--node); border:1px solid var(--line); border-radius:8px; padding:10px 18px; box-shadow:0 8px 24px rgba(0,0,0,.5); opacity:0; pointer-events:none; transition:.25s; max-width:92vw; z-index:10000; }
+.aviso.on { opacity:1; transform:translate(-50%,0); }
+.aviso.erro { border-color:var(--red); color:var(--red); }
+@media (prefers-reduced-motion:reduce) { * { transition:none !important; } }
