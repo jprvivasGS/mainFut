@@ -151,7 +151,19 @@ function simularTudo() {
 }
 
 /* ---------- Geometria do círculo ---------- */
-function geometria() {
+function geometria() { return C.cfg.visual === "classico" ? geoClassica() : geoCircular(); }
+const COL_W = 170, LIN_H = 36;   // visual clássico: largura de cada fase e altura de cada linha
+function geoClassica() {         // árvore tradicional: uma coluna por fase, da esquerda para a direita
+  const pre = R[0].tipo === "prelim", mi = pre ? 1 : 0, S = pre ? 2 * LIN_H : LIN_H, topo = 70, esq = 90;
+  const Y = [];
+  Y[mi] = Array.from({ length: R[mi].count }, (_, j) => topo + j * S);
+  if (pre) Y[0] = Array.from({ length: R[0].count }, (_, i) => Y[1][NUL[i >> 1]] + (i & 1 ? LIN_H / 2 : -LIN_H / 2));   // cada par da preliminar fica ao lado da vaga que alimenta
+  for (let r = mi + 1; r < R.length; r++) Y[r] = Array.from({ length: R[r].count }, (_, i) => (Y[r - 1][2 * i] + Y[r - 1][2 * i + 1]) / 2);
+  const X = R.map((_, r) => esq + r * COL_W), ult = R.length - 1;
+  const champ = { x: X[ult] + COL_W, y: (Y[ult][0] + Y[ult][1]) / 2 };
+  return { visual: "classico", X, Y, W: champ.x + 120, H: topo + R[mi].count * S + 30, champ };
+}
+function geoCircular() {
   const dentro = [];             // raios do anel mais interno (final) para fora
   for (let k = 0; k < R.length; k++) {
     const a = R[R.length - 1 - k];
@@ -161,9 +173,11 @@ function geometria() {
   }
   const raios = R.map((_, r) => dentro[R.length - 1 - r]);
   const W = 2 * (Math.max(...raios) + 90);
-  return { raios, W, cx: W / 2, cy: W / 2 };
+  return { visual: "circular", raios, W, H: W, cx: W / 2, cy: W / 2, champ: { x: W / 2, y: W / 2 } };
 }
-function pos(r, i) {             // mesma convenção da Copa antiga: posição i do anel, a partir da direita, no sentido horário
+function pos(r, i) {
+  if (G.visual === "classico") return { x: G.X[r], y: G.Y[r][i] };
+  // circular — mesma convenção da Copa antiga: posição i do anel, a partir da direita, no sentido horário
   const ang = i * 2 * Math.PI / R[r].count;
   return { x: G.cx + G.raios[r] * Math.cos(ang), y: G.cy + G.raios[r] * Math.sin(ang) };
 }
@@ -172,8 +186,8 @@ function pos(r, i) {             // mesma convenção da Copa antiga: posição 
 function desenharArena() {
   G = geometria();
   const arena = $("arena"), camp = campeaoId();
-  arena.style.width = arena.style.height = G.W + "px";
-  $("svg").setAttribute("width", G.W); $("svg").setAttribute("height", G.W);
+  arena.style.width = G.W + "px"; arena.style.height = G.H + "px";
+  $("svg").setAttribute("width", G.W); $("svg").setAttribute("height", G.H);
 
   // escudos
   let nos = "";
@@ -184,28 +198,30 @@ function desenharArena() {
       nos += `<div class="no ${cls}" style="left:${p0.x.toFixed(1)}px;top:${p0.y.toFixed(1)}px;--c:${corAnel(r)}" data-r="${r}" data-i="${i}" title="${t ? h(`${t.nome} (${t.uf})`) : "Aguardando"}">${t ? esc(t) : SVG_PADRAO}</div>`;
     }
   });
-  arena.querySelectorAll(".no").forEach(n => n.remove());
+  if (G.visual === "classico") R.forEach((a, r) => { nos += `<div class="rot" style="left:${G.X[r]}px;top:34px;color:${corAnel(r)}">${h(a.nome)}</div>`; });   // título de cada coluna
+  arena.querySelectorAll(".no, .rot").forEach(n => n.remove());
   arena.insertAdjacentHTML("beforeend", nos);
 
   // linhas: cada confronto tem 3 traços (time A → meio, time B → meio, meio → vencedor) e um traço largo invisível para o clique
   let linhas = "";
   R.forEach((a, r) => {
     for (let p = 0; p < a.count / 2; p++) {
-      const p1 = pos(r, 2 * p), p2 = pos(r, 2 * p + 1), mx = (p1.x + p2.x) / 2, my = (p1.y + p2.y) / 2;
-      const alvo = r === R.length - 1 ? { x: G.cx, y: G.cy } : a.tipo === "prelim" ? pos(r + 1, NUL[p]) : pos(r + 1, p);
+      const p1 = pos(r, 2 * p), p2 = pos(r, 2 * p + 1), classico = G.visual === "classico";
+      const mx = classico ? p1.x + COL_W / 2 : (p1.x + p2.x) / 2, my = (p1.y + p2.y) / 2, m0 = { x: mx, y: my };
+      const alvo = r === R.length - 1 ? G.champ : a.tipo === "prelim" ? pos(r + 1, NUL[p]) : pos(r + 1, p);
       const w = venc(r, p), ca = E[r][2 * p], cb = E[r][2 * p + 1];
       const cls = `jg ${w ? "feito" : pronto(r, p) ? "pronto" : ""} ${w && w === ca ? "w1" : w ? "w2" : ""}`;
-      const seg = (x1, y1, x2, y2, c) => `<line class="v ${c}" x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}"/><line class="hit" x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}"/>`;
+      const seg = (pts, c) => { const s = pts.map(q => q.x.toFixed(1) + "," + q.y.toFixed(1)).join(" "); return `<polyline class="v ${c}" points="${s}"/><polyline class="hit" points="${s}"/>`; };
       const nome = id => id ? T.get(id).nome : "?";
       linhas += `<g class="${cls}" data-r="${r}" data-p="${p}"><title>${h(nome(ca))} × ${h(nome(cb))}${pronto(r, p) ? " — clique para ver o confronto" : ""}</title>`
-        + seg(p1.x, p1.y, mx, my, "l1") + seg(p2.x, p2.y, mx, my, "l2") + seg(mx, my, alvo.x, alvo.y, "dest") + `</g>`;
+        + seg(classico ? [p1, { x: mx, y: p1.y }, m0] : [p1, m0], "l1") + seg(classico ? [p2, { x: mx, y: p2.y }, m0] : [p2, m0], "l2") + seg([m0, alvo], "dest") + `</g>`;
     }
   });
   $("svg").innerHTML = linhas;
 
   // campeão no centro
   const cb = $("campeao");
-  cb.style.left = cb.style.top = G.cx + "px";
+  cb.style.left = G.champ.x + "px"; cb.style.top = G.champ.y + "px";
   cb.classList.toggle("tem", !!camp);
   cb.innerHTML = camp ? `${esc(T.get(camp))}<span>${h(T.get(camp).nome)}</span>` : `<span>🏆</span><span>Campeão</span>`;
   cb.title = camp ? "Clique para comemorar de novo" : "";
@@ -430,8 +446,8 @@ function iniciarFogos(cores) {
 /* ---------- Zoom e arrasto ---------- */
 function aplicarZoom() { $("arena").style.transform = `translate(${Z.x}px,${Z.y}px) scale(${Z.s})`; }
 function ajustar() {             // enquadra o círculo inteiro na janela
-  const vp = $("vp"), s = Math.min(vp.clientWidth, vp.clientHeight) / G.W * 0.98;
-  Z = { s, x: (vp.clientWidth - G.W * s) / 2, y: (vp.clientHeight - G.W * s) / 2 }; aplicarZoom();
+  const vp = $("vp"), s = Math.min(vp.clientWidth / G.W, vp.clientHeight / G.H) * 0.98;
+  Z = { s, x: (vp.clientWidth - G.W * s) / 2, y: (vp.clientHeight - G.H * s) / 2 }; aplicarZoom();
 }
 function zoomEm(cx, cy, f) {     // zoom em torno de um ponto da tela
   const r = $("vp").getBoundingClientRect(), mx = cx - r.left, my = cy - r.top, s2 = Math.min(Math.max(Z.s * f, 0.03), 3);
@@ -471,7 +487,7 @@ function deJSON(o) {
   if (ids.length < 2 || new Set(ids).size !== ids.length) throw new Error("Arquivo de save inválido.");
   const { B, m } = estrutura(ids.length);
   if (o.slots.length !== B || o.prelim.length !== 2 * m) throw new Error("Arquivo de save inválido.");
-  C = { cfg: { ida: !!o.cfg.ida, finalUnico: !!o.cfg.finalUnico, sorteio: o.cfg.sorteio || "aleatorio" }, prelim: o.prelim, slots: o.slots, res: [], festa: o.festa || null };
+  C = { cfg: { ida: !!o.cfg.ida, finalUnico: !!o.cfg.finalUnico, sorteio: o.cfg.sorteio || "aleatorio", visual: o.cfg.visual === "classico" ? "classico" : "circular" }, prelim: o.prelim, slots: o.slots, res: [], festa: o.festa || null };
   preparar(o.res);
 }
 function preparar(res) {         // monta os anéis e confere os resultados guardados
@@ -512,7 +528,7 @@ function descricao(n) {          // resumo do formato para o número de times es
 }
 function questionario() {
   C = null; $("chip").hidden = true;
-  if (!Q) { Q = { reg: [...new Set(TIMES.map(t => t.regiao))], modo: "sorteio", n: TIMES.length, escolha: new Set(), busca: "", sorteio: "aleatorio", ida: false, finalUnico: true }; qRecalcular(); Q.n = pool().length; }
+  if (!Q) { Q = { reg: [...new Set(TIMES.map(t => t.regiao))], modo: "sorteio", n: TIMES.length, escolha: new Set(), busca: "", sorteio: "aleatorio", visual: "circular", ida: false, finalUnico: true }; qRecalcular(); Q.n = pool().length; }
   const regs = [...new Set(TIMES.map(t => t.regiao))];
   $("app").innerHTML = `<div class="quest">
    <section class="card"><h2><span class="n">1</span>De onde vêm os times?</h2>
@@ -525,10 +541,14 @@ function questionario() {
     <div class="board" id="q-manual" hidden><div class="board-h"><input id="q-busca" type="search" placeholder="Buscar time" aria-label="Buscar time" value="${h(Q.busca)}">
       <button class="b peq" data-a="q-marcar">Marcar listados</button><button class="b peq" data-a="q-desmarcar">Desmarcar listados</button><button class="b peq" data-a="q-limpar">Limpar tudo</button>
       <span class="dica" id="q-sel"></span></div><div class="board-l" id="q-chips"></div></div></section>
-   <section class="card"><h2><span class="n">3</span>Como sortear o chaveamento?</h2>
+   <section class="card"><h2><span class="n">3</span>Qual visual de chaveamento?</h2>
+    <div class="opts"><label class="opt"><input type="radio" name="q-vis" value="circular" ${Q.visual === "circular" ? "checked" : ""}> ◎ Circular especial</label>
+      <label class="opt"><input type="radio" name="q-vis" value="classico" ${Q.visual === "classico" ? "checked" : ""}> ▤ Clássico (árvore em colunas)</label></div>
+    <p class="dica">Os dois mostram a mesma copa — dá para trocar de visual a qualquer momento, no botão da barra de ações.</p></section>
+   <section class="card"><h2><span class="n">4</span>Como sortear o chaveamento?</h2>
     <div class="campos"><label>Sorteio<select id="q-so"><option value="aleatorio">Totalmente aleatório</option><option value="separar">Espalhar times do mesmo estado pelo círculo</option><option value="base">Ordem da base (alfabética)</option></select></label></div>
     <p class="dica">“Espalhar” faz times do mesmo estado tenderem a só se encontrar nas fases finais. Em “Ordem da base”, vizinhos no círculo são vizinhos na lista.</p></section>
-   <section class="card"><h2><span class="n">4</span>Formato dos jogos</h2>
+   <section class="card"><h2><span class="n">5</span>Formato dos jogos</h2>
     <div class="campos"><label>Confrontos<select id="q-ida"><option value="unico">Jogo único</option><option value="ida">Ida e volta</option></select></label>
       <label class="linha-chk" id="q-fuw" hidden><input type="checkbox" id="q-fu" ${Q.finalUnico ? "checked" : ""}> Final em jogo único</label></div>
     <p class="dica">Empate (no jogo único ou no agregado) vai para os pênaltis. Dá para lançar o placar de cada confronto clicando na linha dele no círculo.</p></section>
@@ -574,7 +594,7 @@ function qPick(c) {
 function comecar() {
   const ids = Q.modo === "manual" ? [...Q.escolha] : embaralhar(pool().map(t => t.id)).slice(0, Q.n);
   const { prelim, slots } = montarSorteio(ids, Q.sorteio);
-  C = { cfg: { ida: Q.ida, finalUnico: Q.ida && Q.finalUnico, sorteio: Q.sorteio }, prelim, slots, res: [], festa: null };
+  C = { cfg: { ida: Q.ida, finalUnico: Q.ida && Q.finalUnico, sorteio: Q.sorteio, visual: Q.visual }, prelim, slots, res: [], festa: null };
   preparar(); sincronizarHub(null); salvarLocal(); entrarCopa();
 }
 
@@ -588,7 +608,7 @@ function entrarCopa() {
       <input id="lt-busca" type="search" placeholder="Buscar time" aria-label="Buscar time"><div class="lista-l" id="lt"></div></aside>
     <section>
       <div class="acoes"><button class="b sim" id="b-fase" data-a="sim-fase">⏭ Simular fase</button><button class="b sim" id="b-tudo" data-a="sim-tudo">⏩ Simular tudo</button>
-        <button class="b" data-a="sortear">🎲 Sortear de novo</button><button class="b" data-a="limpar">↺ Limpar resultados</button><span class="esp"></span>
+        <button class="b" data-a="visual" id="b-vis"></button><button class="b" data-a="sortear">🎲 Sortear de novo</button><button class="b" data-a="limpar">↺ Limpar resultados</button><span class="esp"></span>
         <button class="b" data-a="baixar">💾 Baixar save</button><button class="b" data-a="abrir">📂 Abrir save</button><button class="b perigo" data-a="nova">⚙ Nova copa</button></div>
       <p id="status"></p><div class="legenda" id="legenda"></div>
       <div class="vp" id="vp"><div class="zoom"><button data-a="z+" aria-label="Aproximar">+</button><button data-a="z-" aria-label="Afastar">−</button><button data-a="z0" aria-label="Centralizar" title="Centralizar">⌖</button></div>
@@ -597,8 +617,9 @@ function entrarCopa() {
     </section></div>`;
   ligarZoom();
   $("lt-busca").addEventListener("input", desenharLista);
-  desenhar(); ajustar();
+  desenhar(); rotuloVisual(); ajustar();
 }
+function rotuloVisual() { $("b-vis").textContent = C.cfg.visual === "classico" ? "◎ Ver circular" : "▤ Ver clássico"; }
 
 /* ---------- Ações dos botões ---------- */
 function acao(a, v) {
@@ -608,6 +629,7 @@ function acao(a, v) {
     case "q-marcar": qListados().forEach(t => Q.escolha.add(t.id)); return qParciais();
     case "q-desmarcar": qListados().forEach(t => Q.escolha.delete(t.id)); return qParciais();
     case "q-limpar": Q.escolha.clear(); return qParciais();
+    case "visual": C.cfg.visual = C.cfg.visual === "classico" ? "circular" : "classico"; salvarLocal(); desenhar(); rotuloVisual(); return ajustar();
     case "sim-fase": return simularFase();
     case "sim-tudo": return simularTudo();
     case "sortear": {
@@ -656,6 +678,7 @@ document.addEventListener("change", e => {
     $("q-n").value = Q.n; qParciais();
   }
   else if (el.name === "q-modo") { Q.modo = el.value; qParciais(); }
+  else if (el.name === "q-vis") Q.visual = el.value;
   else if (el.id === "q-n") { Q.n = Math.min(Math.max(parseInt(el.value) || 2, 2), Math.max(pool().length, 2)); el.value = Q.n; qRes(); }
   else if (el.id === "q-so") Q.sorteio = el.value;
   else if (el.id === "q-ida") { Q.ida = el.value === "ida"; qParciais(); }

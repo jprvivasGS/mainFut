@@ -115,6 +115,8 @@ input,select { background:var(--bg); border:1px solid var(--line); border-radius
 .no.vence { background:#116329; border-color:var(--ok); }
 .no.fora { filter:grayscale(1); opacity:.2; }
 .no.espera { border-style:dashed; opacity:.35; cursor:default; }
+.rot { position:absolute; transform:translateX(-50%); font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.5px; white-space:nowrap; opacity:.85; pointer-events:none; }
+.jg .v { stroke-linejoin:round; }
 .svg-padrao { width:14px; height:14px; fill:var(--mut); }
 
 .campeao { position:absolute; transform:translate(-50%,-50%); z-index:30; display:flex; align-items:center; justify-content:center; gap:6px;
