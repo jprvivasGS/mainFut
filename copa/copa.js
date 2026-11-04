@@ -428,10 +428,6 @@ function hexDominante(img) {     // cor mais frequente da imagem (mesmo método 
     return melhor ? "#" + [melhor.r, melhor.g, melhor.b].map(v => Math.round(v / melhor.n).toString(16).padStart(2, "0")).join("") : null;
   } catch (e) { return null; }
 }
-function escura(hex) {           // cor tão escura que sumiria no fundo (ex.: preto): o fogo mantém a cor, mas ganha uma borda clara
-  const [r, g, b] = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
-  return (0.299 * r + 0.587 * g + 0.114 * b) < 70;
-}
 function corHex(caminho) {       // lê o hex da imagem em cores/…; se falhar, usa a tabela pelo nome
   if (!cacheCor.has(caminho)) cacheCor.set(caminho, new Promise(ok => {
     const reserva = COR_PADRAO[nomeDaCor(caminho).toLowerCase()] || null, i = new Image();
@@ -457,16 +453,15 @@ function iniciarFogos(cores) {
   cv.width = innerWidth; cv.height = innerHeight;
   if (fogos) cancelAnimationFrame(fogos);
   (function quadro() {
-    ctx.fillStyle = "rgba(13,17,23,.2)"; ctx.fillRect(0, 0, cv.width, cv.height);    // rastro
+    ctx.fillStyle = "rgba(66,76,94,.2)"; ctx.fillRect(0, 0, cv.width, cv.height);    // rastro
     if (Math.random() < 0.05) {
       const x = Math.random() * cv.width, y = Math.random() * cv.height / 2, c = cores[rnd(cores.length)];
-      for (let i = 0; i < 50; i++) { const a = Math.random() * Math.PI * 2, v = Math.random() * 6 + 2; ps.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, al: 1, c, borda: escura(c) }); }
+      for (let i = 0; i < 50; i++) { const a = Math.random() * Math.PI * 2, v = Math.random() * 6 + 2; ps.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, al: 1, c }); }
     }
     for (let i = ps.length - 1; i >= 0; i--) {
       const p = ps[i]; p.x += p.vx; p.y += p.vy; p.vy += 0.05; p.al -= 0.015;
       if (p.al <= 0) { ps.splice(i, 1); continue; }
       ctx.globalAlpha = p.al; ctx.fillStyle = p.c; ctx.beginPath(); ctx.arc(p.x, p.y, 3, 0, Math.PI * 2); ctx.fill();
-      if (p.borda) { ctx.strokeStyle = "rgba(255,255,255,.8)"; ctx.lineWidth = 1.2; ctx.stroke(); }
     }
     ctx.globalAlpha = 1;
     fogos = requestAnimationFrame(quadro);
