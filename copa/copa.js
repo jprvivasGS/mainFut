@@ -41,7 +41,7 @@ let JG = null;                   // confronto aberto na janela de placar { r, p,
 /* ---------- Utilidades de tela ---------- */
 function esc(t) {                // escudo; sem imagem, mostra a sigla
   if (!t.escudo) return `<span class="esc"><b>${h(sigla(t))}</b></span>`;
-  return `<span class="esc"><img src="${RAIZ}${h(t.escudo)}" alt="" data-s="${h(sigla(t))}" onerror="this.replaceWith(Object.assign(document.createElement('b'),{textContent:this.dataset.s}))"></span>`;
+  return `<span class="esc"><img src="${RAIZ}${h(t.escudo)}" alt="" decoding="async" data-s="${h(sigla(t))}" onerror="this.replaceWith(Object.assign(document.createElement('b'),{textContent:this.dataset.s}))"></span>`;
 }
 const SVG_PADRAO = `<svg class="svg-padrao" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>`;
 let tAviso;
@@ -183,48 +183,71 @@ function pos(r, i) {
 }
 
 /* ---------- Desenho da arena ---------- */
+let ARENA = { chave: "", nos: [], gs: [], nb: [], gb: [], camp: "" };   // elementos já criados (para atualizar sem recriar)
 function desenharArena() {
   G = geometria();
-  const arena = $("arena"), camp = campeaoId();
+  const chave = [G.visual, R.map(a => a.count).join("."), NUL.join(",")].join("|");     // muda só se a estrutura mudar
+  if (chave !== ARENA.chave || !$("arena").querySelector(".no")) montarArena(chave);
+  atualizarArena();
+}
+function montarArena(chave) {    // cria escudos e linhas UMA vez; o conteúdo é preenchido em atualizarArena()
+  const arena = $("arena"), nb = [], gb = []; let nn = 0, ng = 0;
   arena.style.width = G.W + "px"; arena.style.height = G.H + "px";
   $("svg").setAttribute("width", G.W); $("svg").setAttribute("height", G.H);
 
-  // escudos
-  let nos = "";
+  let nos = "", linhas = "";
+  const f = n => n.toFixed(1), pts = a => a.map(q => f(q.x) + "," + f(q.y)).join(" ");
   R.forEach((a, r) => {
-    for (let i = 0; i < a.count; i++) {
-      const id = E[r][i], p = i >> 1, m = C.res[r][p], t = id && T.get(id), p0 = pos(r, i);
-      const cls = !id ? "espera" : (m && m.w === id) ? "vence" : (m && m.w) ? "fora" : "";
-      nos += `<div class="no ${cls}" style="left:${p0.x.toFixed(1)}px;top:${p0.y.toFixed(1)}px;--c:${corAnel(r)}" data-r="${r}" data-i="${i}" title="${t ? h(`${t.nome} (${t.uf})`) : "Aguardando"}">${t ? esc(t) : SVG_PADRAO}</div>`;
+    nb[r] = nn; gb[r] = ng;
+    for (let i = 0; i < a.count; i++, nn++) {
+      const p0 = pos(r, i);
+      nos += `<div class="no espera" style="left:${f(p0.x)}px;top:${f(p0.y)}px;--c:${corAnel(r)}" data-r="${r}" data-i="${i}"></div>`;
     }
+    // cada confronto: 3 traços visíveis (time A → meio, time B → meio, meio → vencedor) e UM traço largo invisível para o clique
+    for (let p = 0; p < a.count / 2; p++, ng++) {
+      const p1 = pos(r, 2 * p), p2 = pos(r, 2 * p + 1), classico = G.visual === "classico";
+      const mx = classico ? p1.x + COL_W / 2 : (p1.x + p2.x) / 2, m0 = { x: mx, y: (p1.y + p2.y) / 2 };
+      const alvo = r === R.length - 1 ? G.champ : a.tipo === "prelim" ? pos(r + 1, NUL[p]) : pos(r + 1, p);
+      const l1 = classico ? [p1, { x: mx, y: p1.y }, m0] : [p1, m0], l2 = classico ? [p2, { x: mx, y: p2.y }, m0] : [p2, m0];
+      const hit = classico ? `M${pts([p1, { x: mx, y: p1.y }, m0, { x: mx, y: p2.y }, p2]).replace(/ /g, " L")} M${pts([m0, alvo]).replace(/ /g, " L")}`
+                           : `M${pts([p1, m0, p2]).replace(/ /g, " L")} M${pts([m0, alvo]).replace(/ /g, " L")}`;
+      linhas += `<g class="jg" data-r="${r}" data-p="${p}"><title></title><polyline class="v l1" points="${pts(l1)}"/><polyline class="v l2" points="${pts(l2)}"/><polyline class="v dest" points="${pts([m0, alvo])}"/><path class="hit" d="${hit}"/></g>`;
+    }
+    if (G.visual === "classico") nos += `<div class="rot" style="left:${G.X[r]}px;top:34px;color:${corAnel(r)}">${h(a.nome)}</div>`;   // título da coluna
   });
-  if (G.visual === "classico") R.forEach((a, r) => { nos += `<div class="rot" style="left:${G.X[r]}px;top:34px;color:${corAnel(r)}">${h(a.nome)}</div>`; });   // título de cada coluna
   arena.querySelectorAll(".no, .rot").forEach(n => n.remove());
   arena.insertAdjacentHTML("beforeend", nos);
-
-  // linhas: cada confronto tem 3 traços (time A → meio, time B → meio, meio → vencedor) e um traço largo invisível para o clique
-  let linhas = "";
+  $("svg").innerHTML = linhas;
+  const cb = $("campeao"); cb.style.left = G.champ.x + "px"; cb.style.top = G.champ.y + "px";
+  ARENA = { chave, nos: [...arena.querySelectorAll(".no")], gs: [...$("svg").querySelectorAll(".jg")], nb, gb, camp: "?" };
+}
+function atualizarArena() {      // mexe só nos escudos e linhas cujo estado mudou
+  const nome = id => id ? T.get(id).nome : "?";
   R.forEach((a, r) => {
+    for (let i = 0; i < a.count; i++) {
+      const el = ARENA.nos[ARENA.nb[r] + i], id = E[r][i], m = C.res[r][i >> 1];
+      const cls = !id ? "espera" : (m && m.w === id) ? "vence" : (m && m.w) ? "fora" : "", sig = (id || "") + "|" + cls;
+      if (el._s === sig) continue;
+      if (el._id !== id) {
+        el._id = id; const t = id && T.get(id);
+        el.title = t ? `${t.nome} (${t.uf})` : "Aguardando"; el.innerHTML = t ? esc(t) : SVG_PADRAO;
+      }
+      el._s = sig; el.className = "no " + cls;
+    }
     for (let p = 0; p < a.count / 2; p++) {
-      const p1 = pos(r, 2 * p), p2 = pos(r, 2 * p + 1), classico = G.visual === "classico";
-      const mx = classico ? p1.x + COL_W / 2 : (p1.x + p2.x) / 2, my = (p1.y + p2.y) / 2, m0 = { x: mx, y: my };
-      const alvo = r === R.length - 1 ? G.champ : a.tipo === "prelim" ? pos(r + 1, NUL[p]) : pos(r + 1, p);
-      const w = venc(r, p), ca = E[r][2 * p], cb = E[r][2 * p + 1];
-      const cls = `jg ${w ? "feito" : pronto(r, p) ? "pronto" : ""} ${w && w === ca ? "w1" : w ? "w2" : ""}`;
-      const seg = (pts, c) => { const s = pts.map(q => q.x.toFixed(1) + "," + q.y.toFixed(1)).join(" "); return `<polyline class="v ${c}" points="${s}"/><polyline class="hit" points="${s}"/>`; };
-      const nome = id => id ? T.get(id).nome : "?";
-      linhas += `<g class="${cls}" data-r="${r}" data-p="${p}"><title>${h(nome(ca))} × ${h(nome(cb))}${pronto(r, p) ? " — clique para ver o confronto" : ""}</title>`
-        + seg(classico ? [p1, { x: mx, y: p1.y }, m0] : [p1, m0], "l1") + seg(classico ? [p2, { x: mx, y: p2.y }, m0] : [p2, m0], "l2") + seg([m0, alvo], "dest") + `</g>`;
+      const g = ARENA.gs[ARENA.gb[r] + p], w = venc(r, p), ca = E[r][2 * p], cb = E[r][2 * p + 1], ok = pronto(r, p);
+      const cls = `jg ${w ? "feito" : ok ? "pronto" : ""} ${w && w === ca ? "w1" : w ? "w2" : ""}`, sig = cls + "|" + ca + "|" + cb;
+      if (g._s === sig) continue;
+      g._s = sig; g.setAttribute("class", cls);
+      g.firstChild.textContent = `${nome(ca)} × ${nome(cb)}${ok ? " — clique para ver o confronto" : ""}`;
     }
   });
-  $("svg").innerHTML = linhas;
-
-  // campeão no centro
-  const cb = $("campeao");
-  cb.style.left = G.champ.x + "px"; cb.style.top = G.champ.y + "px";
-  cb.classList.toggle("tem", !!camp);
-  cb.innerHTML = camp ? `${esc(T.get(camp))}<span>${h(T.get(camp).nome)}</span>` : `<span>🏆</span><span>Campeão</span>`;
-  cb.title = camp ? "Clique para comemorar de novo" : "";
+  const camp = campeaoId(), btn = $("campeao");     // campeão no centro
+  if (ARENA.camp !== (camp || "")) {
+    ARENA.camp = camp || ""; btn.classList.toggle("tem", !!camp);
+    btn.innerHTML = camp ? `${esc(T.get(camp))}<span>${h(T.get(camp).nome)}</span>` : `<span>🏆</span><span>Campeão</span>`;
+    btn.title = camp ? "Clique para comemorar de novo" : "";
+  }
 }
 function desenharLegenda() {
   $("legenda").innerHTML = R.map((a, r) => {
@@ -248,13 +271,20 @@ function estadoDosTimes() {      // id → "vivo" | "fora" | "camp"
   if (camp) e.set(camp, "camp");
   return e;
 }
+let LISTA = "";
 function desenharLista() {
   const termo = sem($("lt-busca").value.trim()), st = estadoDosTimes();
   const ids = [...st.keys()].sort((a, b) => T.get(a).nome.localeCompare(T.get(b).nome, "pt-BR") || T.get(a).uf.localeCompare(T.get(b).uf));
   const vivos = ids.filter(id => st.get(id) !== "fora").length;
   $("lt-n").textContent = `(${vivos} vivos de ${ids.length})`;
-  $("lt").innerHTML = ids.filter(id => !termo || sem(`${T.get(id).nome} ${T.get(id).uf} ${sigla(T.get(id))}`).includes(termo))
-    .map(id => { const t = T.get(id); return `<button type="button" class="titem ${st.get(id)}" data-id="${h(id)}">${esc(t)}<span>${h(t.nome)}</span><small>${h(t.uf)}</small><i></i></button>`; }).join("")
+  const vis = ids.filter(id => !termo || sem(`${T.get(id).nome} ${T.get(id).uf} ${sigla(T.get(id))}`).includes(termo)), chave = vis.join("|");
+  const box = $("lt");
+  if (chave === LISTA && box.children.length === vis.length) {     // mesma lista: só atualiza o estado de cada time
+    vis.forEach((id, k) => { const c = "titem " + st.get(id); if (box.children[k].className !== c) box.children[k].className = c; });
+    return;
+  }
+  LISTA = chave;
+  box.innerHTML = vis.map(id => { const t = T.get(id); return `<button type="button" class="titem ${st.get(id)}" data-id="${h(id)}">${esc(t)}<span>${h(t.nome)}</span><small>${h(t.uf)}</small><i></i></button>`; }).join("")
     || `<p class="dica">Nenhum time encontrado.</p>`;
 }
 function desenhar() { desenharArena(); desenharLegenda(); desenharStatus(); desenharLista(); }
@@ -381,8 +411,8 @@ function abrirTime(id) {
 function abrirImagem(src) { $("imgGrande").src = src; $("imgDlg").showModal(); }
 
 /* ---------- Comemoração do campeão (fogos com as cores do time) ---------- */
-const COR_PADRAO = { amarelo: "#facc15", anil: "#6366f1", azul: "#2f7de1", branco: "#ffffff", ciano: "#22d3ee", cinza: "#9ca3af", fume: "#8b949e", graxa: "#6b7280",
-  laranja: "#f97316", lima: "#a3e635", magenta: "#e91e8c", prata: "#cbd5e1", preto: "#9ca3af", rosa: "#f472b6", roxo: "#8b5cf6", turquesa: "#14b8a6", verde: "#22c55e", vermelho: "#ef4444" };
+const COR_PADRAO = { amarelo: "#facc15", anil: "#6366f1", azul: "#2f7de1", branco: "#ffffff", ciano: "#22d3ee", cinza: "#9ca3af", fume: "#8b949e", graxa: "#2b2b2b",
+  laranja: "#f97316", lima: "#a3e635", magenta: "#e91e8c", prata: "#cbd5e1", preto: "#0a0a0a", rosa: "#f472b6", roxo: "#8b5cf6", turquesa: "#14b8a6", verde: "#22c55e", vermelho: "#ef4444" };
 const cacheCor = new Map();
 function hexDominante(img) {     // cor mais frequente da imagem (mesmo método do hub)
   try {
@@ -398,10 +428,9 @@ function hexDominante(img) {     // cor mais frequente da imagem (mesmo método 
     return melhor ? "#" + [melhor.r, melhor.g, melhor.b].map(v => Math.round(v / melhor.n).toString(16).padStart(2, "0")).join("") : null;
   } catch (e) { return null; }
 }
-function clarear(hex) {          // cores muito escuras somem no fundo: mistura com branco
+function escura(hex) {           // cor tão escura que sumiria no fundo (ex.: preto): o fogo mantém a cor, mas ganha uma borda clara
   const [r, g, b] = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
-  if ((0.299 * r + 0.587 * g + 0.114 * b) > 80) return hex;
-  return "#" + [r, g, b].map(v => Math.round(v + (255 - v) * 0.55).toString(16).padStart(2, "0")).join("");
+  return (0.299 * r + 0.587 * g + 0.114 * b) < 70;
 }
 function corHex(caminho) {       // lê o hex da imagem em cores/…; se falhar, usa a tabela pelo nome
   if (!cacheCor.has(caminho)) cacheCor.set(caminho, new Promise(ok => {
@@ -417,7 +446,7 @@ async function festa(id) {
   if ($("jogoDlg").open) $("jogoDlg").close();
   $("festaEsc").innerHTML = esc(t); $("festaNome").textContent = t.nome; $("festaLocal").textContent = [t.cidade, t.uf].filter(Boolean).join(" · ");
   $("festa").hidden = false;
-  let cores = (await Promise.all((t.cores || []).map(corHex))).filter(Boolean).map(clarear);
+  let cores = (await Promise.all((t.cores || []).map(corHex))).filter(Boolean);
   if (!cores.length) cores = ["#da3633", "#ffffff", "#ffd700"];
   if ($("festa").hidden || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   iniciarFogos(cores);
@@ -431,12 +460,13 @@ function iniciarFogos(cores) {
     ctx.fillStyle = "rgba(13,17,23,.2)"; ctx.fillRect(0, 0, cv.width, cv.height);    // rastro
     if (Math.random() < 0.05) {
       const x = Math.random() * cv.width, y = Math.random() * cv.height / 2, c = cores[rnd(cores.length)];
-      for (let i = 0; i < 50; i++) { const a = Math.random() * Math.PI * 2, v = Math.random() * 6 + 2; ps.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, al: 1, c }); }
+      for (let i = 0; i < 50; i++) { const a = Math.random() * Math.PI * 2, v = Math.random() * 6 + 2; ps.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, al: 1, c, borda: escura(c) }); }
     }
     for (let i = ps.length - 1; i >= 0; i--) {
       const p = ps[i]; p.x += p.vx; p.y += p.vy; p.vy += 0.05; p.al -= 0.015;
       if (p.al <= 0) { ps.splice(i, 1); continue; }
       ctx.globalAlpha = p.al; ctx.fillStyle = p.c; ctx.beginPath(); ctx.arc(p.x, p.y, 3, 0, Math.PI * 2); ctx.fill();
+      if (p.borda) { ctx.strokeStyle = "rgba(255,255,255,.8)"; ctx.lineWidth = 1.2; ctx.stroke(); }
     }
     ctx.globalAlpha = 1;
     fogos = requestAnimationFrame(quadro);
@@ -469,7 +499,11 @@ function ligarZoom() {
   });
   const soltar = e => { dedos.delete(e.pointerId); if (!dedos.size) { vp.classList.remove("arrastando"); setTimeout(() => vp._arrastou = false, 0); } };
   vp.addEventListener("pointerup", soltar); vp.addEventListener("pointercancel", soltar);
-  vp.addEventListener("wheel", e => { e.preventDefault(); zoomEm(e.clientX, e.clientY, e.deltaY < 0 ? 1.12 : 1 / 1.12); }, { passive: false });
+  let rodaF = 1, rodaP = null, rodaQ = 0;      // a roda dispara muitos eventos: aplica o zoom uma vez por quadro
+  vp.addEventListener("wheel", e => {
+    e.preventDefault(); rodaF *= e.deltaY < 0 ? 1.12 : 1 / 1.12; rodaP = { x: e.clientX, y: e.clientY };
+    if (!rodaQ) rodaQ = requestAnimationFrame(() => { zoomEm(rodaP.x, rodaP.y, rodaF); rodaF = 1; rodaQ = 0; });
+  }, { passive: false });
   $("arena").addEventListener("click", e => {
     if (vp._arrastou) return;
     const n = e.target.closest(".no"); if (n) return clickNo(+n.dataset.r, +n.dataset.i);
@@ -495,7 +529,10 @@ function preparar(res) {         // monta os anéis e confere os resultados guar
   C.res = R.map((_, r) => (res && res[r] && typeof res[r] === "object") ? res[r] : {});
   derivar();
 }
-function salvarLocal() { try { localStorage.setItem(LOCAL, JSON.stringify(paraJSON())); } catch (e) { /* sem armazenamento */ } }
+let tSalvar = 0;
+function gravarLocal() { clearTimeout(tSalvar); tSalvar = 0; if (!C) return; try { localStorage.setItem(LOCAL, JSON.stringify(paraJSON())); } catch (e) { /* sem armazenamento */ } }
+function salvarLocal() { clearTimeout(tSalvar); tSalvar = setTimeout(gravarLocal, 400); }
+addEventListener("pagehide", () => { if (tSalvar) gravarLocal(); });
 function baixar() {
   const a = document.createElement("a"), n = C.prelim.length + C.slots.filter(x => x != null).length;
   a.href = URL.createObjectURL(new Blob([JSON.stringify(paraJSON())], { type: "application/json" }));
@@ -644,7 +681,7 @@ function acao(a, v) {
     case "abrir": return abrirArquivo();
     case "nova":
       if (C && !confirm("Começar uma nova copa? A atual será substituída (baixe o save antes se quiser guardá-la).")) return;
-      try { localStorage.removeItem(LOCAL); } catch (e) { /* ignora */ }
+      clearTimeout(tSalvar); try { localStorage.removeItem(LOCAL); } catch (e) { /* ignora */ }
       sincronizarHub(null); pararFogos(); return questionario();
     case "z+": case "z-": case "z0": {
       const r = $("vp").getBoundingClientRect();
