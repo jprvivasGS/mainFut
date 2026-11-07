@@ -727,7 +727,10 @@
       "serie": null,
       "fundacao": 1944,
       "escudo": "escudos/macapa-ap.png",
-      "cores": [],
+      "cores":  [
+        "cores/azul.png",
+        "cores/branco.png"
+       ],
       "mascote": {
         "nome": "Leão",
         "imagem": "mascotes/macapa-ap.png"
@@ -1137,7 +1140,10 @@
       "serie": "B",
       "fundacao": 1914,
       "escudo": "escudos/ceara-ce.png",
-      "cores": [],
+      "cores": [
+        "cores/preto.png",
+        "cores/branco.png"
+       ],
       "mascote": {
         "nome": "Vozão",
         "imagem": "mascotes/ceara-ce.png"
@@ -4002,7 +4008,10 @@
       "serie": "A",
       "fundacao": 1942,
       "escudo": "escudos/botafogo-rj.png",
-      "cores": [],
+      "cores":  [
+        "cores/preto.png",
+        "cores/branco.png"
+       ],
       "mascote": {
         "nome": "Cachorro",
         "imagem": "mascotes/botafogo-rj.png"
@@ -4490,7 +4499,11 @@
       "serie": "D",
       "fundacao": 2018,
       "escudo": "escudos/porto-velho-ro.png",
-      "cores": [],
+      "cores":  [
+        "cores/anil.png",
+        "cores/vermelho.png",
+        "cores/branco.png"
+       ],
       "mascote": {
         "nome": "Locomotiva",
         "imagem": "mascotes/porto-velho-ro.png"
@@ -5119,7 +5132,10 @@
       "serie": "B",
       "fundacao": 1973,
       "escudo": "escudos/chapecoense-sc.png",
-      "cores": [],
+      "cores":  [
+        "cores/verde.png",
+        "cores/branco.png"
+       ],
       "mascote": {
         "nome": "Índio Condá",
         "imagem": "mascotes/chapecoense-sc.png"
@@ -5766,13 +5782,13 @@
       "sigla": "GRP",
       "uf": "TO",
       "regiao": "norte",
-      "cidade": "1988",
+      "cidade": "Gurupi",
       "federacao": {
         "sigla": "FFTO",
         "imagem": "federacao/TO.png"
       },
       "serie": null,
-      "fundacao": null,
+      "fundacao": 1988,
       "escudo": "escudos/gurupi-to.png",
       "cores": [
         "cores/amarelo.png",
