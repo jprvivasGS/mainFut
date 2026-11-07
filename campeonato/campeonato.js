@@ -303,7 +303,7 @@ function questionario() {
     comps: [{ nome: "Libertadores", vagas: 4 }, { nome: "Sul-Americana", vagas: 6 }] }; Q.nd = Math.max(1, Math.round(pool().length / 20)); qRecalcular(); }
   const regs = [...new Set(TIMES.map(t => t.regiao))];
   $("app").innerHTML = `<div class="quest">
-   <section class="card"><h2><span class="n">1</span>Quais times vão jogar?</h2>
+   <section class="card"><h2><span class="n">1</span>De onde vêm os times</h2>
     <div class="opts">${regs.map(r => `<label class="opt"><input type="checkbox" data-reg="${h(r)}" ${Q.reg.includes(r) ? "checked" : ""}> ${h(REG[r] || r)} <small>(${TIMES.filter(t => t.regiao === r).length})</small></label>`).join("")}</div>
     <p class="dica" id="q-pool"></p></section>
    <section class="card"><h2><span class="n">2</span>Quantas divisões?</h2>
