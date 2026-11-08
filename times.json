@@ -14,6 +14,7 @@
         "imagem": "federacao/AC.png"
       },
       "serie": "D",
+      "forca": 281,
       "fundacao": 2022,
       "escudo": "escudos/aquiry-ac.png",
       "cores": [
@@ -41,6 +42,7 @@
         "imagem": "federacao/AC.png"
       },
       "serie": "D",
+      "forca": 336,
       "fundacao": 1952,
       "escudo": "escudos/atletico-ac.png",
       "cores": [
@@ -68,6 +70,7 @@
         "imagem": "federacao/AC.png"
       },
       "serie": "D",
+      "forca": 344,
       "fundacao": 1966,
       "escudo": "escudos/atletico-juventus-ac.png",
       "cores": [
@@ -95,6 +98,7 @@
         "imagem": "federacao/AC.png"
       },
       "serie": "D",
+      "forca": 299,
       "fundacao": 2011,
       "escudo": "escudos/galvez-ac.png",
       "cores": [
@@ -122,6 +126,7 @@
         "imagem": "federacao/AC.png"
       },
       "serie": "D",
+      "forca": 267,
       "fundacao": 2015,
       "escudo": "escudos/humaita-ac.png",
       "cores": [
@@ -150,6 +155,7 @@
         "imagem": "federacao/AC.png"
       },
       "serie": "D",
+      "forca": 341,
       "fundacao": 1946,
       "escudo": "escudos/independencia-ac.png",
       "cores": [
@@ -178,6 +184,7 @@
         "imagem": "federacao/AC.png"
       },
       "serie": "D",
+      "forca": 288,
       "fundacao": 1979,
       "escudo": "escudos/placido-de-castro-ac.png",
       "cores": [
@@ -207,6 +214,7 @@
         "imagem": "federacao/AC.png"
       },
       "serie": "D",
+      "forca": 317,
       "fundacao": 1919,
       "escudo": "escudos/rio-branco-ac.png",
       "cores": [
@@ -234,6 +242,7 @@
         "imagem": "federacao/AL.png"
       },
       "serie": "D",
+      "forca": 364,
       "fundacao": 1977,
       "escudo": "escudos/asa-al.png",
       "cores": [
@@ -261,6 +270,7 @@
         "imagem": "federacao/AL.png"
       },
       "serie": "D",
+      "forca": 363,
       "fundacao": 1946,
       "escudo": "escudos/capelense-al.png",
       "cores": [
@@ -289,6 +299,7 @@
         "imagem": "federacao/AL.png"
       },
       "serie": "D",
+      "forca": 386,
       "fundacao": 2003,
       "escudo": "escudos/coruripe-al.png",
       "cores": [
@@ -316,6 +327,7 @@
         "imagem": "federacao/AL.png"
       },
       "serie": "B",
+      "forca": 674,
       "fundacao": 1912,
       "escudo": "escudos/crb-al.png",
       "cores": [
@@ -343,6 +355,7 @@
         "imagem": "federacao/AL.png"
       },
       "serie": "D",
+      "forca": 380,
       "fundacao": 1913,
       "escudo": "escudos/csa-al.png",
       "cores": [
@@ -370,6 +383,7 @@
         "imagem": "federacao/AL.png"
       },
       "serie": "D",
+      "forca": 407,
       "fundacao": 1947,
       "escudo": "escudos/cse-al.png",
       "cores": [
@@ -398,6 +412,7 @@
         "imagem": "federacao/AL.png"
       },
       "serie": "D",
+      "forca": 399,
       "fundacao": 1974,
       "escudo": "escudos/murici-al.png",
       "cores": [
@@ -425,6 +440,7 @@
         "imagem": "federacao/AL.png"
       },
       "serie": "D",
+      "forca": 357,
       "fundacao": 1909,
       "escudo": "escudos/penedense-al.png",
       "cores": [
@@ -452,6 +468,7 @@
         "imagem": "federacao/AM.png"
       },
       "serie": "C",
+      "forca": 521,
       "fundacao": 2019,
       "escudo": "escudos/amazonas-am.png",
       "cores": [
@@ -479,6 +496,7 @@
         "imagem": "federacao/AM.png"
       },
       "serie": "D",
+      "forca": 372,
       "fundacao": 1930,
       "escudo": "escudos/fast-club-am.png",
       "cores": [
@@ -507,6 +525,7 @@
         "imagem": "federacao/AM.png"
       },
       "serie": "D",
+      "forca": 387,
       "fundacao": 2020,
       "escudo": "escudos/manauara-am.png",
       "cores": [
@@ -535,6 +554,7 @@
         "imagem": "federacao/AM.png"
       },
       "serie": "D",
+      "forca": 361,
       "fundacao": 2013,
       "escudo": "escudos/manaus-am.png",
       "cores": [
@@ -563,6 +583,7 @@
         "imagem": "federacao/AM.png"
       },
       "serie": "C",
+      "forca": 540,
       "fundacao": 1913,
       "escudo": "escudos/nacional-am.png",
       "cores": [
@@ -590,6 +611,7 @@
         "imagem": "federacao/AM.png"
       },
       "serie": "D",
+      "forca": 353,
       "fundacao": 1971,
       "escudo": "escudos/princesa-do-solimoes-am.png",
       "cores": [
@@ -617,6 +639,7 @@
         "imagem": "federacao/AM.png"
       },
       "serie": "D",
+      "forca": 349,
       "fundacao": 1913,
       "escudo": "escudos/rio-negro-am.png",
       "cores": [
@@ -644,6 +667,7 @@
         "imagem": "federacao/AM.png"
       },
       "serie": "D",
+      "forca": 359,
       "fundacao": 1918,
       "escudo": "escudos/sao-raimundo-am.png",
       "cores": [
@@ -671,6 +695,7 @@
         "imagem": "federacao/AP.png"
       },
       "serie": "D",
+      "forca": 296,
       "fundacao": 1944,
       "escudo": "escudos/amapa-ap.png",
       "cores": [
@@ -698,6 +723,7 @@
         "imagem": "federacao/AP.png"
       },
       "serie": "D",
+      "forca": 324,
       "fundacao": 1973,
       "escudo": "escudos/equatorial-ap.png",
       "cores": [
@@ -725,6 +751,7 @@
         "imagem": "federacao/AP.png"
       },
       "serie": "D",
+      "forca": 262,
       "fundacao": 1944,
       "escudo": "escudos/macapa-ap.png",
       "cores": [
@@ -752,6 +779,7 @@
         "imagem": "federacao/AP.png"
       },
       "serie": "D",
+      "forca": 306,
       "fundacao": 1969,
       "escudo": "escudos/oratorio-ap.png",
       "cores": [
@@ -779,6 +807,7 @@
         "imagem": "federacao/AP.png"
       },
       "serie": "D",
+      "forca": 291,
       "fundacao": 1955,
       "escudo": "escudos/santana-ap.png",
       "cores": [
@@ -807,6 +836,7 @@
         "imagem": "federacao/AP.png"
       },
       "serie": "D",
+      "forca": 282,
       "fundacao": 1946,
       "escudo": "escudos/sao-jose-ap.png",
       "cores": [
@@ -835,6 +865,7 @@
         "imagem": "federacao/AP.png"
       },
       "serie": "D",
+      "forca": 269,
       "fundacao": 1947,
       "escudo": "escudos/trem-ap.png",
       "cores": [
@@ -862,6 +893,7 @@
         "imagem": "federacao/AP.png"
       },
       "serie": "D",
+      "forca": 303,
       "fundacao": 1963,
       "escudo": "escudos/ypiranga-ap.png",
       "cores": [
@@ -890,6 +922,7 @@
         "imagem": "federacao/BA.png"
       },
       "serie": "D",
+      "forca": 410,
       "fundacao": 1970,
       "escudo": "escudos/atletico-ba.png",
       "cores": [
@@ -918,6 +951,7 @@
         "imagem": "federacao/BA.png"
       },
       "serie": "A",
+      "forca": 824,
       "fundacao": 1931,
       "escudo": "escudos/bahia-ba.png",
       "cores": [
@@ -946,6 +980,7 @@
         "imagem": "federacao/BA.png"
       },
       "serie": "D",
+      "forca": 400,
       "fundacao": 1941,
       "escudo": "escudos/feirense-ba.png",
       "cores": [
@@ -974,6 +1009,7 @@
         "imagem": "federacao/BA.png"
       },
       "serie": "D",
+      "forca": 405,
       "fundacao": 1933,
       "escudo": "escudos/galicia-ba.png",
       "cores": [
@@ -1001,6 +1037,7 @@
         "imagem": "federacao/BA.png"
       },
       "serie": "D",
+      "forca": 383,
       "fundacao": 1965,
       "escudo": "escudos/jacuipense-ba.png",
       "cores": [
@@ -1028,6 +1065,7 @@
         "imagem": "federacao/BA.png"
       },
       "serie": "D",
+      "forca": 413,
       "fundacao": 2006,
       "escudo": "escudos/juazeirense-ba.png",
       "cores": [
@@ -1056,6 +1094,7 @@
         "imagem": "federacao/BA.png"
       },
       "serie": "A",
+      "forca": 808,
       "fundacao": 1899,
       "escudo": "escudos/vitoria-ba.png",
       "cores": [
@@ -1083,6 +1122,7 @@
         "imagem": "federacao/BA.png"
       },
       "serie": "D",
+      "forca": 395,
       "fundacao": 1906,
       "escudo": "escudos/ypiranga-ba.png",
       "cores": [
@@ -1110,6 +1150,7 @@
         "imagem": "federacao/CE.png"
       },
       "serie": "D",
+      "forca": 374,
       "fundacao": 1997,
       "escudo": "escudos/atletico-ce.png",
       "cores": [
@@ -1138,6 +1179,7 @@
         "imagem": "federacao/CE.png"
       },
       "serie": "B",
+      "forca": 661,
       "fundacao": 1914,
       "escudo": "escudos/ceara-ce.png",
       "cores": [
@@ -1165,6 +1207,7 @@
         "imagem": "federacao/CE.png"
       },
       "serie": "D",
+      "forca": 415,
       "fundacao": 1933,
       "escudo": "escudos/ferroviario-ce.png",
       "cores": [
@@ -1193,6 +1236,7 @@
         "imagem": "federacao/CE.png"
       },
       "serie": "C",
+      "forca": 524,
       "fundacao": 1954,
       "escudo": "escudos/floresta-ce.png",
       "cores": [
@@ -1220,6 +1264,7 @@
         "imagem": "federacao/CE.png"
       },
       "serie": "B",
+      "forca": 673,
       "fundacao": 1916,
       "escudo": "escudos/fortaleza-ce.png",
       "cores": [
@@ -1248,6 +1293,7 @@
         "imagem": "federacao/CE.png"
       },
       "serie": "D",
+      "forca": 382,
       "fundacao": 1938,
       "escudo": "escudos/guarany-ce.png",
       "cores": [
@@ -1275,6 +1321,7 @@
         "imagem": "federacao/CE.png"
       },
       "serie": "D",
+      "forca": 408,
       "fundacao": 1963,
       "escudo": "escudos/icasa-ce.png",
       "cores": [
@@ -1302,6 +1349,7 @@
         "imagem": "federacao/CE.png"
       },
       "serie": "D",
+      "forca": 394,
       "fundacao": 2010,
       "escudo": "escudos/iguatu-ce.png",
       "cores": [
@@ -1329,6 +1377,7 @@
         "imagem": "federacao/DF.png"
       },
       "serie": "D",
+      "forca": 286,
       "fundacao": 1999,
       "escudo": "escudos/brasilia-df.png",
       "cores": [
@@ -1356,6 +1405,7 @@
         "imagem": "federacao/DF.png"
       },
       "serie": "D",
+      "forca": 292,
       "fundacao": 2000,
       "escudo": "escudos/brasiliense-df.png",
       "cores": [
@@ -1384,6 +1434,7 @@
         "imagem": "federacao/DF.png"
       },
       "serie": "D",
+      "forca": 300,
       "fundacao": 2005,
       "escudo": "escudos/capital-df.png",
       "cores": [
@@ -1412,6 +1463,7 @@
         "imagem": "federacao/DF.png"
       },
       "serie": "D",
+      "forca": 339,
       "fundacao": 1979,
       "escudo": "escudos/ceilandia-df.png",
       "cores": [
@@ -1439,6 +1491,7 @@
         "imagem": "federacao/DF.png"
       },
       "serie": "C",
+      "forca": 467,
       "fundacao": 1975,
       "escudo": "escudos/gama-df.png",
       "cores": [
@@ -1466,6 +1519,7 @@
         "imagem": "federacao/DF.png"
       },
       "serie": "D",
+      "forca": 307,
       "fundacao": 1996,
       "escudo": "escudos/real-brasilia-df.png",
       "cores": [
@@ -1493,6 +1547,7 @@
         "imagem": "federacao/DF.png"
       },
       "serie": "D",
+      "forca": 268,
       "fundacao": 1993,
       "escudo": "escudos/samambaia-df.png",
       "cores": [
@@ -1520,6 +1575,7 @@
         "imagem": "federacao/DF.png"
       },
       "serie": "D",
+      "forca": 297,
       "fundacao": 1975,
       "escudo": "escudos/sobradinho-df.png",
       "cores": [
@@ -1548,6 +1604,7 @@
         "imagem": "federacao/ES.png"
       },
       "serie": "D",
+      "forca": 321,
       "fundacao": 1963,
       "escudo": "escudos/desportiva-ferroviaria-es.png",
       "cores": [
@@ -1575,6 +1632,7 @@
         "imagem": "federacao/ES.png"
       },
       "serie": "D",
+      "forca": 266,
       "fundacao": 2001,
       "escudo": "escudos/linhares-es.png",
       "cores": [
@@ -1602,6 +1660,7 @@
         "imagem": "federacao/ES.png"
       },
       "serie": "D",
+      "forca": 283,
       "fundacao": 2021,
       "escudo": "escudos/nova-venecia-es.png",
       "cores": [
@@ -1630,6 +1689,7 @@
         "imagem": "federacao/ES.png"
       },
       "serie": "D",
+      "forca": 310,
       "fundacao": 2014,
       "escudo": "escudos/porto-vitoria-es.png",
       "cores": [
@@ -1657,6 +1717,7 @@
         "imagem": "federacao/ES.png"
       },
       "serie": "D",
+      "forca": 338,
       "fundacao": 2008,
       "escudo": "escudos/real-noroeste-es.png",
       "cores": [
@@ -1685,6 +1746,7 @@
         "imagem": "federacao/ES.png"
       },
       "serie": "D",
+      "forca": 331,
       "fundacao": 1913,
       "escudo": "escudos/rio-branco-es.png",
       "cores": [
@@ -1712,6 +1774,7 @@
         "imagem": "federacao/ES.png"
       },
       "serie": "D",
+      "forca": 316,
       "fundacao": 1930,
       "escudo": "escudos/serra-es.png",
       "cores": [
@@ -1740,6 +1803,7 @@
         "imagem": "federacao/ES.png"
       },
       "serie": "D",
+      "forca": 346,
       "fundacao": 1912,
       "escudo": "escudos/vitoria-es.png",
       "cores": [
@@ -1767,6 +1831,7 @@
         "imagem": "federacao/GO.png"
       },
       "serie": "D",
+      "forca": 390,
       "fundacao": 1946,
       "escudo": "escudos/anapolis-go.png",
       "cores": [
@@ -1795,6 +1860,7 @@
         "imagem": "federacao/GO.png"
       },
       "serie": "D",
+      "forca": 388,
       "fundacao": 1985,
       "escudo": "escudos/aparecidense-go.png",
       "cores": [
@@ -1822,6 +1888,7 @@
         "imagem": "federacao/GO.png"
       },
       "serie": "B",
+      "forca": 638,
       "fundacao": 1937,
       "escudo": "escudos/atletico-go.png",
       "cores": [
@@ -1849,6 +1916,7 @@
         "imagem": "federacao/GO.png"
       },
       "serie": "D",
+      "forca": 362,
       "fundacao": 1931,
       "escudo": "escudos/crac-go.png",
       "cores": [
@@ -1876,6 +1944,7 @@
         "imagem": "federacao/GO.png"
       },
       "serie": "D",
+      "forca": 373,
       "fundacao": 1938,
       "escudo": "escudos/goiania-go.png",
       "cores": [
@@ -1903,6 +1972,7 @@
         "imagem": "federacao/GO.png"
       },
       "serie": "B",
+      "forca": 651,
       "fundacao": 1943,
       "escudo": "escudos/goias-go.png",
       "cores": [
@@ -1930,6 +2000,7 @@
         "imagem": "federacao/GO.png"
       },
       "serie": "C",
+      "forca": 537,
       "fundacao": 1970,
       "escudo": "escudos/goiatuba-go.png",
       "cores": [
@@ -1957,6 +2028,7 @@
         "imagem": "federacao/GO.png"
       },
       "serie": "B",
+      "forca": 666,
       "fundacao": 1943,
       "escudo": "escudos/vila-nova-go.png",
       "cores": [
@@ -1984,6 +2056,7 @@
         "imagem": "federacao/MA.png"
       },
       "serie": "D",
+      "forca": 277,
       "fundacao": 1974,
       "escudo": "escudos/bacabal-ma.png",
       "cores": [
@@ -2011,6 +2084,7 @@
         "imagem": "federacao/MA.png"
       },
       "serie": "D",
+      "forca": 263,
       "fundacao": 2010,
       "escudo": "escudos/cordino-ma.png",
       "cores": [
@@ -2038,6 +2112,7 @@
         "imagem": "federacao/MA.png"
       },
       "serie": "D",
+      "forca": 311,
       "fundacao": 2008,
       "escudo": "escudos/iape-ma.png",
       "cores": [
@@ -2066,6 +2141,7 @@
         "imagem": "federacao/MA.png"
       },
       "serie": "C",
+      "forca": 461,
       "fundacao": 2001,
       "escudo": "escudos/imperatriz-ma.png",
       "cores": [
@@ -2093,6 +2169,7 @@
         "imagem": "federacao/MA.png"
       },
       "serie": "D",
+      "forca": 304,
       "fundacao": 2021,
       "escudo": "escudos/luminense-ma.png",
       "cores": [
@@ -2120,6 +2197,7 @@
         "imagem": "federacao/MA.png"
       },
       "serie": "C",
+      "forca": 469,
       "fundacao": 1932,
       "escudo": "escudos/maranhao-ma.png",
       "cores": [
@@ -2149,6 +2227,7 @@
         "imagem": "federacao/MA.png"
       },
       "serie": "D",
+      "forca": 272,
       "fundacao": 1937,
       "escudo": "escudos/moto-club-ma.png",
       "cores": [
@@ -2176,6 +2255,7 @@
         "imagem": "federacao/MA.png"
       },
       "serie": "D",
+      "forca": 335,
       "fundacao": 1923,
       "escudo": "escudos/sampaio-correa-ma.png",
       "cores": [
@@ -2204,6 +2284,7 @@
         "imagem": "federacao/MG.png"
       },
       "serie": "C",
+      "forca": 568,
       "fundacao": 1912,
       "escudo": "escudos/america-mg.png",
       "cores": [
@@ -2231,6 +2312,7 @@
         "imagem": "federacao/MG.png"
       },
       "serie": "B",
+      "forca": 700,
       "fundacao": 1909,
       "escudo": "escudos/athletic-mg.png",
       "cores": [
@@ -2258,6 +2340,7 @@
         "imagem": "federacao/MG.png"
       },
       "serie": "A",
+      "forca": 855,
       "fundacao": 1908,
       "escudo": "escudos/atletico-mg.png",
       "cores": [
@@ -2285,6 +2368,7 @@
         "imagem": "federacao/MG.png"
       },
       "serie": "A",
+      "forca": 832,
       "fundacao": 1921,
       "escudo": "escudos/cruzeiro-mg.png",
       "cores": [
@@ -2312,6 +2396,7 @@
         "imagem": "federacao/MG.png"
       },
       "serie": "D",
+      "forca": 411,
       "fundacao": 1998,
       "escudo": "escudos/ipatinga-mg.png",
       "cores": [
@@ -2341,6 +2426,7 @@
         "imagem": "federacao/MG.png"
       },
       "serie": "D",
+      "forca": 403,
       "fundacao": 1913,
       "escudo": "escudos/pouso-alegre-mg.png",
       "cores": [
@@ -2368,6 +2454,7 @@
         "imagem": "federacao/MG.png"
       },
       "serie": "D",
+      "forca": 402,
       "fundacao": 1914,
       "escudo": "escudos/tombense-mg.png",
       "cores": [
@@ -2395,6 +2482,7 @@
         "imagem": "federacao/MG.png"
       },
       "serie": "C",
+      "forca": 550,
       "fundacao": 1922,
       "escudo": "escudos/uberlandia-mg.png",
       "cores": [
@@ -2422,6 +2510,7 @@
         "imagem": "federacao/MS.png"
       },
       "serie": "D",
+      "forca": 345,
       "fundacao": 1971,
       "escudo": "escudos/aguia-negra-ms.png",
       "cores": [
@@ -2449,6 +2538,7 @@
         "imagem": "federacao/MS.png"
       },
       "serie": "D",
+      "forca": 328,
       "fundacao": 2001,
       "escudo": "escudos/aquidauense-ms.png",
       "cores": [
@@ -2476,6 +2566,7 @@
         "imagem": "federacao/MS.png"
       },
       "serie": "D",
+      "forca": 290,
       "fundacao": 1943,
       "escudo": "escudos/comercial-ms.png",
       "cores": [
@@ -2503,6 +2594,7 @@
         "imagem": "federacao/MS.png"
       },
       "serie": "D",
+      "forca": 276,
       "fundacao": 1914,
       "escudo": "escudos/corumbaense-ms.png",
       "cores": [
@@ -2530,6 +2622,7 @@
         "imagem": "federacao/MS.png"
       },
       "serie": "D",
+      "forca": 318,
       "fundacao": 2004,
       "escudo": "escudos/costa-rica-ms.png",
       "cores": [
@@ -2558,6 +2651,7 @@
         "imagem": "federacao/MS.png"
       },
       "serie": "D",
+      "forca": 295,
       "fundacao": 2020,
       "escudo": "escudos/dourados-ms.png",
       "cores": [
@@ -2586,6 +2680,7 @@
         "imagem": "federacao/MS.png"
       },
       "serie": "D",
+      "forca": 271,
       "fundacao": 1938,
       "escudo": "escudos/operario-ms.png",
       "cores": [
@@ -2613,6 +2708,7 @@
         "imagem": "federacao/MS.png"
       },
       "serie": "D",
+      "forca": 314,
       "fundacao": 1947,
       "escudo": "escudos/ubiratan-ms.png",
       "cores": [
@@ -2640,6 +2736,7 @@
         "imagem": "federacao/MT.png"
       },
       "serie": "B",
+      "forca": 665,
       "fundacao": 2001,
       "escudo": "escudos/cuiaba-mt.png",
       "cores": [
@@ -2667,6 +2764,7 @@
         "imagem": "federacao/MT.png"
       },
       "serie": "D",
+      "forca": 368,
       "fundacao": 1925,
       "escudo": "escudos/dom-bosco-mt.png",
       "cores": [
@@ -2694,6 +2792,7 @@
         "imagem": "federacao/MT.png"
       },
       "serie": "D",
+      "forca": 385,
       "fundacao": 2004,
       "escudo": "escudos/luverdense-mt.png",
       "cores": [
@@ -2721,6 +2820,7 @@
         "imagem": "federacao/MT.png"
       },
       "serie": "D",
+      "forca": 371,
       "fundacao": 1934,
       "escudo": "escudos/mixto-mt.png",
       "cores": [
@@ -2748,6 +2848,7 @@
         "imagem": "federacao/MT.png"
       },
       "serie": "D",
+      "forca": 355,
       "fundacao": 2002,
       "escudo": "escudos/pantanal-mt.png",
       "cores": [
@@ -2776,6 +2877,7 @@
         "imagem": "federacao/MT.png"
       },
       "serie": "D",
+      "forca": 378,
       "fundacao": 1977,
       "escudo": "escudos/sinop-mt.png",
       "cores": [
@@ -2803,6 +2905,7 @@
         "imagem": "federacao/MT.png"
       },
       "serie": "D",
+      "forca": 356,
       "fundacao": 1973,
       "escudo": "escudos/uniao-mt.png",
       "cores": [
@@ -2830,6 +2933,7 @@
         "imagem": "federacao/MT.png"
       },
       "serie": "D",
+      "forca": 377,
       "fundacao": 2002,
       "escudo": "escudos/varzea-grande-mt.png",
       "cores": [
@@ -2858,6 +2962,7 @@
         "imagem": "federacao/PA.png"
       },
       "serie": "D",
+      "forca": 389,
       "fundacao": 1982,
       "escudo": "escudos/aguia-de-maraba-pa.png",
       "cores": [
@@ -2885,6 +2990,7 @@
         "imagem": "federacao/PA.png"
       },
       "serie": "D",
+      "forca": 396,
       "fundacao": 2007,
       "escudo": "escudos/cameta-pa.png",
       "cores": [
@@ -2914,6 +3020,7 @@
         "imagem": "federacao/PA.png"
       },
       "serie": "D",
+      "forca": 412,
       "fundacao": 1924,
       "escudo": "escudos/castanhal-pa.png",
       "cores": [
@@ -2941,6 +3048,7 @@
         "imagem": "federacao/PA.png"
       },
       "serie": "C",
+      "forca": 533,
       "fundacao": 1914,
       "escudo": "escudos/paysandu-pa.png",
       "cores": [
@@ -2968,6 +3076,7 @@
         "imagem": "federacao/PA.png"
       },
       "serie": "A",
+      "forca": 809,
       "fundacao": 1905,
       "escudo": "escudos/remo-pa.png",
       "cores": [
@@ -2994,6 +3103,7 @@
         "imagem": "federacao/PA.png"
       },
       "serie": "D",
+      "forca": 401,
       "fundacao": 1944,
       "escudo": "escudos/sao-raimundo-pa.png",
       "cores": [
@@ -3021,6 +3131,7 @@
         "imagem": "federacao/PA.png"
       },
       "serie": "D",
+      "forca": 384,
       "fundacao": 1972,
       "escudo": "escudos/tucurui-pa.png",
       "cores": [
@@ -3050,6 +3161,7 @@
         "imagem": "federacao/PA.png"
       },
       "serie": "D",
+      "forca": 404,
       "fundacao": 1903,
       "escudo": "escudos/tuna-luso-pa.png",
       "cores": [
@@ -3077,6 +3189,7 @@
         "imagem": "federacao/PB.png"
       },
       "serie": "D",
+      "forca": 348,
       "fundacao": 1948,
       "escudo": "escudos/atletico-pb.png",
       "cores": [
@@ -3104,6 +3217,7 @@
         "imagem": "federacao/PB.png"
       },
       "serie": "D",
+      "forca": 334,
       "fundacao": 1936,
       "escudo": "escudos/auto-esporte-pb.png",
       "cores": [
@@ -3131,6 +3245,7 @@
         "imagem": "federacao/PB.png"
       },
       "serie": "C",
+      "forca": 484,
       "fundacao": 1931,
       "escudo": "escudos/belo-pb.png",
       "cores": [
@@ -3158,6 +3273,7 @@
         "imagem": "federacao/PB.png"
       },
       "serie": "D",
+      "forca": 330,
       "fundacao": 1915,
       "escudo": "escudos/campinense-pb.png",
       "cores": [
@@ -3185,6 +3301,7 @@
         "imagem": "federacao/PB.png"
       },
       "serie": "D",
+      "forca": 329,
       "fundacao": 1961,
       "escudo": "escudos/nacional-pb.png",
       "cores": [
@@ -3212,6 +3329,7 @@
         "imagem": "federacao/PB.png"
       },
       "serie": "D",
+      "forca": 358,
       "fundacao": 1991,
       "escudo": "escudos/sousa-pb.png",
       "cores": [
@@ -3240,6 +3358,7 @@
         "imagem": "federacao/PB.png"
       },
       "serie": "D",
+      "forca": 322,
       "fundacao": 1996,
       "escudo": "escudos/sportivo-paraibano-pb.png",
       "cores": [
@@ -3267,6 +3386,7 @@
         "imagem": "federacao/PB.png"
       },
       "serie": "D",
+      "forca": 305,
       "fundacao": 1925,
       "escudo": "escudos/treze-pb.png",
       "cores": [
@@ -3294,6 +3414,7 @@
         "imagem": "federacao/PE.png"
       },
       "serie": "D",
+      "forca": 366,
       "fundacao": 1919,
       "escudo": "escudos/central-pe.png",
       "cores": [
@@ -3321,6 +3442,7 @@
         "imagem": "federacao/PE.png"
       },
       "serie": "B",
+      "forca": 654,
       "fundacao": 1901,
       "escudo": "escudos/nautico-pe.png",
       "cores": [
@@ -3348,6 +3470,7 @@
         "imagem": "federacao/PE.png"
       },
       "serie": "D",
+      "forca": 342,
       "fundacao": 1998,
       "escudo": "escudos/petrolina-pe.png",
       "cores": [
@@ -3376,6 +3499,7 @@
         "imagem": "federacao/PE.png"
       },
       "serie": "D",
+      "forca": 381,
       "fundacao": 1993,
       "escudo": "escudos/porto-pe.png",
       "cores": [
@@ -3404,6 +3528,7 @@
         "imagem": "federacao/PE.png"
       },
       "serie": "D",
+      "forca": 360,
       "fundacao": 2016,
       "escudo": "escudos/retro-pe.png",
       "cores": [
@@ -3432,6 +3557,7 @@
         "imagem": "federacao/PE.png"
       },
       "serie": "D",
+      "forca": 365,
       "fundacao": 1972,
       "escudo": "escudos/salgueiro-pe.png",
       "cores": [
@@ -3460,6 +3586,7 @@
         "imagem": "federacao/PE.png"
       },
       "serie": "B",
+      "forca": 620,
       "fundacao": 1914,
       "escudo": "escudos/santa-cruz-pe.png",
       "cores": [
@@ -3488,6 +3615,7 @@
         "imagem": "federacao/PE.png"
       },
       "serie": "B",
+      "forca": 626,
       "fundacao": 1905,
       "escudo": "escudos/sport-pe.png",
       "cores": [
@@ -3515,6 +3643,7 @@
         "imagem": "federacao/PI.png"
       },
       "serie": "D",
+      "forca": 284,
       "fundacao": 1988,
       "escudo": "escudos/4-de-julho-pi.png",
       "cores": [
@@ -3542,6 +3671,7 @@
         "imagem": "federacao/PI.png"
       },
       "serie": "D",
+      "forca": 294,
       "fundacao": 2013,
       "escudo": "escudos/altos-pi.png",
       "cores": [
@@ -3571,6 +3701,7 @@
         "imagem": "federacao/PI.png"
       },
       "serie": "D",
+      "forca": 354,
       "fundacao": 2018,
       "escudo": "escudos/oeirense-pi.png",
       "cores": [
@@ -3598,6 +3729,7 @@
         "imagem": "federacao/PI.png"
       },
       "serie": "D",
+      "forca": 343,
       "fundacao": 1913,
       "escudo": "escudos/parnahyba-pi.png",
       "cores": [
@@ -3625,6 +3757,7 @@
         "imagem": "federacao/PI.png"
       },
       "serie": "D",
+      "forca": 350,
       "fundacao": 1948,
       "escudo": "escudos/piaui-pi.png",
       "cores": [
@@ -3653,6 +3786,7 @@
         "imagem": "federacao/PI.png"
       },
       "serie": "D",
+      "forca": 275,
       "fundacao": 1976,
       "escudo": "escudos/picos-pi.png",
       "cores": [
@@ -3680,6 +3814,7 @@
         "imagem": "federacao/PI.png"
       },
       "serie": "D",
+      "forca": 320,
       "fundacao": 1946,
       "escudo": "escudos/teresina-pi.png",
       "cores": [
@@ -3708,6 +3843,7 @@
         "imagem": "federacao/PI.png"
       },
       "serie": "D",
+      "forca": 315,
       "fundacao": 1959,
       "escudo": "escudos/tiradentes-pi.png",
       "cores": [
@@ -3735,6 +3871,7 @@
         "imagem": "federacao/PR.png"
       },
       "serie": "A",
+      "forca": 817,
       "fundacao": 1924,
       "escudo": "escudos/athletico-pr.png",
       "cores": [
@@ -3762,6 +3899,7 @@
         "imagem": "federacao/PR.png"
       },
       "serie": "D",
+      "forca": 398,
       "fundacao": 2008,
       "escudo": "escudos/cascavel-pr.png",
       "cores": [
@@ -3789,6 +3927,7 @@
         "imagem": "federacao/PR.png"
       },
       "serie": "D",
+      "forca": 370,
       "fundacao": 2002,
       "escudo": "escudos/cianorte-pr.png",
       "cores": [
@@ -3817,6 +3956,7 @@
         "imagem": "federacao/PR.png"
       },
       "serie": "A",
+      "forca": 839,
       "fundacao": 1909,
       "escudo": "escudos/coritiba-pr.png",
       "cores": [
@@ -3844,6 +3984,7 @@
         "imagem": "federacao/PR.png"
       },
       "serie": "C",
+      "forca": 515,
       "fundacao": 1956,
       "escudo": "escudos/londrina-pr.png",
       "cores": [
@@ -3871,6 +4012,7 @@
         "imagem": "federacao/PR.png"
       },
       "serie": "B",
+      "forca": 693,
       "fundacao": 2010,
       "escudo": "escudos/maringa-pr.png",
       "cores": [
@@ -3898,6 +4040,7 @@
         "imagem": "federacao/PR.png"
       },
       "serie": "B",
+      "forca": 670,
       "fundacao": 1912,
       "escudo": "escudos/operario-ferroviario-pr.png",
       "cores": [
@@ -3925,6 +4068,7 @@
         "imagem": "federacao/PR.png"
       },
       "serie": "D",
+      "forca": 391,
       "fundacao": 1989,
       "escudo": "escudos/parana-club-pr.png",
       "cores": [
@@ -3952,6 +4096,7 @@
         "imagem": "federacao/RJ.png"
       },
       "serie": "D",
+      "forca": 419,
       "fundacao": 1904,
       "escudo": "escudos/america-rj.png",
       "cores": [
@@ -3979,6 +4124,7 @@
         "imagem": "federacao/RJ.png"
       },
       "serie": "D",
+      "forca": 406,
       "fundacao": 1904,
       "escudo": "escudos/bangu-rj.png",
       "cores": [
@@ -4006,6 +4152,7 @@
         "imagem": "federacao/RJ.png"
       },
       "serie": "A",
+      "forca": 813,
       "fundacao": 1942,
       "escudo": "escudos/botafogo-rj.png",
       "cores": [
@@ -4033,6 +4180,7 @@
         "imagem": "federacao/RJ.png"
       },
       "serie": "A",
+      "forca": 827,
       "fundacao": 1895,
       "escudo": "escudos/flamengo-rj.png",
       "cores": [
@@ -4060,6 +4208,7 @@
         "imagem": "federacao/RJ.png"
       },
       "serie": "A",
+      "forca": 814,
       "fundacao": 1902,
       "escudo": "escudos/fluminense-rj.png",
       "cores": [
@@ -4088,6 +4237,7 @@
         "imagem": "federacao/RJ.png"
       },
       "serie": "D",
+      "forca": 397,
       "fundacao": 1990,
       "escudo": "escudos/nova-iguacu-rj.png",
       "cores": [
@@ -4115,6 +4265,7 @@
         "imagem": "federacao/RJ.png"
       },
       "serie": "A",
+      "forca": 852,
       "fundacao": 1898,
       "escudo": "escudos/vasco-rj.png",
       "cores": [
@@ -4142,6 +4293,7 @@
         "imagem": "federacao/RJ.png"
       },
       "serie": "C",
+      "forca": 576,
       "fundacao": 1976,
       "escudo": "escudos/volta-redonda-rj.png",
       "cores": [
@@ -4169,6 +4321,7 @@
         "imagem": "federacao/RN.png"
       },
       "serie": "C",
+      "forca": 473,
       "fundacao": 1915,
       "escudo": "escudos/abc-rn.png",
       "cores": [
@@ -4196,6 +4349,7 @@
         "imagem": "federacao/RN.png"
       },
       "serie": "D",
+      "forca": 270,
       "fundacao": 1915,
       "escudo": "escudos/alecrim-rn.png",
       "cores": [
@@ -4223,6 +4377,7 @@
         "imagem": "federacao/RN.png"
       },
       "serie": "D",
+      "forca": 337,
       "fundacao": 1915,
       "escudo": "escudos/america-rn.png",
       "cores": [
@@ -4250,6 +4405,7 @@
         "imagem": "federacao/RN.png"
       },
       "serie": "D",
+      "forca": 309,
       "fundacao": 1960,
       "escudo": "escudos/barauna-rn.png",
       "cores": [
@@ -4278,6 +4434,7 @@
         "imagem": "federacao/RN.png"
       },
       "serie": "D",
+      "forca": 289,
       "fundacao": 2012,
       "escudo": "escudos/globo-rn.png",
       "cores": [
@@ -4306,6 +4463,7 @@
         "imagem": "federacao/RN.png"
       },
       "serie": "D",
+      "forca": 278,
       "fundacao": 1965,
       "escudo": "escudos/mossoro-rn.png",
       "cores": [
@@ -4334,6 +4492,7 @@
         "imagem": "federacao/RN.png"
       },
       "serie": "D",
+      "forca": 293,
       "fundacao": 1945,
       "escudo": "escudos/potiguar-rn.png",
       "cores": [
@@ -4361,6 +4520,7 @@
         "imagem": "federacao/RN.png"
       },
       "serie": "D",
+      "forca": 340,
       "fundacao": 2002,
       "escudo": "escudos/sportiva-potiguar-rn.png",
       "cores": [
@@ -4388,6 +4548,7 @@
         "imagem": "federacao/RO.png"
       },
       "serie": "D",
+      "forca": 325,
       "fundacao": 1991,
       "escudo": "escudos/genus-ro.png",
       "cores": [
@@ -4415,6 +4576,7 @@
         "imagem": "federacao/RO.png"
       },
       "serie": "D",
+      "forca": 285,
       "fundacao": 2014,
       "escudo": "escudos/guapore-ro.png",
       "cores": [
@@ -4443,6 +4605,7 @@
         "imagem": "federacao/RO.png"
       },
       "serie": "D",
+      "forca": 279,
       "fundacao": 1991,
       "escudo": "escudos/ji-parana-ro.png",
       "cores": [
@@ -4470,6 +4633,7 @@
         "imagem": "federacao/RO.png"
       },
       "serie": "D",
+      "forca": 287,
       "fundacao": 1952,
       "escudo": "escudos/moto-esporte-ro.png",
       "cores": [
@@ -4497,6 +4661,7 @@
         "imagem": "federacao/RO.png"
       },
       "serie": "D",
+      "forca": 260,
       "fundacao": 2018,
       "escudo": "escudos/porto-velho-ro.png",
       "cores": [
@@ -4525,6 +4690,7 @@
         "imagem": "federacao/RO.png"
       },
       "serie": "D",
+      "forca": 326,
       "fundacao": 2011,
       "escudo": "escudos/real-ariquemedes-ro.png",
       "cores": [
@@ -4553,6 +4719,7 @@
         "imagem": "federacao/RO.png"
       },
       "serie": "D",
+      "forca": 274,
       "fundacao": 1982,
       "escudo": "escudos/uniao-ro.png",
       "cores": [
@@ -4581,6 +4748,7 @@
         "imagem": "federacao/RO.png"
       },
       "serie": "D",
+      "forca": 313,
       "fundacao": 1991,
       "escudo": "escudos/vilhena-ro.png",
       "cores": [
@@ -4609,6 +4777,7 @@
         "imagem": "federacao/RR.png"
       },
       "serie": "D",
+      "forca": 312,
       "fundacao": 1944,
       "escudo": "escudos/atletico-rr.png",
       "cores": [
@@ -4637,6 +4806,7 @@
         "imagem": "federacao/RR.png"
       },
       "serie": "D",
+      "forca": 280,
       "fundacao": 1973,
       "escudo": "escudos/atletico-boa-vista-rr.png",
       "cores": [
@@ -4664,6 +4834,7 @@
         "imagem": "federacao/RR.png"
       },
       "serie": "D",
+      "forca": 301,
       "fundacao": 1946,
       "escudo": "escudos/bare-rr.png",
       "cores": [
@@ -4691,6 +4862,7 @@
         "imagem": "federacao/RR.png"
       },
       "serie": "D",
+      "forca": 265,
       "fundacao": 1965,
       "escudo": "escudos/gas-rr.png",
       "cores": [
@@ -4719,6 +4891,7 @@
         "imagem": "federacao/RR.png"
       },
       "serie": "D",
+      "forca": 273,
       "fundacao": 2023,
       "escudo": "escudos/monte-roraima-rr.png",
       "cores": [
@@ -4747,6 +4920,7 @@
         "imagem": "federacao/RR.png"
       },
       "serie": "D",
+      "forca": 308,
       "fundacao": 1962,
       "escudo": "escudos/pacaraima-rr.png",
       "cores": [
@@ -4774,6 +4948,7 @@
         "imagem": "federacao/RR.png"
       },
       "serie": "D",
+      "forca": 259,
       "fundacao": 2011,
       "escudo": "escudos/real-rr.png",
       "cores": [
@@ -4802,6 +4977,7 @@
         "imagem": "federacao/RR.png"
       },
       "serie": "D",
+      "forca": 298,
       "fundacao": 1963,
       "escudo": "escudos/sao-raimundo-rr.png",
       "cores": [
@@ -4829,6 +5005,7 @@
         "imagem": "federacao/RS.png"
       },
       "serie": "D",
+      "forca": 421,
       "fundacao": 1911,
       "escudo": "escudos/brasil-rs.png",
       "cores": [
@@ -4856,6 +5033,7 @@
         "imagem": "federacao/RS.png"
       },
       "serie": "C",
+      "forca": 538,
       "fundacao": 1935,
       "escudo": "escudos/caxias-do-sul-rs.png",
       "cores": [
@@ -4884,6 +5062,7 @@
         "imagem": "federacao/RS.png"
       },
       "serie": "A",
+      "forca": 846,
       "fundacao": 1903,
       "escudo": "escudos/gremio-rs.png",
       "cores": [
@@ -4912,6 +5091,7 @@
         "imagem": "federacao/RS.png"
       },
       "serie": "A",
+      "forca": 854,
       "fundacao": 1909,
       "escudo": "escudos/internacional-rs.png",
       "cores": [
@@ -4939,6 +5119,7 @@
         "imagem": "federacao/RS.png"
       },
       "serie": "B",
+      "forca": 675,
       "fundacao": 1913,
       "escudo": "escudos/juventude-rs.png",
       "cores": [
@@ -4966,6 +5147,7 @@
         "imagem": "federacao/RS.png"
       },
       "serie": "D",
+      "forca": 414,
       "fundacao": 1911,
       "escudo": "escudos/novo-hamburgo-rs.png",
       "cores": [
@@ -4993,6 +5175,7 @@
         "imagem": "federacao/RS.png"
       },
       "serie": "D",
+      "forca": 392,
       "fundacao": 1908,
       "escudo": "escudos/pelotas-rs.png",
       "cores": [
@@ -5020,6 +5203,7 @@
         "imagem": "federacao/RS.png"
       },
       "serie": "C",
+      "forca": 565,
       "fundacao": 1924,
       "escudo": "escudos/ypiranga-rs.png",
       "cores": [
@@ -5047,6 +5231,7 @@
         "imagem": "federacao/SC.png"
       },
       "serie": "B",
+      "forca": 653,
       "fundacao": 1923,
       "escudo": "escudos/avai-sc.png",
       "cores": [
@@ -5074,6 +5259,7 @@
         "imagem": "federacao/SC.png"
       },
       "serie": "C",
+      "forca": 555,
       "fundacao": 2013,
       "escudo": "escudos/barra-sc.png",
       "cores": [
@@ -5101,6 +5287,7 @@
         "imagem": "federacao/SC.png"
       },
       "serie": "C",
+      "forca": 539,
       "fundacao": 1987,
       "escudo": "escudos/brusque-sc.png",
       "cores": [
@@ -5130,6 +5317,7 @@
         "imagem": "federacao/SC.png"
       },
       "serie": "B",
+      "forca": 676,
       "fundacao": 1973,
       "escudo": "escudos/chapecoense-sc.png",
       "cores": [
@@ -5157,6 +5345,7 @@
         "imagem": "federacao/SC.png"
       },
       "serie": "B",
+      "forca": 681,
       "fundacao": 1947,
       "escudo": "escudos/criciuma-sc.png",
       "cores": [
@@ -5185,6 +5374,7 @@
         "imagem": "federacao/SC.png"
       },
       "serie": "C",
+      "forca": 541,
       "fundacao": 1921,
       "escudo": "escudos/figueirense-sc.png",
       "cores": [
@@ -5212,6 +5402,7 @@
         "imagem": "federacao/SC.png"
       },
       "serie": "D",
+      "forca": 376,
       "fundacao": 1976,
       "escudo": "escudos/joinville-sc.png",
       "cores": [
@@ -5240,6 +5431,7 @@
         "imagem": "federacao/SC.png"
       },
       "serie": "D",
+      "forca": 417,
       "fundacao": 1919,
       "escudo": "escudos/marcilio-dias-sc.png",
       "cores": [
@@ -5268,6 +5460,7 @@
         "imagem": "federacao/SE.png"
       },
       "serie": "D",
+      "forca": 375,
       "fundacao": 2022,
       "escudo": "escudos/carmopolis-se.png",
       "cores": [
@@ -5296,6 +5489,7 @@
         "imagem": "federacao/SE.png"
       },
       "serie": "D",
+      "forca": 352,
       "fundacao": 1936,
       "escudo": "escudos/confianca-se.png",
       "cores": [
@@ -5323,6 +5517,7 @@
         "imagem": "federacao/SE.png"
       },
       "serie": "D",
+      "forca": 369,
       "fundacao": 1909,
       "escudo": "escudos/cotinguiba-se.png",
       "cores": [
@@ -5350,6 +5545,7 @@
         "imagem": "federacao/SE.png"
       },
       "serie": "D",
+      "forca": 379,
       "fundacao": 1948,
       "escudo": "escudos/dorense-se.png",
       "cores": [
@@ -5377,6 +5573,7 @@
         "imagem": "federacao/SE.png"
       },
       "serie": "D",
+      "forca": 347,
       "fundacao": 1938,
       "escudo": "escudos/itabaiana-se.png",
       "cores": [
@@ -5405,6 +5602,7 @@
         "imagem": "federacao/SE.png"
       },
       "serie": "D",
+      "forca": 367,
       "fundacao": 2009,
       "escudo": "escudos/lagarto-se.png",
       "cores": [
@@ -5433,6 +5631,7 @@
         "imagem": "federacao/SE.png"
       },
       "serie": "D",
+      "forca": 393,
       "fundacao": 1957,
       "escudo": "escudos/olimpico-se.png",
       "cores": [
@@ -5460,6 +5659,7 @@
         "imagem": "federacao/SE.png"
       },
       "serie": "D",
+      "forca": 351,
       "fundacao": 1909,
       "escudo": "escudos/sergipe-se.png",
       "cores": [
@@ -5487,6 +5687,7 @@
         "imagem": "federacao/SP.png"
       },
       "serie": "A",
+      "forca": 850,
       "fundacao": 1910,
       "escudo": "escudos/corinthians-sp.png",
       "cores": [
@@ -5514,6 +5715,7 @@
         "imagem": "federacao/SP.png"
       },
       "serie": "C",
+      "forca": 577,
       "fundacao": 1911,
       "escudo": "escudos/guarani-sp.png",
       "cores": [
@@ -5541,6 +5743,7 @@
         "imagem": "federacao/SP.png"
       },
       "serie": "A",
+      "forca": 861,
       "fundacao": 1914,
       "escudo": "escudos/palmeiras-sp.png",
       "cores": [
@@ -5568,6 +5771,7 @@
         "imagem": "federacao/SP.png"
       },
       "serie": "C",
+      "forca": 553,
       "fundacao": 1900,
       "escudo": "escudos/ponte-preta-sp.png",
       "cores": [
@@ -5595,6 +5799,7 @@
         "imagem": "federacao/SP.png"
       },
       "serie": "D",
+      "forca": 409,
       "fundacao": 1920,
       "escudo": "escudos/portuguesa-sp.png",
       "cores": [
@@ -5623,6 +5828,7 @@
         "imagem": "federacao/SP.png"
       },
       "serie": "A",
+      "forca": 841,
       "fundacao": 1928,
       "escudo": "escudos/redbull-bragantino-sp.png",
       "cores": [
@@ -5651,6 +5857,7 @@
         "imagem": "federacao/SP.png"
       },
       "serie": "A",
+      "forca": 857,
       "fundacao": 1912,
       "escudo": "escudos/santos-sp.png",
       "cores": [
@@ -5678,6 +5885,7 @@
         "imagem": "federacao/SP.png"
       },
       "serie": "A",
+      "forca": 853,
       "fundacao": 1930,
       "escudo": "escudos/sao-paulo-sp.png",
       "cores": [
@@ -5706,6 +5914,7 @@
         "imagem": "federacao/TO.png"
       },
       "serie": "D",
+      "forca": 302,
       "fundacao": 1997,
       "escudo": "escudos/araguaina-to.png",
       "cores": [
@@ -5734,6 +5943,7 @@
         "imagem": "federacao/TO.png"
       },
       "serie": "D",
+      "forca": 319,
       "fundacao": 2012,
       "escudo": "escudos/capital-to.png",
       "cores": [
@@ -5761,6 +5971,7 @@
         "imagem": "federacao/TO.png"
       },
       "serie": "D",
+      "forca": 333,
       "fundacao": 1983,
       "escudo": "escudos/guarai-to.png",
       "cores": [
@@ -5788,6 +5999,7 @@
         "imagem": "federacao/TO.png"
       },
       "serie": "D",
+      "forca": 332,
       "fundacao": 1988,
       "escudo": "escudos/gurupi-to.png",
       "cores": [
@@ -5816,6 +6028,7 @@
         "imagem": "federacao/TO.png"
       },
       "serie": "D",
+      "forca": 327,
       "fundacao": 1990,
       "escudo": "escudos/interporto-to.png",
       "cores": [
@@ -5844,6 +6057,7 @@
         "imagem": "federacao/TO.png"
       },
       "serie": "D",
+      "forca": 323,
       "fundacao": 1991,
       "escudo": "escudos/palmas-to.png",
       "cores": [
@@ -5872,6 +6086,7 @@
         "imagem": "federacao/TO.png"
       },
       "serie": "D",
+      "forca": 261,
       "fundacao": 1989,
       "escudo": "escudos/tocantinopolis-to.png",
       "cores": [
@@ -5899,6 +6114,7 @@
         "imagem": "federacao/TO.png"
       },
       "serie": "D",
+      "forca": 264,
       "fundacao": 1992,
       "escudo": "escudos/uniao-to.png",
       "cores": [
