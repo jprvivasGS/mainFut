@@ -36,31 +36,42 @@ function logo() {                        // tenta os endereços possíveis do lo
 
 /* ---------- Rodadas (método do círculo) ---------- */
 function gerarRodadas(ids, turnos) {
-  const n = ids.length, v = [...ids], ida = [];
+  const v = [...ids]; if (v.length % 2) v.push(null);            // grupo ímpar: alguém folga a cada rodada
+  const n = v.length, ida = [];
   for (let r = 0; r < n - 1; r++) {
-    ida.push(Array.from({ length: n / 2 }, (_, i) => ({ c: v[i], f: v[n - 1 - i], gc: null, gf: null })));
+    ida.push(Array.from({ length: n / 2 }, (_, i) => ({ c: v[i], f: v[n - 1 - i], gc: null, gf: null })).filter(m => m.c && m.f));
     v.splice(1, 0, v.pop());
   }
   const volta = turnos === 2 ? ida.map(r => r.map(m => ({ c: m.f, f: m.c, gc: null, gf: null }))) : [];
   return [...ida, ...volta];
 }
-const montarFix = () => { S.fix = S.divs.map(ids => gerarRodadas(ids, S.cfg.turnos)); };
+const FM = d => S.cfg.fmt[d];            // formato da divisão: {g grupos, tn turnos, po mata-mata, k classificados, p vagas via mata-mata, pl jogos/confronto, fl jogos da final}
+const grupos = d => { const n = S.divs[d].length / FM(d).g; return Array.from({ length: FM(d).g }, (_, g) => S.divs[d].slice(g * n, (g + 1) * n)); };
+const montarFix = () => {
+  S.fix = S.divs.map((_, d) => {
+    const gs = grupos(d).map((ids, g) => gerarRodadas(ids, FM(d).tn).map(r => r.map(m => ({ ...m, g }))));
+    return gs[0].map((_, r) => gs.flatMap(x => x[r]));      // a rodada n junta os jogos de todos os grupos
+  });
+  S.po = S.divs.map(() => null);
+};
 const gols = () => [0, 0, 1, 1, 1, 2, 2, 3][rnd(8)];
 function simular(d, rodada) {            // preenche só o que ainda não tem placar
   (rodada ? [S.fix[d][rodada - 1]] : S.fix[d]).forEach(r => r.forEach(m => {
     if (m.gc == null) m.gc = gols();     // mantém o lado que a pessoa já digitou
     if (m.gf == null) m.gf = gols();
   }));
+  if (!rodada) poSim(d);                 // simular a série inclui o mata-mata
 }
-const completa = d => S.fix[d].every(r => r.every(m => m.gc != null && m.gf != null));
+const ligaOk = d => S.fix[d].every(r => r.every(m => m.gc != null && m.gf != null));
+const completa = d => ligaOk(d) && (!FM(d).po || !!poOrdem(d));
 const completaTudo = () => S.divs.every((_, d) => completa(d));
 
 /* ---------- Tabela ---------- */
-function tabela(d) {
-  const L = S.divs[d].map(id => ({ t: T.get(id), P: 0, J: 0, V: 0, E: 0, D: 0, GP: 0, GC: 0, SG: 0, ded: 0 }));
+function tabela(d, g = 0) {
+  const L = grupos(d)[g].map(id => ({ t: T.get(id), P: 0, J: 0, V: 0, E: 0, D: 0, GP: 0, GC: 0, SG: 0, ded: 0 }));
   const por = new Map(L.map(x => [x.t.id, x]));
   S.fix[d].forEach(r => r.forEach(m => {
-    if (m.gc == null || m.gf == null) return;
+    if (m.g !== g || m.gc == null || m.gf == null) return;
     const a = por.get(m.c), b = por.get(m.f);
     a.J++; b.J++; a.GP += m.gc; a.GC += m.gf; b.GP += m.gf; b.GC += m.gc;
     if (m.gc > m.gf) { a.P += S.cfg.pv; a.V++; b.D++; }
@@ -72,11 +83,86 @@ function tabela(d) {
   return L.sort((a, b) => b.P - a.P || b.V - a.V || b.SG - a.SG || b.GP - a.GP || a.t.nome.localeCompare(b.t.nome, "pt-BR"));
 }
 
+/* ---------- Classificação geral, mata-mata e ranking final ---------- */
+const pp = d => d === 0 ? 1 : FM(d).g > 1 ? S.cfg.acc[d - 1] : FM(d).p;            // vagas de acesso decididas no mata-mata
+const nDir = d => d > 0 && FM(d).po && FM(d).g === 1 ? S.cfg.acc[d - 1] - pp(d) : 0; // sobem direto pela tabela
+const nK = d => FM(d).g === 1 ? FM(d).k : FM(d).k * FM(d).g;                         // classificados ao mata-mata
+function base(d) {                       // tabela geral: 1 grupo = a própria tabela; vários = posição no grupo, depois P > V > SG > GP
+  if (FM(d).g === 1) return tabela(d, 0);
+  return grupos(d).flatMap((_, g) => tabela(d, g).map((x, i) => ({ ...x, pos: i })))
+    .sort((a, b) => a.pos - b.pos || b.P - a.P || b.V - a.V || b.SG - a.SG || b.GP - a.GP || a.t.nome.localeCompare(b.t.nome, "pt-BR"));
+}
+function qualificados(d) {               // ids na ordem de cabeça de chave
+  const f = FM(d); if (!f.po) return [];
+  return (f.g === 1 ? base(d).slice(nDir(d), nDir(d) + f.k) : base(d).filter(x => x.pos < f.k)).map(x => x.t.id);
+}
+const agg = t => [t.l.reduce((s, x) => s + x[0], 0), t.l.reduce((s, x) => s + x[1], 0)];
+function poVenc(t) {
+  if (t.bye) return t.a;
+  if (!t.a || !t.b || t.l.some(x => x[0] == null || x[1] == null)) return null;
+  const [A, B] = agg(t); if (A !== B) return A > B ? t.a : t.b;
+  const p = t.pen; return p && p[0] != null && p[1] != null && p[0] !== p[1] ? (p[0] > p[1] ? t.a : t.b) : null;
+}
+function poCriar(sd, f) {
+  const K = sd.length, m = Math.ceil(Math.log2(K)), N = 2 ** m, r = [];
+  let o = [1]; while (o.length < N) o = o.flatMap(s => [s, o.length * 2 + 1 - s]);   // chave padrão: 1 x último, melhores nunca se cruzam cedo
+  const at = s => sd[s - 1] || null;
+  for (let ri = 0, n = N / 2; ri < m; ri++, n /= 2) {
+    const legs = (ri === m - 1 ? f.fl : f.pl) || 1;
+    r.push(Array.from({ length: n }, (_, i) => ({ a: ri ? null : at(o[2 * i]), b: ri ? null : at(o[2 * i + 1]), bye: ri === 0 && !at(o[2 * i + 1]),
+      l: Array.from({ length: legs }, () => [null, null]), pen: null })));
+  }
+  return { sd, r };
+}
+function poSync(d) {                     // cria a chave quando a fase de pontos termina e repassa os vencedores
+  const f = FM(d); if (!f.po || !ligaOk(d)) { S.po[d] = null; return; }
+  const sd = qualificados(d); let b = S.po[d];
+  if (!b || b.sd.join() !== sd.join()) b = S.po[d] = poCriar(sd, f);
+  b.r.forEach((rd, ri) => ri && rd.forEach((t, i) => {
+    const a = poVenc(b.r[ri - 1][2 * i]), c = poVenc(b.r[ri - 1][2 * i + 1]);
+    if (t.a !== a || t.b !== c) { t.a = a; t.b = c; t.l = t.l.map(() => [null, null]); t.pen = null; }
+  }));
+}
+function poOrdem(d) {                    // campeão, vice, semifinalistas… (null enquanto não termina)
+  poSync(d); const b = S.po[d]; if (!b) return null;
+  const camp = poVenc(b.r[b.r.length - 1][0]); if (!camp) return null;
+  const out = [camp], pos = id => b.sd.indexOf(id);
+  for (let ri = b.r.length - 1; ri >= 0; ri--) out.push(...b.r[ri].filter(t => !t.bye).map(t => poVenc(t) === t.a ? t.b : t.a).filter(Boolean).sort((x, y) => pos(x) - pos(y)));
+  return out;
+}
+function poJogar(t) {
+  if (t.bye || !t.a || !t.b) return;
+  t.l.forEach(l => { if (l[0] == null) l[0] = gols(); if (l[1] == null) l[1] = gols(); });
+  const [A, B] = agg(t), p = t.pen;
+  if (A === B && !(p && p[0] != null && p[1] != null && p[0] !== p[1])) t.pen = rnd(2) ? [5, 4] : [4, 5];
+}
+function poSim(d) {
+  for (let ri = 0; ; ri++) { poSync(d); const b = S.po[d]; if (!b || ri >= b.r.length) return; b.r[ri].forEach(poJogar); }
+}
+function poFase(d) {
+  poSync(d); const b = S.po[d];
+  if (!b) { aviso("Termine a fase de pontos antes.", true); return false; }
+  const ri = b.r.findIndex(r => r.some(t => !t.bye && !poVenc(t)));
+  if (ri < 0) { aviso("O mata-mata já terminou.", true); return false; }
+  b.r[ri].forEach(poJogar); poSync(d); return true;
+}
+function ranking(d) {                    // ordem final: sobe direto, resultado do mata-mata, resto da tabela
+  const B = base(d).map(x => x.t.id); if (!FM(d).po) return B;
+  const dr = B.slice(0, nDir(d)), Qs = qualificados(d), usados = new Set([...dr, ...Qs]);
+  return [...dr, ...(poOrdem(d) || Qs), ...B.filter(id => !usados.has(id))];
+}
+function zonas(d) {
+  const f = FM(d), B = base(d).map(x => x.t.id), a = S.cfg.acc, Qs = new Set(qualificados(d)), z = new Map();
+  const sobe = d > 0 ? a[d - 1] : 0, desce = d < S.divs.length - 1 ? a[d] : 0, dir = f.po ? nDir(d) : sobe;
+  B.forEach((id, i) => z.set(id, d === 0 && !f.po && i === 0 ? "top" : i < dir ? "up" : Qs.has(id) ? "po" : desce && i >= B.length - desce ? "down" : ""));
+  return z;
+}
+
 /* ---------- Vagas internacionais (recalculadas a cada mudança) ---------- */
 function classificar() {
   const comps = S.cfg.comps || [];
   if (!comps.length) return null;
-  const rank = tabela(0).map(x => x.t.id), ja = new Map(), lista = comps.map(() => []);
+  const rank = ranking(0), ja = new Map(), lista = comps.map(() => []);
   let ini = 0;                           // posições já "reservadas" pelas competições anteriores
   comps.forEach((c, ci) => {
     let vagas = c.vagas;
@@ -98,11 +184,11 @@ function classificar() {
 
 /* ---------- Fim de temporada: acesso e descenso ---------- */
 function encerrar() {
-  const K = classificar(), rank = S.divs.map((_, d) => tabela(d)), ids = rank.map(l => l.map(x => x.t.id)), n = S.cfg.acc;
+  const K = classificar(), ids = S.divs.map((_, d) => ranking(d)), pts = S.divs.map((_, d) => new Map(base(d).map(x => [x.t.id, x.P]))), n = S.cfg.acc;
   const reg = {
     ano: S.ano,
     classif: K ? K.comps.map(l => l.map(q => [q.id, q.tipo])) : [],
-    divs: rank.map(l => l.map(x => [x.t.id, x.P])),
+    divs: ids.map((l, d) => l.map(id => [id, pts[d].get(id)])),
     sobem: n.map((q, k) => ids[k + 1].slice(0, q)),                     // topo da divisão k+1 sobe
     descem: n.map((q, k) => ids[k].slice(ids[k].length - q))            // fim da divisão k desce
   };
@@ -122,7 +208,7 @@ function simularAnos() {
 
 /* ---------- Save ---------- */
 function paraJSON() {                    // só os placares: as rodadas são refeitas a partir da ordem dos times
-  return { versao: 1, ano: S.ano, cfg: S.cfg, divs: S.divs, deducoes: S.deducoes, ext: S.ext, historico: S.historico,
+  return { versao: 2, po: S.po, ano: S.ano, cfg: S.cfg, divs: S.divs, deducoes: S.deducoes, ext: S.ext, historico: S.historico,
     placar: S.fix.map(rs => rs.flatMap(r => r.map(m => (m.gc == null || m.gf == null) ? null : [m.gc, m.gf]))) };
 }
 function deJSON(o) {
@@ -131,8 +217,10 @@ function deJSON(o) {
   if (falta.length) throw new Error("A base não tem mais estes times: " + falta.slice(0, 5).join(", "));
   S = { cfg: o.cfg, ano: o.ano, divs: o.divs, deducoes: o.deducoes || [], ext: o.ext || [], historico: o.historico || [] };
   S.cfg.comps = S.cfg.comps || [];       // saves antigos não tinham competições
+  S.cfg.fmt = S.cfg.fmt || S.divs.map(() => ({ g: 1, tn: S.cfg.turnos, po: false, k: 4, p: 1, pl: 2, fl: 1 }));
   montarFix();
   S.fix.forEach((rs, d) => rs.flat().forEach((m, i) => { const p = o.placar?.[d]?.[i]; if (p) { m.gc = p[0]; m.gf = p[1]; } }));
+  if (Array.isArray(o.po) && o.po.length === S.divs.length) S.po = o.po;
   ui = { aba: "temporada", div: 0, rodada: 1 };
 }
 function salvarLocal() { try { localStorage.setItem(LOCAL, JSON.stringify(paraJSON())); } catch (e) { /* sem armazenamento */ } }
@@ -167,6 +255,7 @@ function qRecalcular() {
   const n = pool().length, max = Math.max(1, Math.floor(n / 4));
   Q.nd = Math.min(Math.max(Q.nd || 1, 1), max);
   Q.tam = tamPadrao(n, Q.nd); Q.acc = accPadrao(Q.tam);
+  Q.fmt = Q.tam.map((_, i) => Q.fmt[i] || fmtPadrao());
   const livres = new Set(pool().map(t => t.id));
   Q.alloc = Q.tam.map((t, i) => (Q.alloc[i] || []).filter(id => livres.has(id)).slice(0, t));
   Q.sel.clear();
@@ -195,15 +284,26 @@ function qErros() {
     const mov = (i > 0 ? Q.acc[i - 1] : 0) + (i < Q.nd - 1 ? Q.acc[i] : 0);
     if (mov > t) e.push(`Série ${LETRAS[i]}: ${mov} times trocariam de divisão, mais do que o tamanho da série (${t}).`);
   });
+  Q.tam.forEach((n, i) => {              // formato de cada divisão
+    const f = Q.fmt[i]; if (!f) return; const g = f.g, L = `Série ${LETRAS[i]}`;
+    if (!Number.isInteger(g) || g < 1 || n % g || (g > 1 && n / g < 3)) return e.push(`${L}: ${g} grupo(s) não dividem ${n} times em grupos de pelo menos 3.`);
+    if (!f.po) return;
+    const ac = i > 0 ? Q.acc[i - 1] : 0, desce = i < Q.nd - 1 ? Q.acc[i] : 0, p = i === 0 ? 1 : g > 1 ? ac : f.p, K = g === 1 ? f.k : f.k * g, dir = i > 0 && g === 1 ? ac - p : 0;
+    if (!(f.k >= 1) || K < 2 || f.k > n / g) return e.push(`${L} (mata-mata): informe classificados válidos (mínimo 2 no total, no máximo o tamanho do grupo).`);
+    if (i > 0 && ac < 1) return e.push(`${L}: sem vagas de acesso, o mata-mata não tem o que decidir.`);
+    if (i > 0 && (!(p >= 1) || (p & (p - 1)) || p > ac)) e.push(`${L}: as vagas decididas no mata-mata devem ser 1, 2, 4… e não passar das vagas de acesso (${ac}).`);
+    else if (p >= K) e.push(`${L}: o mata-mata precisa de mais classificados do que vagas de acesso.`);
+    else if (dir + K + desce > n) e.push(`${L}: acesso direto + mata-mata + rebaixados passam de ${n} times.`);
+  });
   return e;
 }
 function questionario() {
   $("ano").hidden = true;
-  if (!Q) { Q = { reg: [...new Set(TIMES.map(t => t.regiao))], nd: 0, tam: [], acc: [], pv: 3, pe: 1, turnos: 2, dist: "sorteio", alloc: [], sel: new Set(), busca: "",
+  if (!Q) { Q = { reg: [...new Set(TIMES.map(t => t.regiao))], nd: 0, tam: [], acc: [], pv: 3, pe: 1, turnos: 2, dist: "sorteio", alloc: [], sel: new Set(), busca: "", fmt: [],
     comps: [{ nome: "Libertadores", vagas: 4 }, { nome: "Sul-Americana", vagas: 6 }] }; Q.nd = Math.max(1, Math.round(pool().length / 20)); qRecalcular(); }
   const regs = [...new Set(TIMES.map(t => t.regiao))];
   $("app").innerHTML = `<div class="quest">
-   <section class="card"><h2><span class="n">1</span>Quais times vão jogar?</h2>
+   <section class="card"><h2><span class="n">1</span>De onde vêm os times</h2>
     <div class="opts">${regs.map(r => `<label class="opt"><input type="checkbox" data-reg="${h(r)}" ${Q.reg.includes(r) ? "checked" : ""}> ${h(REG[r] || r)} <small>(${TIMES.filter(t => t.regiao === r).length})</small></label>`).join("")}</div>
     <p class="dica" id="q-pool"></p></section>
    <section class="card"><h2><span class="n">2</span>Quantas divisões?</h2>
@@ -220,7 +320,9 @@ function questionario() {
     <label>Pontos por empate<input type="number" id="q-pe" min="0" max="3" value="${Q.pe}"></label>
     <label>Formato<select id="q-tn"><option value="2">Turno e returno</option><option value="1">Turno único</option></select></label>
     <label>Distribuição dos times<select id="q-ds"><option value="sorteio">Sorteio aleatório</option><option value="base">Ordem da base</option><option value="manual">Escolher manualmente</option></select></label></div></section>
-   <section class="card" id="q-c5" hidden><h2><span class="n">6</span>Monte as séries</h2><div id="q-board"></div></section>
+   <section class="card"><h2><span class="n">6</span>Formato de cada divisão</h2>
+    <p class="dica">Pontos corridos ou grupos (zonas) e, se quiser, um mata-mata: pelo título ou pelas vagas de acesso. Use um modelo pronto ou ajuste à mão.</p><div id="q-fmt"></div></section>
+   <section class="card" id="q-c5" hidden><h2><span class="n">7</span>Monte as séries</h2><div id="q-board"></div></section>
    <section class="card"><div id="q-res"></div><button class="b verde" id="q-go" data-a="q-go">Começar competição</button></section></div>`;
   $("q-tn").value = Q.turnos; $("q-ds").value = Q.dist; $("q-c5").hidden = Q.dist !== "manual";
   qParciais();
@@ -235,10 +337,47 @@ function qParciais() {                   // redesenha só o que depende das resp
   $("q-c3").hidden = Q.nd < 2;
   $("q-acc").innerHTML = Q.acc.map((a, k) => `<label>Série ${LETRAS[k]} ↔ ${LETRAS[k + 1]}<input type="number" data-acc="${k}" min="0" value="${a}"></label>`).join("");
   qComps();
+  qFmt();
   qRes();
   if (Q.dist === "manual") qBoard();
   const novo = chave && document.querySelector(`[data-${chave}="${f.dataset[chave]}"]`);
   if (novo) novo.focus();                // devolve o foco ao mesmo campo depois de refeito
+}
+const fmtPadrao = () => ({ g: 1, tn: Q.turnos, po: false, k: 4, p: 1, pl: 2, fl: 1 });
+const PRE = [["pc", "Pontos corridos"], ["acc", "Pontos corridos + mata-mata (Série B/C)"], ["red", "Campeão direto + reducido (Primera B/C/D)"],
+  ["zon", "2 zonas + mata-mata (Primera Nacional)"], ["grp", "Vários grupos + mata-mata (Série D)"]];
+function aplicarPreset(i, k) {
+  if (!k) return;
+  const f = Q.fmt[i], n = Q.tam[i], ac = i > 0 ? Q.acc[i - 1] : 1, desce = i < Q.nd - 1 ? Q.acc[i] : 0;
+  const perto = alvo => { let b = 1; for (let g = 2; g <= n / 3; g++) if (n % g === 0 && (b === 1 || Math.abs(g - alvo) < Math.abs(b - alvo))) b = g; return b; };
+  const pot = x => { let p = 1; while (p * 2 <= x) p *= 2; return p; };
+  Object.assign(f, { g: 1, po: k !== "pc", pl: 2, fl: 1 });
+  if (k === "acc") { f.p = pot(Math.max(ac, 1)); f.k = Math.min(8, n - desce - (ac - f.p)); }
+  if (k === "red") { f.p = 1; f.k = Math.min(8, n - desce - (ac - 1)); f.pl = 1; }
+  if (k === "zon" || k === "grp") { f.g = perto(k === "zon" ? 2 : Math.round(n / 8)); f.k = Math.max(1, Math.min(k === "zon" ? 8 : 4, Math.floor(n / f.g / 2))); }
+  qFmt(); qRes();
+}
+function qFmtDica(i) {
+  const el = document.querySelector(`[data-fh="${i}"]`); if (!el) return;
+  const f = Q.fmt[i], n = Q.tam[i], g = f.g || 1, ac = i > 0 ? Q.acc[i - 1] : 0, p = i === 0 ? 1 : g > 1 ? ac : f.p, dir = i > 0 && g === 1 && f.po ? ac - p : 0;
+  el.textContent = (g > 1 ? `${g} grupos de ${n / g} times` : "Pontos corridos") + (f.po ? ` · mata-mata com ${f.k} ${g > 1 ? "por grupo" : "classificados"}${i > 0 ? `, ${p} ${p > 1 ? "vagas" : "vaga"} de acesso` : ", decide o título"}${dir > 0 ? `; ${dir} ${dir > 1 ? "sobem" : "sobe"} direto pela tabela` : ""}` : "");
+}
+function qFmt() {
+  const sel = (a, b) => a == b ? " selected" : "";
+  $("q-fmt").innerHTML = Q.tam.map((n, i) => {
+    const f = Q.fmt[i], g = f.g || 1, ac = i > 0 ? Q.acc[i - 1] : 0, id = `data-i="${i}"`;
+    return `<div class="fmt"><h3>Série ${LETRAS[i]} · ${n} times</h3><div class="campos">
+     <label>Modelo pronto<select data-pre="${i}"><option value="">Escolher…</option>${PRE.map(([k, t]) => `<option value="${k}">${t}</option>`).join("")}</select></label>
+     <label>Grupos<input type="number" data-f="g" ${id} min="1" value="${g}"></label>
+     <label>Jogos na fase de pontos<select data-f="tn" ${id}><option value="2"${sel(f.tn, 2)}>Turno e returno</option><option value="1"${sel(f.tn, 1)}>Turno único</option></select></label>
+     <label class="opt"><input type="checkbox" data-f="po" ${id} ${f.po ? "checked" : ""}> Mata-mata ${i > 0 ? "pelas vagas de acesso" : "pelo título"}</label></div>
+     ${f.po ? `<div class="campos"><label>Classificados ${g > 1 ? "por grupo" : "no total"}<input type="number" data-f="k" ${id} min="1" value="${f.k}"></label>
+      ${i > 0 ? `<label>Vagas de acesso no mata-mata<input type="number" data-f="p" ${id} min="1" value="${g > 1 ? ac : f.p}" ${g > 1 ? "disabled" : ""}></label>` : ""}
+      <label>Confrontos<select data-f="pl" ${id}><option value="1"${sel(f.pl, 1)}>Jogo único</option><option value="2"${sel(f.pl, 2)}>Ida e volta</option></select></label>
+      <label>Final<select data-f="fl" ${id}><option value="1"${sel(f.fl, 1)}>Jogo único</option><option value="2"${sel(f.fl, 2)}>Ida e volta</option></select></label></div>` : ""}
+     <p class="dica" data-fh="${i}"></p></div>`;
+  }).join("");
+  Q.fmt.forEach((_, i) => qFmtDica(i));
 }
 function qHints() {                      // mostra quais posições da tabela cada competição pega
   let ini = 0;
@@ -323,7 +462,7 @@ function qPick(c) {
 
 function comecar() {
   const ids = (Q.dist === "sorteio" ? embaralhar : x => x)(pool().map(t => t.id)); let p = 0;
-  S = { cfg: { pv: Q.pv, pe: Q.pe, turnos: Q.turnos, acc: Q.acc.slice(0, Q.nd - 1),
+  S = { cfg: { pv: Q.pv, pe: Q.pe, turnos: Q.turnos, acc: Q.acc.slice(0, Q.nd - 1), fmt: Q.fmt.slice(0, Q.nd).map(f => ({ ...f })),
           comps: Q.comps.map(c => ({ nome: c.nome.trim(), sigla: c.nome.trim().slice(0, 3).toUpperCase(), vagas: c.vagas })) },
         ano: 1, deducoes: [], ext: [], historico: [],
         divs: Q.dist === "manual" ? Q.alloc.map(l => embaralhar(l)) : Q.tam.map(t => ids.slice(p, p += t)) };
@@ -339,9 +478,10 @@ function desenhar() {
     <div id="conteudo"></div>`;
   ui.aba === "temporada" ? vTemporada() : vHistorico();
 }
+const abasGrupo = () => { const G = grupos(ui.div).length; return G < 2 ? "" : Array.from({ length: G }, (_, g) => `<button class="tab ${g === (ui.grupo || 0) ? "on" : ""}" data-a="grp" data-v="${g}">Grupo ${LETRAS[g]}</button>`).join(""); };
 const abasDiv = () => S.divs.map((_, d) => `<button class="tab ${d === ui.div ? "on" : ""}" data-a="div" data-v="${d}">Série ${LETRAS[d]}${completa(d) ? " ✓" : ""}</button>`).join("");
 function vTemporada() {
-  $("conteudo").innerHTML = `<div class="tabs" id="abas-div">${abasDiv()}</div>
+  $("conteudo").innerHTML = `<div class="tabs" id="abas-div">${abasDiv()}</div><div class="tabs" id="abas-g">${abasGrupo()}</div>
    <div class="acoes">
     <button class="b sim" data-a="rodada">🎲 Simular rodada</button><button class="b sim" data-a="divisao">🎲 Simular série</button><button class="b sim" data-a="temporada">🎲 Simular temporada</button>
     <button class="b verde" id="btn-enc" data-a="encerrar" ${completaTudo() ? "" : "disabled"}>Encerrar temporada ▸</button>
@@ -353,28 +493,51 @@ function vTemporada() {
     <section class="card"><div class="ctit">Confrontos</div>
      <div class="rod"><button class="b peq" data-a="prev" id="bp">❮</button><span id="rod-label"></span><button class="b peq" data-a="next" id="bn">❯</button></div>
      <div id="jogos"></div></section></div>
+   <section class="card" id="po" hidden></section>
    ${(S.cfg.comps || []).length ? `<section class="card" id="classif"></section>` : ""}
    <section class="card">${htmlPunicoes()}</section>
    ${(S.cfg.comps || []).length ? `<section class="card">${htmlExterno()}</section>` : ""}`;
-  desenharTabela(); desenharRodada();
+  desenharTabela(); desenharPO(); desenharRodada();
 }
 function desenharTabela() {
-  const d = ui.div, L = tabela(d), K = classificar(), n = S.cfg.acc, ult = S.divs.length - 1;
-  const sobe = d > 0 ? n[d - 1] : 0, desce = d < ult ? n[d] : 0;
-  $("titulo").textContent = `Série ${LETRAS[d]}`;
+  const d = ui.div, G = grupos(d).length, g = Math.min(ui.grupo || 0, G - 1), L = tabela(d, g), K = classificar(), f = FM(d), Z = zonas(d);
+  const COR = { top: "var(--gold)", up: "#3fb950", po: "#a371f7", down: "var(--red)" };
+  const ac = d > 0 ? S.cfg.acc[d - 1] : 0, desce = d < S.divs.length - 1 ? S.cfg.acc[d] : 0, dir = f.po ? nDir(d) : ac;
+  $("titulo").textContent = `Série ${LETRAS[d]}` + (G > 1 ? ` · Grupo ${LETRAS[g]}` : "");
   $("tabela").innerHTML = L.map((x, i) => {
-    const q = K && K.por.get(x.t.id);
-    const zona = d === 0 && i === 0 ? "var(--gold)" : i < sobe ? "#3fb950" : desce && i >= L.length - desce ? "var(--red)" : "";
+    const q = K && K.por.get(x.t.id), zona = COR[Z.get(x.t.id)] || "";
     const vaga = q ? COR_COMP[q.c % COR_COMP.length] : "";
     const barra = zona && vaga ? `inset 3px 0 0 ${zona}, inset 6px 0 0 ${vaga}` : zona || vaga ? `inset 3px 0 0 ${zona || vaga}` : "";
     return `<tr><td style="box-shadow:${barra || "none"}" title="${q ? h(descVaga(q)) : ""}"><div class="cl"><span class="pos">${i + 1}</span>${esc(x.t)}<span>${h(x.t.nome)}</span><span class="uf">${h(x.t.uf)}</span></div></td>
       <td><strong>${x.P}</strong>${x.ded ? `<span class="ded" title="Pontos deduzidos">−${x.ded}</span>` : ""}</td><td>${x.J}</td><td>${x.V}</td><td>${x.E}</td><td>${x.D}</td><td>${x.GP}</td><td>${x.GC}</td><td>${x.SG}</td>${K ? `<td><button class="mini" data-a="ext-sel" data-v="${h(x.t.id)}" title="Marcar vaga externa" aria-label="Marcar vaga externa para ${h(x.t.nome)}">🏆</button></td>` : ""}</tr>`;
   }).join("");
-  $("legenda").innerHTML = [d === 0 && ["z-top", "Campeão"], sobe && ["z-up", `Acesso (${sobe})`], desce && ["z-down", `Rebaixamento (${desce})`]]
+  $("legenda").innerHTML = [d === 0 && !f.po && ["z-top", "Campeão"], dir && ["z-up", `Acesso${f.po ? " direto" : ""} (${dir})`], f.po && ["z-po", `Mata-mata (${nK(d)})`], desce && ["z-down", `Rebaixamento (${desce})`]]
     .filter(Boolean).map(([c, t]) => `<span><i class="${c}"></i>${t}</span>`).join("")
     + (K ? S.cfg.comps.map((c, i) => `<span><i style="background:${COR_COMP[i % COR_COMP.length]}"></i>${h(c.nome)}</span>`).join("") : "");
   desenharClassif(K);
 }
+function htmlPO() {
+  const d = ui.div, f = FM(d), b = S.po[d], p = pp(d);
+  const cab = `<h3>Mata-mata – Série ${LETRAS[d]}</h3><p class="dica">${d === 0 ? "Decide o campeão." : `${p} ${p > 1 ? "vagas de acesso saem" : "vaga de acesso sai"} daqui${nDir(d) ? `; os ${nDir(d)} melhores da tabela sobem direto` : ""}.`}</p>`;
+  if (!b) return `${cab}<p class="vazio">Termine a fase de pontos para definir os ${nK(d)} classificados.</p>`;
+  const nm = x => x ? h(T.get(x).nome) : "A definir", ord = poOrdem(d);
+  const rod = ri => { const t = 2 ** (b.r.length - ri); return t === 2 ? "Final" : t === 4 ? "Semifinal" : t === 8 ? "Quartas de final" : t === 16 ? "Oitavas de final" : `Fase de ${t}`; };
+  const tie = (t, ri, ti) => {
+    if (t.bye) return `<div class="tie"><small>${nm(t.a)} avança direto</small></div>`;
+    if (!t.a || !t.b) return `<div class="tie"><div class="jogo"><span class="eq casa">${nm(t.a)}</span><span class="placar">x</span><span class="eq">${nm(t.b)}</span></div></div>`;
+    const n = t.l.length, w = poVenc(t);
+    const inp = (s, li) => `<input type="number" min="0" max="20" data-po="${ri},${ti},${li},${s}" value="${t.l[li][s === "a" ? 0 : 1] ?? ""}" aria-label="Gols ${h(T.get(t[s]).nome)}">`;
+    const legs = t.l.map((_, li) => { const H = n === 2 && li === 0 ? "b" : "a", A = H === "a" ? "b" : "a", th = T.get(t[H]), ta = T.get(t[A]);
+      return `<div class="jogo"><span class="eq casa" title="${h(th.nome)}">${h(sigla(th))}${esc(th)}</span><span class="placar">${inp(H, li)}x${inp(A, li)}</span><span class="eq">${esc(ta)}${h(sigla(ta))}</span></div>`; }).join("");
+    const cheio = t.l.every(x => x[0] != null && x[1] != null), [A, B] = cheio ? agg(t) : [0, 1];
+    const pen = cheio && A === B ? `<div class="pen">Pênaltis: ${h(sigla(T.get(t.a)))} <input type="number" min="0" data-pen="${ri},${ti},0,a" value="${t.pen?.[0] ?? ""}" aria-label="Pênaltis ${h(T.get(t.a).nome)}"> x <input type="number" min="0" data-pen="${ri},${ti},0,b" value="${t.pen?.[1] ?? ""}" aria-label="Pênaltis ${h(T.get(t.b).nome)}"> ${h(sigla(T.get(t.b)))}</div>` : "";
+    return `<div class="tie">${legs}${n === 2 && cheio ? `<small>Agregado ${A} x ${B}</small>` : ""}${pen}${w ? `<small>✓ ${nm(w)} avança</small>` : ""}</div>`;
+  };
+  return `${cab}<div class="acoes"><button class="b sim" data-a="po-fase">🎲 Simular próxima fase</button></div>
+   <div class="comps">${b.r.map((rd, ri) => `<div class="comp-col"><h4>${rod(ri)}</h4>${rd.map((t, ti) => tie(t, ri, ti)).join("")}</div>`).join("")}</div>
+   ${ord ? `<p class="dica"><b>Campeão: ${nm(ord[0])}</b>${d > 0 ? ` · Sobem pelo mata-mata: ${ord.slice(0, p).map(nm).join(", ")}` : ""}</p>` : ""}`;
+}
+function desenharPO() { const el = $("po"); if (!el) return; el.hidden = !FM(ui.div).po; el.innerHTML = FM(ui.div).po ? htmlPO() : ""; }
 const COR_COMP = ["#58a6ff", "#f0883e", "#bc8cff", "#3fb950", "#d29922", "#f778ba"];
 function descVaga(q) {                   // texto da dica ao passar o mouse na barra colorida
   const c = S.cfg.comps[q.c];
@@ -404,7 +567,9 @@ function desenharRodada() {
   const R = S.fix[ui.div], r = Math.min(ui.rodada, R.length); ui.rodada = r;
   $("rod-label").textContent = `${r}ª RODADA de ${R.length}`;
   $("bp").disabled = r === 1; $("bn").disabled = r === R.length;
+  const G = grupos(ui.div).length, gs = Math.min(ui.grupo || 0, G - 1);
   $("jogos").innerHTML = R[r - 1].map((m, i) => {
+    if (G > 1 && m.g !== gs) return "";
     const c = T.get(m.c), f = T.get(m.f), v = x => x ?? "";
     return `<div class="jogo"><span class="eq casa" title="${h(c.nome)} (${h(c.uf)})">${h(sigla(c))}${esc(c)}</span>
       <span class="placar"><input type="number" min="0" max="20" data-j="${i}" data-l="c" value="${v(m.gc)}" aria-label="Gols ${h(c.nome)}">x<input type="number" min="0" max="20" data-j="${i}" data-l="f" value="${v(m.gf)}" aria-label="Gols ${h(f.nome)}"></span>
@@ -452,7 +617,9 @@ function acao(a, v) {
     case "q-mover": return qMover([...Q.sel], v);
     case "q-selvis": qLivres().forEach(id => Q.sel.add(id)); return qBoard();
     case "aba": ui.aba = v; return desenhar();
-    case "div": ui.div = +v; ui.rodada = 1; return desenhar();
+    case "div": ui.div = +v; ui.rodada = 1; ui.grupo = 0; return desenhar();
+    case "grp": ui.grupo = +v; return desenhar();
+    case "po-fase": if (!poFase(d)) return; break;
     case "prev": case "next": ui.rodada = Math.min(Math.max(ui.rodada + (a === "next" ? 1 : -1), 1), S.fix[d].length); return desenharRodada();
     case "rodada": simular(d, ui.rodada); break;
     case "divisao": simular(d); break;
@@ -500,8 +667,8 @@ $("app").addEventListener("change", e => {
   const el = e.target, d = el.dataset, v = +el.value;
   if (d.reg) { Q.reg = el.checked ? [...Q.reg, d.reg] : Q.reg.filter(r => r !== d.reg); qRecalcular(); $("q-nd").value = Q.nd; setTimeout(qParciais, 0); }
   else if (el.id === "q-nd") { if ((v || 1) !== Q.nd) { Q.nd = v || 1; qRecalcular(); setTimeout(qParciais, 0); } el.value = Q.nd; }
-  else if (d.tam) { Q.tam[d.tam] = v; Q.alloc[d.tam] = (Q.alloc[d.tam] || []).slice(0, v || 0); if (Q.dist === "manual") qColunas(); qRes(); }
-  else if (d.acc) { Q.acc[d.acc] = v; qRes(); }
+  else if (d.tam) { Q.tam[d.tam] = v; Q.alloc[d.tam] = (Q.alloc[d.tam] || []).slice(0, v || 0); if (Q.dist === "manual") qColunas(); qFmt(); qRes(); }
+  else if (d.acc) { Q.acc[d.acc] = v; qFmt(); qRes(); }
   else if (el.id === "q-nc") {           // muda a quantidade de competições
     const n = Math.min(Math.max(v || 0, 0), 6); el.value = n;
     if (n === Q.comps.length) return;
@@ -513,12 +680,23 @@ $("app").addEventListener("change", e => {
   else if (d.cv) { Q.comps[d.cv].vagas = parseInt(el.value); qHints(); qRes(); }
   else if (el.id === "q-pv") { Q.pv = v; qRes(); }
   else if (el.id === "q-pe") { Q.pe = v; qRes(); }
-  else if (el.id === "q-tn") Q.turnos = v;
+  else if (el.id === "q-tn") { Q.turnos = v; Q.fmt.forEach(f => f.tn = v); qFmt(); }
   else if (el.id === "q-ds") { Q.dist = el.value; $("q-c5").hidden = Q.dist !== "manual"; if (Q.dist === "manual") qBoard(); qRes(); }
+  else if (d.f) {                        // formato da divisão
+    const i = +d.i; Q.fmt[i][d.f] = d.f === "po" ? el.checked : d.f === "g" ? (v || 1) : v;
+    if (d.f === "po" || d.f === "g") { qFmt(); const n = document.querySelector(`[data-f="${d.f}"][data-i="${i}"]`); if (n) n.focus(); } else qFmtDica(i);
+    qRes();
+  }
+  else if (d.pre !== undefined) aplicarPreset(+d.pre, el.value);
+  else if (d.po || d.pen) {              // placar do mata-mata
+    const [ri, ti, x, s] = (d.po || d.pen).split(","), t = S.po[ui.div].r[+ri][+ti], val = el.value === "" ? null : Math.max(0, parseInt(el.value));
+    if (d.po) t.l[+x][s === "a" ? 0 : 1] = val; else { t.pen = t.pen || [null, null]; t.pen[s === "a" ? 0 : 1] = val; }
+    poSync(ui.div); salvarLocal(); desenharPO(); desenharTabela(); $("abas-div").innerHTML = abasDiv(); $("btn-enc").disabled = !completaTudo();
+  }
   else if (d.j) {                        // placar digitado à mão
     const m = S.fix[ui.div][ui.rodada - 1][+d.j];
     m[d.l === "c" ? "gc" : "gf"] = el.value === "" ? null : Math.max(0, parseInt(el.value));
-    salvarLocal(); desenharTabela(); $("abas-div").innerHTML = abasDiv(); $("btn-enc").disabled = !completaTudo();
+    salvarLocal(); desenharTabela(); desenharPO(); $("abas-div").innerHTML = abasDiv(); $("btn-enc").disabled = !completaTudo();
   }
 });
 
