@@ -1,0 +1,217 @@
+﻿id;nome;uf;serie;forca
+palmeiras-sp;Palmeiras;SP;A;861
+santos-sp;Santos;SP;A;857
+atletico-mg;Atlético;MG;A;855
+internacional-rs;Internacional;RS;A;854
+sao-paulo-sp;São Paulo;SP;A;853
+vasco-rj;Vasco;RJ;A;852
+corinthians-sp;Corinthians;SP;A;850
+gremio-rs;Grêmio;RS;A;846
+redbull-bragantino-sp;RedBull Bragantino;SP;A;841
+coritiba-pr;Coritiba;PR;A;839
+cruzeiro-mg;Cruzeiro;MG;A;832
+flamengo-rj;Flamengo;RJ;A;827
+bahia-ba;Bahia;BA;A;824
+athletico-pr;Athletico;PR;A;817
+fluminense-rj;Fluminense;RJ;A;814
+botafogo-rj;Botafogo;RJ;A;813
+remo-pa;Remo;PA;A;809
+vitoria-ba;Vitória;BA;A;808
+athletic-mg;Athletic;MG;B;700
+maringa-pr;Maringá;PR;B;693
+criciuma-sc;Criciúma;SC;B;681
+chapecoense-sc;Chapecoense;SC;B;676
+juventude-rs;Juventude;RS;B;675
+crb-al;CRB;AL;B;674
+fortaleza-ce;Fortaleza;CE;B;673
+operario-ferroviario-pr;Opérario Ferroviário;PR;B;670
+vila-nova-go;Vila Nova;GO;B;666
+cuiaba-mt;Cuiabá;MT;B;665
+ceara-ce;Ceará;CE;B;661
+nautico-pe;Náutico;PE;B;654
+avai-sc;Avaí;SC;B;653
+goias-go;Goiás;GO;B;651
+atletico-go;Atlético;GO;B;638
+sport-pe;Sport;PE;B;626
+santa-cruz-pe;Santa Cruz;PE;B;620
+guarani-sp;Guarani;SP;C;577
+volta-redonda-rj;Volta Redonda;RJ;C;576
+america-mg;América;MG;C;568
+ypiranga-rs;Ypiranga;RS;C;565
+barra-sc;Barra;SC;C;555
+ponte-preta-sp;Ponte Preta;SP;C;553
+uberlandia-mg;Uberlândia;MG;C;550
+figueirense-sc;Figueirense;SC;C;541
+nacional-am;Nacional;AM;C;540
+brusque-sc;Brusque;SC;C;539
+caxias-do-sul-rs;Caxias do Sul;RS;C;538
+goiatuba-go;Goiatuba;GO;C;537
+paysandu-pa;Paysandu;PA;C;533
+floresta-ce;Floresta;CE;C;524
+amazonas-am;Amazonas;AM;C;521
+londrina-pr;Londrina;PR;C;515
+belo-pb;Belo;PB;C;484
+abc-rn;ABC;RN;C;473
+maranhao-ma;Maranhão;MA;C;469
+gama-df;Gama;DF;C;467
+imperatriz-ma;Imperatriz;MA;C;461
+brasil-rs;Brasil;RS;D;421
+america-rj;América;RJ;D;419
+marcilio-dias-sc;Marcílio Dias;SC;D;417
+ferroviario-ce;Ferroviário;CE;D;415
+novo-hamburgo-rs;Novo Hamburgo;RS;D;414
+juazeirense-ba;Juazeirense;BA;D;413
+castanhal-pa;Castanhal;PA;D;412
+ipatinga-mg;Ipatinga;MG;D;411
+atletico-ba;Atlético;BA;D;410
+portuguesa-sp;Portuguesa;SP;D;409
+icasa-ce;Icasa;CE;D;408
+cse-al;CSE;AL;D;407
+bangu-rj;Bangu;RJ;D;406
+galicia-ba;Galícia;BA;D;405
+tuna-luso-pa;Tuna Luso;PA;D;404
+pouso-alegre-mg;Pouso Alegre;MG;D;403
+tombense-mg;Tombense;MG;D;402
+sao-raimundo-pa;São Raimundo;PA;D;401
+feirense-ba;Feirense;BA;D;400
+murici-al;Murici;AL;D;399
+cascavel-pr;Cascavel;PR;D;398
+nova-iguacu-rj;Nova Iguaçu;RJ;D;397
+cameta-pa;Cametá;PA;D;396
+ypiranga-ba;Ypiranga;BA;D;395
+iguatu-ce;Iguatu;CE;D;394
+olimpico-se;Olímpico;SE;D;393
+pelotas-rs;Pelotas;RS;D;392
+parana-club-pr;Paraná Club;PR;D;391
+anapolis-go;Anápolis;GO;D;390
+aguia-de-maraba-pa;Águia de Marabá;PA;D;389
+aparecidense-go;Aparecidense;GO;D;388
+manauara-am;Manauara;AM;D;387
+coruripe-al;Coruripe;AL;D;386
+luverdense-mt;Luverdense;MT;D;385
+tucurui-pa;Tucuruí;PA;D;384
+jacuipense-ba;Jacuipense;BA;D;383
+guarany-ce;Guarany;CE;D;382
+porto-pe;Porto;PE;D;381
+csa-al;CSA;AL;D;380
+dorense-se;Dorense;SE;D;379
+sinop-mt;Sinop;MT;D;378
+varzea-grande-mt;Várzea Grande;MT;D;377
+joinville-sc;Joinville;SC;D;376
+carmopolis-se;Carmópolis;SE;D;375
+atletico-ce;Atlético;CE;D;374
+goiania-go;Goiânia;GO;D;373
+fast-club-am;Fast Club;AM;D;372
+mixto-mt;Mixto;MT;D;371
+cianorte-pr;Cianorte;PR;D;370
+cotinguiba-se;Cotinguiba;SE;D;369
+dom-bosco-mt;Dom Bosco;MT;D;368
+lagarto-se;Lagarto;SE;D;367
+central-pe;Central;PE;D;366
+salgueiro-pe;Salgueiro;PE;D;365
+asa-al;ASA;AL;D;364
+capelense-al;Capelense;AL;D;363
+crac-go;CRAC;GO;D;362
+manaus-am;Manaus;AM;D;361
+retro-pe;Retrô;PE;D;360
+sao-raimundo-am;São Raimundo;AM;D;359
+sousa-pb;Sousa;PB;D;358
+penedense-al;Penedense;AL;D;357
+uniao-mt;União;MT;D;356
+pantanal-mt;Pantanal;MT;D;355
+oeirense-pi;Oeirense;PI;D;354
+princesa-do-solimoes-am;Princesa do Solimões;AM;D;353
+confianca-se;Confiança;SE;D;352
+sergipe-se;Sergipe;SE;D;351
+piaui-pi;Piauí;PI;D;350
+rio-negro-am;Rio Negro;AM;D;349
+atletico-pb;Atlético;PB;D;348
+itabaiana-se;Itabaiana;SE;D;347
+vitoria-es;Vitória;ES;D;346
+aguia-negra-ms;Águia Negra;MS;D;345
+atletico-juventus-ac;Atlético Juventus;AC;D;344
+parnahyba-pi;Parnahyba;PI;D;343
+petrolina-pe;Petrolina;PE;D;342
+independencia-ac;Independência;AC;D;341
+sportiva-potiguar-rn;Sportiva Potiguar;RN;D;340
+ceilandia-df;Ceilândia;DF;D;339
+real-noroeste-es;Real Noroeste;ES;D;338
+america-rn;América;RN;D;337
+atletico-ac;Atlético;AC;D;336
+sampaio-correa-ma;Sampaio Corrêa;MA;D;335
+auto-esporte-pb;Auto Esporte;PB;D;334
+guarai-to;Guaraí;TO;D;333
+gurupi-to;Gurupi;TO;D;332
+rio-branco-es;Rio Branco;ES;D;331
+campinense-pb;Campinense;PB;D;330
+nacional-pb;Nacional;PB;D;329
+aquidauense-ms;Aquidauense;MS;D;328
+interporto-to;Interporto;TO;D;327
+real-ariquemedes-ro;Real Ariquemedes;RO;D;326
+genus-ro;Genus;RO;D;325
+equatorial-ap;Equatorial;AP;D;324
+palmas-to;Palmas;TO;D;323
+sportivo-paraibano-pb;Sportivo Paraibano;PB;D;322
+desportiva-ferroviaria-es;Desportiva Ferroviária;ES;D;321
+teresina-pi;Teresina;PI;D;320
+capital-to;Capital;TO;D;319
+costa-rica-ms;Costa Rica;MS;D;318
+rio-branco-ac;Rio Branco;AC;D;317
+serra-es;Serra;ES;D;316
+tiradentes-pi;Tiradentes;PI;D;315
+ubiratan-ms;Ubiratan;MS;D;314
+vilhena-ro;Vilhena;RO;D;313
+atletico-rr;Atlético;RR;D;312
+iape-ma;IAPE;MA;D;311
+porto-vitoria-es;Porto Vitória;ES;D;310
+barauna-rn;Baraúna;RN;D;309
+pacaraima-rr;Pacaraima;RR;D;308
+real-brasilia-df;Real Brasilia;DF;D;307
+oratorio-ap;Oratório;AP;D;306
+treze-pb;Treze;PB;D;305
+luminense-ma;Luminense;MA;D;304
+ypiranga-ap;Ypiranga;AP;D;303
+araguaina-to;Araguaína;TO;D;302
+bare-rr;Baré;RR;D;301
+capital-df;Capital;DF;D;300
+galvez-ac;Galvez;AC;D;299
+sao-raimundo-rr;São Raimundo;RR;D;298
+sobradinho-df;Sobradinho;DF;D;297
+amapa-ap;Amapá;AP;D;296
+dourados-ms;Dourados;MS;D;295
+altos-pi;Altos;PI;D;294
+potiguar-rn;Potiguar;RN;D;293
+brasiliense-df;Brasiliense;DF;D;292
+santana-ap;Santana;AP;D;291
+comercial-ms;Comercial;MS;D;290
+globo-rn;Globo;RN;D;289
+placido-de-castro-ac;Plácido de Castro;AC;D;288
+moto-esporte-ro;Moto Esporte;RO;D;287
+brasilia-df;Brasília;DF;D;286
+guapore-ro;Guaporé;RO;D;285
+4-de-julho-pi;4 de Julho;PI;D;284
+nova-venecia-es;Nova Venécia;ES;D;283
+sao-jose-ap;São José;AP;D;282
+aquiry-ac;Aquiry;AC;D;281
+atletico-boa-vista-rr;Atlético Boa Vista;RR;D;280
+ji-parana-ro;Ji-Paraná;RO;D;279
+mossoro-rn;Mossoró;RN;D;278
+bacabal-ma;Bacabal;MA;D;277
+corumbaense-ms;Corumbaense;MS;D;276
+picos-pi;Picos;PI;D;275
+uniao-ro;União;RO;D;274
+monte-roraima-rr;Monte Roraima;RR;D;273
+moto-club-ma;Moto Club;MA;D;272
+operario-ms;Opérario;MS;D;271
+alecrim-rn;Alecrim;RN;D;270
+trem-ap;Trem;AP;D;269
+samambaia-df;Samambaia;DF;D;268
+humaita-ac;Humaitá;AC;D;267
+linhares-es;Linhares;ES;D;266
+gas-rr;GAS;RR;D;265
+uniao-to;União;TO;D;264
+cordino-ma;Cordino;MA;D;263
+macapa-ap;Macapá;AP;D;262
+tocantinopolis-to;Tocantinópolis;TO;D;261
+porto-velho-ro;Porto Velho;RO;D;260
+real-rr;Real;RR;D;259
