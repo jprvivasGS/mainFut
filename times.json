@@ -7476,227 +7476,227 @@
       }
     },
     {
-      "id": "csc-cayenne-gfcy",
+      "id": "csc-cayenne-cacy",
       "nome": "CSC Cayenne",
       "sigla": "CSC",
-      "uf": "GFCY",
-      "regiao": "Guiana Francesa",
+      "uf": "CACY",
+      "regiao": "Caiena",
       "cidade": "Caiena",
       "federacao": {
-        "sigla": "LGF",
-        "imagem": "federacao/GF.png"
+        "sigla": "LFC",
+        "imagem": "federacao/CA.png"
       },
       "serie": "A",
       "forca": 700,
       "fundacao": 1919,
-      "escudo": "escudos/csc-cayenne-gfcy.png",
+      "escudo": "escudos/csc-cayenne-cacy.png",
       "cores": [
         "cores/azul.png",
         "cores/branco.png"
       ],
       "mascote": {
         "nome": "Cayennais",
-        "imagem": "mascotes/csc-cayenne-gfcy.png"
+        "imagem": "mascotes/csc-cayenne-cacy.png"
       },
       "uniformes": {
-        "titular": "uniformes/csc-cayenne-gfcy-1.png",
-        "reserva": "uniformes/csc-cayenne-gfcy-2.png"
+        "titular": "uniformes/csc-cayenne-cacy-1.png",
+        "reserva": "uniformes/csc-cayenne-cacy-2.png"
       }
     },
     {
-      "id": "as-etoile-matoury-gfcy",
+      "id": "as-etoile-matoury-cacy",
       "nome": "Étoile Matoury",
       "sigla": "EMAT",
-      "uf": "GFCY",
-      "regiao": "Guiana Francesa",
+      "uf": "CACY",
+      "regiao": "Caiena",
       "cidade": "Matoury",
       "federacao": {
-        "sigla": "LGF",
-        "imagem": "federacao/GF.png"
+        "sigla": "LFC",
+        "imagem": "federacao/CA.png"
       },
       "serie": "A",
       "forca": 700,
       "fundacao": 2014,
-      "escudo": "escudos/as-etoile-matoury-gfcy.png",
+      "escudo": "escudos/as-etoile-matoury-cacy.png",
       "cores": [
         "cores/amarelo.png",
         "cores/preto.png"
       ],
       "mascote": {
         "nome": "Étoile",
-        "imagem": "mascotes/as-etoile-matoury-gfcy.png"
+        "imagem": "mascotes/as-etoile-matoury-cacy.png"
       },
       "uniformes": {
-        "titular": "uniformes/as-etoile-matoury-gfcy-1.png",
-        "reserva": "uniformes/as-etoile-matoury-gfcy-2.png"
+        "titular": "uniformes/as-etoile-matoury-cacy-1.png",
+        "reserva": "uniformes/as-etoile-matoury-cacy-2.png"
       }
     },
     {
-      "id": "le-geldar-gfsl",
+      "id": "le-geldar-casl",
       "nome": "Le Geldar",
       "sigla": "GEL",
-      "uf": "GFSL",
-      "regiao": "Guiana Francesa",
+      "uf": "CASL",
+      "regiao": "Caiena",
       "cidade": "Kourou",
       "federacao": {
         "sigla": "LGF",
-        "imagem": "federacao/GF.png"
+        "imagem": "federacao/CA.png"
       },
       "serie": "A",
       "forca": 700,
       "fundacao": 1992,
-      "escudo": "escudos/le-geldar-gfsl.png",
+      "escudo": "escudos/le-geldar-casl.png",
       "cores": [
         "cores/preto.png",
         "cores/branco.png"
       ],
       "mascote": {
         "nome": "Spatial",
-        "imagem": "mascotes/le-geldar-gfsl.png"
+        "imagem": "mascotes/le-geldar-casl.png"
       },
       "uniformes": {
-        "titular": "uniformes/le-geldar-gfsl-1.png",
-        "reserva": "uniformes/le-geldar-gfsl-2.png"
+        "titular": "uniformes/le-geldar-casl-1.png",
+        "reserva": "uniformes/le-geldar-casl-2.png"
       }
     },
     {
-      "id": "us-matoury-gfcy",
+      "id": "us-matoury-cacy",
       "nome": "US Matoury",
       "sigla": "MAT",
-      "uf": "GFCY",
-      "regiao": "Guiana Francesa",
+      "uf": "CACY",
+      "regiao": "Caiena",
       "cidade": "Matoury",
       "federacao": {
         "sigla": "LGF",
-        "imagem": "federacao/GF.png"
+        "imagem": "federacao/CA.png"
       },
       "serie": "A",
       "forca": 700,
       "fundacao": 2000,
-      "escudo": "escudos/us-matoury-gfcy.png",
+      "escudo": "escudos/us-matoury-cacy.png",
       "cores": [
         "cores/vermelho.png",
         "cores/preto.png"
       ],
       "mascote": {
         "nome": "Jaguar",
-        "imagem": "mascotes/us-matoury-gfcy.png"
+        "imagem": "mascotes/us-matoury-cacy.png"
       },
       "uniformes": {
-        "titular": "uniformes/us-matoury-gfcy-1.png",
-        "reserva": "uniformes/us-matoury-gfcy-2.png"
+        "titular": "uniformes/us-matoury-cacy-1.png",
+        "reserva": "uniformes/us-matoury-cacy-2.png"
       }
     },
     {
-      "id": "asu-grand-santi-gfsl",
+      "id": "asu-grand-santi-casl",
       "nome": "ASU Grand Santi",
       "sigla": "GSA",
-      "uf": "GFSL",
-      "regiao": "Guiana Francesa",
+      "uf": "CASL",
+      "regiao": "Caiena",
       "cidade": "Grand-Santi",
       "federacao": {
         "sigla": "LGF",
-        "imagem": "federacao/GF.png"
+        "imagem": "federacao/CA.png"
       },
       "serie": "A",
       "forca": 700,
       "fundacao": 2003,
-      "escudo": "escudos/asu-grand-santi-gfsl.png",
+      "escudo": "escudos/asu-grand-santi-casl.png",
       "cores": [
         "cores/verde.png",
         "cores/amarelo.png"
       ],
       "mascote": {
         "nome": "Maroni",
-        "imagem": "mascotes/asu-grand-santi-gfsl.png"
+        "imagem": "mascotes/asu-grand-santi-casl.png"
       },
       "uniformes": {
-        "titular": "uniformes/asu-grand-santi-gfsl-1.png",
-        "reserva": "uniformes/asu-grand-santi-gfsl-2.png"
+        "titular": "uniformes/asu-grand-santi-casl-1.png",
+        "reserva": "uniformes/asu-grand-santi-casl-2.png"
       }
     },
     {
-      "id": "us-sinnamary-gfcy",
+      "id": "us-sinnamary-cacy",
       "nome": "US Sinnamary",
       "sigla": "SIN",
-      "uf": "GFCY",
-      "regiao": "Guiana Francesa",
+      "uf": "CACY",
+      "regiao": "Caiena",
       "cidade": "Sinnamary",
       "federacao": {
         "sigla": "LGF",
-        "imagem": "federacao/GF.png"
+        "imagem": "federacao/CA.png"
       },
       "serie": "A",
       "forca": 700,
       "fundacao": 1953,
-      "escudo": "escudos/us-sinnamary-gfcy.png",
+      "escudo": "escudos/us-sinnamary-cacy.png",
       "cores": [
         "cores/vermelho.png",
         "cores/branco.png"
       ],
       "mascote": {
         "nome": "Ibis",
-        "imagem": "mascotes/us-sinnamary-gfcy.png"
+        "imagem": "mascotes/us-sinnamary-cacy.png"
       },
       "uniformes": {
-        "titular": "uniformes/us-sinnamary-gfcy-1.png",
-        "reserva": "uniformes/us-sinnamary-gfcy-2.png"
+        "titular": "uniformes/us-sinnamary-cacy-1.png",
+        "reserva": "uniformes/us-sinnamary-cacy-2.png"
       }
     },
     {
-      "id": "ag-de-remire-gfcy",
+      "id": "ag-de-remire-cacy",
       "nome": "AG de Rémire",
       "sigla": "REM",
-      "uf": "GFCY",
-      "regiao": "Guiana Francesa",
+      "uf": "CACY",
+      "regiao": "Caiena",
       "cidade": "Rémire-Montjoly",
       "federacao": {
         "sigla": "LGF",
-        "imagem": "federacao/GF.png"
+        "imagem": "federacao/CA.png"
       },
       "serie": "A",
       "forca": 700,
       "fundacao": 1974,
-      "escudo": "escudos/ag-de-remire-gfcy.png",
+      "escudo": "escudos/ag-de-remire-cacy.png",
       "cores": [
         "cores/verde.png",
         "cores/preto.png"
       ],
       "mascote": {
         "nome": "Montjoly",
-        "imagem": "mascotes/ag-de-remire-gfcy.png"
+        "imagem": "mascotes/ag-de-remire-cacy.png"
       },
       "uniformes": {
-        "titular": "uniformes/ag-de-remire-gfcy-1.png",
-        "reserva": "uniformes/ag-de-remire-gfcy-2.png"
+        "titular": "uniformes/ag-de-remire-cacy-1.png",
+        "reserva": "uniformes/ag-de-remire-cacy-2.png"
       }
     },
     {
-      "id": "sc-kourou-gfsl",
+      "id": "sc-kourou-casl",
       "nome": "SC Kourou",
       "sigla": "KOU",
-      "uf": "GFSL",
-      "regiao": "Guiana Francesa",
+      "uf": "CASL",
+      "regiao": "Caiena",
       "cidade": "Kourou",
       "federacao": {
         "sigla": "LGF",
-        "imagem": "federacao/GF.png"
+        "imagem": "federacao/CA.png"
       },
       "serie": "A",
       "forca": 700,
       "fundacao": 2008,
-      "escudo": "escudos/sc-kourou-gfsl.png",
+      "escudo": "escudos/sc-kourou-casl.png",
       "cores": [
         "cores/azul.png",
         "cores/amarelo.png"
       ],
       "mascote": {
         "nome": "Fusée",
-        "imagem": "mascotes/sc-kourou-gfsl.png"
+        "imagem": "mascotes/sc-kourou-casl.png"
       },
       "uniformes": {
-        "titular": "uniformes/sc-kourou-gfsl-1.png",
-        "reserva": "uniformes/sc-kourou-gfsl-2.png"
+        "titular": "uniformes/sc-kourou-casl-1.png",
+        "reserva": "uniformes/sc-kourou-casl-2.png"
       }
     },
     {
