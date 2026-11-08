@@ -1,6 +1,6 @@
 {
   "versao": "2.0",
-  "atualizado": "2026-11-01",
+  "atualizado": "2026-11-08",
   "times": [
     {
       "id": "aquiry-ac",
@@ -727,10 +727,10 @@
       "serie": null,
       "fundacao": 1944,
       "escudo": "escudos/macapa-ap.png",
-      "cores":  [
+      "cores": [
         "cores/azul.png",
         "cores/branco.png"
-       ],
+      ],
       "mascote": {
         "nome": "Leão",
         "imagem": "mascotes/macapa-ap.png"
@@ -1143,7 +1143,7 @@
       "cores": [
         "cores/preto.png",
         "cores/branco.png"
-       ],
+      ],
       "mascote": {
         "nome": "Vozão",
         "imagem": "mascotes/ceara-ce.png"
@@ -1865,33 +1865,6 @@
       }
     },
     {
-      "id": "goiatuba-go",
-      "nome": "Goiatuba",
-      "sigla": "GTB",
-      "uf": "GO",
-      "regiao": "centro_oeste",
-      "cidade": "Goiatuba",
-      "federacao": {
-        "sigla": "FFGO",
-        "imagem": "federacao/GO.png"
-      },
-      "serie": "C",
-      "fundacao": 1970,
-      "escudo": "escudos/goiatuba-go.png",
-      "cores": [
-        "cores/azul.png",
-        "cores/branco.png"
-      ],
-      "mascote": {
-        "nome": "Azulão",
-        "imagem": "mascotes/goiatuba-go.png"
-      },
-      "uniformes": {
-        "titular": "uniformes/goiatuba-go-1.png",
-        "reserva": "uniformes/goiatuba-go-2.png"
-      }
-    },
-    {
       "id": "goiania-go",
       "nome": "Goiânia",
       "sigla": "GON",
@@ -1943,6 +1916,33 @@
       "uniformes": {
         "titular": "uniformes/goias-go-1.png",
         "reserva": "uniformes/goias-go-2.png"
+      }
+    },
+    {
+      "id": "goiatuba-go",
+      "nome": "Goiatuba",
+      "sigla": "GTB",
+      "uf": "GO",
+      "regiao": "centro_oeste",
+      "cidade": "Goiatuba",
+      "federacao": {
+        "sigla": "FFGO",
+        "imagem": "federacao/GO.png"
+      },
+      "serie": "C",
+      "fundacao": 1970,
+      "escudo": "escudos/goiatuba-go.png",
+      "cores": [
+        "cores/azul.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Azulão",
+        "imagem": "mascotes/goiatuba-go.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/goiatuba-go-1.png",
+        "reserva": "uniformes/goiatuba-go-2.png"
       }
     },
     {
@@ -2629,33 +2629,6 @@
       }
     },
     {
-      "id": "dom-bosco-mt",
-      "nome": "Dom Bosco",
-      "sigla": "DBC",
-      "uf": "MT",
-      "regiao": "centro_oeste",
-      "cidade": "Cuiabá",
-      "federacao": {
-        "sigla": "FFMT",
-        "imagem": "federacao/MT.png"
-      },
-      "serie": null,
-      "fundacao": 1925,
-      "escudo": "escudos/dom-bosco-mt.png",
-      "cores": [
-        "cores/azul.png",
-        "cores/branco.png"
-      ],
-      "mascote": {
-        "nome": "Leão da Colina",
-        "imagem": "mascotes/dom-bosco-mt.png"
-      },
-      "uniformes": {
-        "titular": "uniformes/dom-bosco-mt-1.png",
-        "reserva": "uniformes/dom-bosco-mt-2.png"
-      }
-    },
-    {
       "id": "cuiaba-mt",
       "nome": "Cuiabá",
       "sigla": "CUI",
@@ -2680,6 +2653,33 @@
       "uniformes": {
         "titular": "uniformes/cuiaba-mt-1.png",
         "reserva": "uniformes/cuiaba-mt-2.png"
+      }
+    },
+    {
+      "id": "dom-bosco-mt",
+      "nome": "Dom Bosco",
+      "sigla": "DBC",
+      "uf": "MT",
+      "regiao": "centro_oeste",
+      "cidade": "Cuiabá",
+      "federacao": {
+        "sigla": "FFMT",
+        "imagem": "federacao/MT.png"
+      },
+      "serie": null,
+      "fundacao": 1925,
+      "escudo": "escudos/dom-bosco-mt.png",
+      "cores": [
+        "cores/azul.png",
+        "cores/branco.png"
+      ],
+      "mascote": {
+        "nome": "Leão da Colina",
+        "imagem": "mascotes/dom-bosco-mt.png"
+      },
+      "uniformes": {
+        "titular": "uniformes/dom-bosco-mt-1.png",
+        "reserva": "uniformes/dom-bosco-mt-2.png"
       }
     },
     {
@@ -4008,10 +4008,10 @@
       "serie": "A",
       "fundacao": 1942,
       "escudo": "escudos/botafogo-rj.png",
-      "cores":  [
+      "cores": [
         "cores/preto.png",
         "cores/branco.png"
-       ],
+      ],
       "mascote": {
         "nome": "Cachorro",
         "imagem": "mascotes/botafogo-rj.png"
@@ -4499,11 +4499,11 @@
       "serie": "D",
       "fundacao": 2018,
       "escudo": "escudos/porto-velho-ro.png",
-      "cores":  [
+      "cores": [
         "cores/anil.png",
         "cores/vermelho.png",
         "cores/branco.png"
-       ],
+      ],
       "mascote": {
         "nome": "Locomotiva",
         "imagem": "mascotes/porto-velho-ro.png"
@@ -5132,10 +5132,10 @@
       "serie": "B",
       "fundacao": 1973,
       "escudo": "escudos/chapecoense-sc.png",
-      "cores":  [
+      "cores": [
         "cores/verde.png",
         "cores/branco.png"
-       ],
+      ],
       "mascote": {
         "nome": "Índio Condá",
         "imagem": "mascotes/chapecoense-sc.png"
