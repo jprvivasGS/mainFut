@@ -33,6 +33,7 @@
 
   /* ---------- Tela inicial ---------- */
   .hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 80px 20px 40px; gap: 14px; }
+  .hero #logo { width: min(200px, 50vw); height: auto; }
   .hero h1 { margin: 0; font-size: clamp(2rem, 6vw, 3.2rem); color: var(--heading); letter-spacing: .5px; }
   .hero .lead { margin: 0; max-width: 46ch; color: var(--muted); }
   .hero .stats { margin: 0; font-size: .9rem; color: var(--muted); max-width: 56ch; }
@@ -158,12 +159,12 @@
     <span class="qtd" id="qtd"></span>
     <button class="fechar" id="btnFecharMenu" aria-label="Fechar menu">×</button>
   </div>
-  <input class="busca" id="busca" type="search" placeholder="Buscar por nome, cidade ou estado" aria-label="Buscar time" autocomplete="off">
+  <input class="busca" id="busca" type="search" placeholder="Buscar por nome, estado ou país" aria-label="Buscar time" autocomplete="off">
   <div class="lista" id="lista"></div>
 </aside>
 
 <main class="hero">
-  <img id="logo" alt="">
+  <img id="logo" alt="Logo do OmniFut">
   <h1>OmniFut</h1>
   <p class="lead">Hub de ideias e simulações de futebol.</p>
   <p class="stats" id="stats">Carregando base de times…</p>
@@ -192,7 +193,7 @@
   <figure><img id="vImg" alt=""><figcaption id="vLeg"></figcaption></figure>
 </dialog>
 
-<script src="shared/hub-data.js"></script>
+<script src="hub-data.js"></script>
 <script>
 const ESTADOS = {
   AC:"Acre", AL:"Alagoas", AP:"Amapá", AM:"Amazonas", BA:"Bahia", CE:"Ceará", DF:"Distrito Federal",
@@ -203,14 +204,32 @@ const ESTADOS = {
   AGCB:"Córdoba", AGSF:"Santa Fe", BOCB:"Cochabamba", BOLP:"La Paz", BOOR:"Oruro", BOPT:"Potosí", 
   BOSC:"Santa Cruz", CACY:"Cayenne", CASL:"Saint-Laurent du Maroni", COAN:"Antioquia", COAT:"Atlántico", 
   COCA:"Caquetá", CODC:"Distrito Capital", COVA:"Valle del Cauca", ECAZ:"Azuay", ECGY:"Guayas", ECPI:"Pichincha", 
-  GYDE:"Demerara-Mahaica", GYEB:"East Berbice-Corentyne", PEAR:"Arequipe", PECU:"Cusco", PELA:"La Libertad", 
-  PELI:"Lima", PYAS:"Asunción", PYCA:"Central", SRPA:"Paramaribo", SRWA:"Wanica", VEBA:"Wanica", VECA:"Carabobo", 
-  VEDC:"Distrito Capital", VEME:"Mérida", VEMI:"Miranda", VETA:"Táchira", VEZU:"Zulia"
+  GYDE:"Demerara-Mahaica", GYEB:"East Berbice-Corentyne", PEAR:"Arequipa", PECU:"Cusco", PELA:"La Libertad", 
+  PELI:"Lima", PYAS:"Asunción", PYCA:"Central", SRPA:"Paramaribo", SRWA:"Wanica", VEBA:"Barinas", VECA:"Carabobo", 
+  VEDC:"Distrito Capital", VEME:"Mérida", VEMI:"Miranda", VETA:"Táchira", VEZU:"Zulia", CLAN:"Antofagasta", CLBI:"Biobío", CLRM:"Região Metropolitana", CLVA:"Valparaíso", UYMO:"Montevidéu"
 };
 const REGIOES = { norte:"Norte", nordeste:"Nordeste", centro_oeste:"Centro-Oeste", sudeste:"Sudeste", sul:"Sul", Argentina:"Argentina" };
 
 const $ = id => document.getElementById(id);
+// Logo: GitHub Pages diferencia maiúsculas, então tenta logo.png e Logo.png; sem nenhum, esconde a imagem
+(function logo() {
+  const img = $("logo"), alvos = ["logo.png", "Logo.png"]; let n = 0;
+  img.onerror = () => { if (++n < alvos.length) img.src = alvos[n]; else img.remove(); };
+  img.src = alvos[0];
+})();
 let times = [];
+
+// ---------- Detalhes (times-detalhe.json): carregados só na primeira vez que alguém abre um time ----------
+let detalhesPromessa = null;
+function carregarDetalhes() {
+  if (!detalhesPromessa) {
+    detalhesPromessa = fetch("times-detalhe.json", { cache: "no-cache" })
+      .then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(d => d.times || {})
+      .catch(() => { detalhesPromessa = null; return {}; });   // falhou: mostra o básico e tenta de novo no próximo clique
+  }
+  return detalhesPromessa;
+}
 
 // ---------- Utilidades ----------
 function el(tag, cls, texto) {
@@ -245,7 +264,10 @@ function imagemTentando(lista, alt, aoFalhar) {
 // Bandeira do estado (bandeiras/UF.png); sem a imagem, mostra a sigla da UF
 function bandeira(t, classe) {
   const estado = ESTADOS[t.uf] || t.uf;
-  const i = imagem(`bandeiras/${t.uf}.png`, "Bandeira de " + estado, img => img.replaceWith(el("span", "uf-tag", t.uf)));
+  // brasileiros: bandeiras/UF.png; estrangeiros: província, depois país (2 primeiras letras do código) e a sigla da federação
+  const nomes = t.uf.length === 2 ? [t.uf] : [t.uf, t.uf.slice(0, 2), (t.federacao || {}).sigla];
+  const i = imagemTentando(nomes.filter(Boolean).map(n => `bandeiras/${n}.png`), "Bandeira de " + estado,
+    img => img.replaceWith(el("span", "uf-tag", t.uf)));
   i.className = classe;
   i.title = estado;
   return i;
@@ -297,8 +319,9 @@ async function carregar() {
     if (!Array.isArray(lista)) throw new Error("formato");
     times = lista.slice().sort((a, b) =>
       a.nome.localeCompare(b.nome, "pt-BR", { sensitivity: "base" }) || a.uf.localeCompare(b.uf));
-    const estados = new Set(times.map(t => t.uf)).size;
-    $("stats").textContent = `${times.length} times em ${estados} ${estados === 1 ? "estado" : "estados"}`;
+    const estados = new Set(times.map(t => t.uf)).size, paises = new Set(times.map(t => t.pais).filter(Boolean)).size;
+    $("stats").textContent = paises > 1 ? `${times.length} times em ${paises} países`
+      : `${times.length} times em ${estados} ${estados === 1 ? "estado" : "estados"}`;
     $("contBtn").textContent = times.length;
     $("btnAbrir").disabled = false;
     desenharLista();
@@ -328,7 +351,7 @@ function fecharMenu() {
 function desenharLista() {
   const termo = semAcento($("busca").value.trim());
   const filtrados = times.filter(t => !termo ||
-    semAcento([t.nome, t.cidade, t.uf, ESTADOS[t.uf], t.sigla].join(" ")).includes(termo));
+    semAcento([t.nome, t.uf, ESTADOS[t.uf], t.pais, t.sigla].join(" ")).includes(termo));
   const lista = $("lista");
   lista.replaceChildren();
   $("qtd").textContent = termo ? `${filtrados.length} de ${times.length}` : `${times.length}`;
@@ -376,7 +399,9 @@ function linhaInfo(dl, rotulo, valor) {
   dl.append(d);
 }
 
-function abrirTime(t) {
+async function abrirTime(leve) {
+  const det = await carregarDetalhes();
+  const t = { ...leve, ...(det[leve.id] || {}) };      // leve + detalhe (cidade, cores, mascote, uniformes, federação, fundação)
   const card = $("card");
   card.replaceChildren();
 
@@ -421,7 +446,7 @@ function abrirTime(t) {
     const sec = el("div", "sec");
     sec.append(el("h4", null, "Federação"));
     const linha = el("div", "fed");
-    if (fed.imagem) linha.append(imagem(fed.imagem, "Federação " + (fed.sigla || "")));
+    if (fed.imagem) linha.append(imagemTentando([...new Set([fed.imagem, fed.sigla && `federacao/${fed.sigla}.png`, `federacao/${t.uf.slice(0, 2)}.png`].filter(Boolean))], "Federação " + (fed.sigla || "")));
     if (fed.sigla) linha.append(el("span", null, fed.sigla));
     sec.append(linha);
     card.append(sec);
@@ -494,7 +519,7 @@ document.addEventListener("keydown", e => {
 // Endereços dos projetos, relativos a esta página (ajuste se as pastas tiverem outro nome).
 const SITES = { campeonato: "campeonato/", copa: "copa/" };
 
-// Lê o que os outros sites gravaram (contrato em shared/hub-data.js); sem o arquivo, fica sem status.
+// Lê o que os outros sites gravaram (contrato em hub-data.js); sem o arquivo, fica sem status.
 function lerHub(chave) {
   return (typeof HubData !== "undefined") ? HubData.get(chave) : null;
 }

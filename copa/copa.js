@@ -28,6 +28,12 @@ const sigla = t => t.sigla || t.nome.slice(0, 3).toUpperCase();
 const sem = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 const nomeDaCor = c => { const b = c.split("/").pop().replace(/\.[a-z]+$/i, ""); return b.charAt(0).toUpperCase() + b.slice(1); };
 
+let DET = null;   // times-detalhe.json: carregado só ao abrir a ficha de um time ou a comemoração do campeão
+function detalhes() {
+  if (!DET) DET = fetch(RAIZ + "times-detalhe.json", { cache: "no-cache" }).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(d => d.times || {}).catch(() => { DET = null; return {}; });   // falhou: usa só o básico e tenta de novo depois
+  return DET;
+}
 let TIMES = [], T = new Map();   // base de times e busca por id
 let Q = null;                    // respostas do questionário
 let C = null;                    // copa em andamento: { cfg, prelim, slots, res, festa }
@@ -398,8 +404,8 @@ function kit(rotulo, src, alt) {
   if (!src) return `<div class="kit">${h(rotulo)}<div style="cursor:default">Sem foto</div></div>`;
   return `<div class="kit">${h(rotulo)}<div data-img="${h(RAIZ + src)}"><img src="${RAIZ}${h(src)}" alt="${h(alt)}" onerror="this.replaceWith(document.createTextNode('Sem foto'))"></div></div>`;
 }
-function abrirTime(id) {
-  const t = T.get(id), u = t.uniformes || {}, m = t.mascote || {}, f = t.federacao || {}, cores = (t.cores || []).map(nomeDaCor);
+async function abrirTime(id) {
+  const t = { ...T.get(id), ...((await detalhes())[id] || {}) }, u = t.uniformes || {}, m = t.mascote || {}, f = t.federacao || {}, cores = (t.cores || []).map(nomeDaCor);
   const camp = campanha(id);
   $("timeBox").innerHTML = `<button class="fechar" data-a="t-fechar" aria-label="Fechar">×</button>
     <div class="ficha">${esc(t)}<div><h3>${h(t.nome)}</h3><p>${h([t.cidade, t.uf].filter(Boolean).join(" · "))}${t.fundacao ? ` · fundado em ${h(t.fundacao)}` : ""}</p>
@@ -438,7 +444,7 @@ function corHex(caminho) {       // lê o hex da imagem em cores/…; se falhar,
 }
 let fogos = null;
 async function festa(id) {
-  const t = T.get(id);
+  const t = { ...T.get(id), ...((await detalhes())[id] || {}) };
   if ($("jogoDlg").open) $("jogoDlg").close();
   $("festaEsc").innerHTML = esc(t); $("festaNome").textContent = t.nome; $("festaLocal").textContent = [t.cidade, t.uf].filter(Boolean).join(" · ");
   $("festa").hidden = false;
