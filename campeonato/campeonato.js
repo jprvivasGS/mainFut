@@ -7,8 +7,7 @@ const LETRAS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const LOCAL = "mainfut:campeonato:save";
 const $ = id => document.getElementById(id);
 const h = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const rnd = n => Math.floor(Math.random() * n);
-const embaralhar = a => { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = rnd(i + 1); [b[i], b[j]] = [b[j], b[i]]; } return b; };
+const rnd = RNG.rnd, embaralhar = RNG.embaralhar;   // sorteios vêm de ../core/rng.js (com semente, gravada no save)
 const sigla = t => t.sigla || t.nome.slice(0, 3).toUpperCase();
 const sem = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
@@ -209,7 +208,8 @@ function simularAnos() {
 /* ---------- Save ---------- */
 function paraJSON() {                    // só os placares: as rodadas são refeitas a partir da ordem dos times
   return { versao: 2, po: S.po, ano: S.ano, cfg: S.cfg, divs: S.divs, deducoes: S.deducoes, ext: S.ext, historico: S.historico,
-    placar: S.fix.map(rs => rs.flatMap(r => r.map(m => (m.gc == null || m.gf == null) ? null : [m.gc, m.gf]))) };
+    placar: S.fix.map(rs => rs.flatMap(r => r.map(m => (m.gc == null || m.gf == null) ? null : [m.gc, m.gf]))),
+    rng: RNG.salvar() };                 // { semente, estado }: ao carregar, os sorteios continuam de onde pararam
 }
 function deJSON(o) {
   if (!o || !Array.isArray(o.divs) || !o.cfg) throw new Error("Arquivo de save inválido.");
@@ -221,6 +221,7 @@ function deJSON(o) {
   montarFix();
   S.fix.forEach((rs, d) => rs.flat().forEach((m, i) => { const p = o.placar?.[d]?.[i]; if (p) { m.gc = p[0]; m.gf = p[1]; } }));
   if (Array.isArray(o.po) && o.po.length === S.divs.length) S.po = o.po;
+  RNG.restaurar(o.rng);                  // saves antigos não têm "rng": seguem com a semente da página
   ui = { aba: "temporada", div: 0, rodada: 1 };
 }
 function salvarLocal() { try { localStorage.setItem(LOCAL, JSON.stringify(paraJSON())); } catch (e) { /* sem armazenamento */ } sincronizarHub(); }
@@ -480,6 +481,7 @@ function qPick(c) {
 }
 
 function comecar() {
+  RNG.semear();                          // semente própria desta competição (vai para o save)
   const ids = (Q.dist === "sorteio" ? embaralhar : x => x)(pool().map(t => t.id)); let p = 0;
   S = { cfg: { pv: Q.pv, pe: Q.pe, turnos: Q.turnos, acc: Q.acc.slice(0, Q.nd - 1), fmt: Q.fmt.slice(0, Q.nd).map(f => ({ ...f })),
           comps: Q.comps.map(c => ({ nome: c.nome.trim(), sigla: c.nome.trim().slice(0, 3).toUpperCase(), vagas: c.vagas })) },
