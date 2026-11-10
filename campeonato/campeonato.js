@@ -223,7 +223,26 @@ function deJSON(o) {
   if (Array.isArray(o.po) && o.po.length === S.divs.length) S.po = o.po;
   ui = { aba: "temporada", div: 0, rodada: 1 };
 }
-function salvarLocal() { try { localStorage.setItem(LOCAL, JSON.stringify(paraJSON())); } catch (e) { /* sem armazenamento */ } }
+function salvarLocal() { try { localStorage.setItem(LOCAL, JSON.stringify(paraJSON())); } catch (e) { /* sem armazenamento */ } sincronizarHub(); }
+
+/* ---------- Ponte com o hub (hub-data.js) ---------- */
+// Grava no contrato do hub: campeonato:progresso { concluidas, total } e campeonato:campeao { id, nome, uf }.
+// concluidas = temporadas encerradas; total = concluidas + a temporada em andamento.
+// campeao = campeão da Série A assim que ela termina; antes disso, o da última temporada encerrada.
+function sincronizarHub() {
+  if (typeof HubData === "undefined" || !S) return;      // sem hub-data.js na página, o campeonato segue normal
+  try {
+    const feitas = S.historico.length;
+    HubData.set("campeonato:progresso", { concluidas: feitas, total: feitas + 1 });
+    const id = completa(0) ? ranking(0)[0] : (feitas ? S.historico[feitas - 1].divs[0][0][0] : null), t = id && T.get(id);
+    if (t) HubData.set("campeonato:campeao", { id: t.id, nome: t.nome, uf: t.uf });
+    else HubData.remove("campeonato:campeao");
+  } catch (e) { /* o hub é opcional: nunca atrapalha o save */ }
+}
+function limparHub() {
+  if (typeof HubData === "undefined") return;
+  HubData.remove("campeonato:progresso"); HubData.remove("campeonato:campeao");
+}
 function baixar() {
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([JSON.stringify(paraJSON())], { type: "application/json" }));
@@ -637,7 +656,7 @@ function acao(a, v) {
     case "nova":
       if (!confirm("Começar uma nova competição? A atual será substituída (salve antes se quiser guardá-la).")) return;
       try { localStorage.removeItem(LOCAL); } catch (e) { /* ignora */ }
-      S = null; Q = null; return questionario();
+      limparHub(); S = null; Q = null; return questionario();
   }
   salvarLocal(); desenhar();
 }
@@ -713,6 +732,6 @@ $("app").addEventListener("change", e => {
     $("app").innerHTML = `<p class="erros">Não consegui carregar ../times.json. Abra pelo GitHub Pages ou por um servidor local (python -m http.server).</p>`;
     return;
   }
-  try { const salvo = localStorage.getItem(LOCAL); if (salvo) { deJSON(JSON.parse(salvo)); return desenhar(); } } catch (e) { /* save local inválido: recomeça */ }
+  try { const salvo = localStorage.getItem(LOCAL); if (salvo) { deJSON(JSON.parse(salvo)); sincronizarHub(); return desenhar(); } } catch (e) { /* save local inválido: recomeça */ }
   questionario();
 })();
