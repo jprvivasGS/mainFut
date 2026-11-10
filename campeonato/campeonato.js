@@ -1,15 +1,15 @@
 /* Campeonato Nacional – mainFut
    Fluxo: questionário → temporada (rodadas + tabela) → encerrar (acesso/descenso) → próxima temporada.
-   Rodadas e tabela vêm do simulador regional: método do círculo e desempate P > V > SG > GP. */
+   Rodadas, tabela e critérios de desempate vêm de ../core/regras.js. */
 const RAIZ = "../";                     // times.json e imagens ficam na pasta do hub
 const REG = { norte: "Norte", nordeste: "Nordeste", centro_oeste: "Centro-Oeste", sudeste: "Sudeste", sul: "Sul" };
 const LETRAS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const LOCAL = "mainfut:campeonato:save";
 const $ = id => document.getElementById(id);
 const h = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const semModulo = [typeof RNG === "undefined" && "rng", typeof Sim === "undefined" && "sim"].filter(Boolean);
+const semModulo = [typeof RNG === "undefined" && "rng", typeof Sim === "undefined" && "sim", typeof Regras === "undefined" && "regras"].filter(Boolean);
 if (semModulo.length) {                  // sem os módulos a página ficaria parada em "Carregando times…"
-  $("app").innerHTML = `<p class="erros">Não carreguei ${semModulo.map(m => `../core/${m}.js`).join(" e ")}. Confira se o index.html tem as tags <code>&lt;script src="../core/rng.js"&gt;&lt;/script&gt;</code> e <code>&lt;script src="../core/sim.js"&gt;&lt;/script&gt;</code> antes do campeonato.js e se os arquivos foram publicados em /mainFut/core/.</p>`;
+  $("app").innerHTML = `<p class="erros">Não carreguei ${semModulo.map(m => `../core/${m}.js`).join(" e ")}. Confira se o index.html tem as tags ${semModulo.map(m => `<code>&lt;script src="../core/${m}.js"&gt;&lt;/script&gt;</code>`).join(" ")} antes do campeonato.js (na ordem rng.js, sim.js, regras.js) e se os arquivos foram publicados em /mainFut/core/.</p>`;
   throw new Error("Módulo não carregado: " + semModulo.join(", "));
 }
 const rnd = RNG.rnd, embaralhar = RNG.embaralhar;   // sorteios vêm de ../core/rng.js (com semente, gravada no save)
@@ -39,16 +39,7 @@ function logo() {                        // tenta os endereços possíveis do lo
 }
 
 /* ---------- Rodadas (método do círculo) ---------- */
-function gerarRodadas(ids, turnos) {
-  const v = [...ids]; if (v.length % 2) v.push(null);            // grupo ímpar: alguém folga a cada rodada
-  const n = v.length, ida = [];
-  for (let r = 0; r < n - 1; r++) {
-    ida.push(Array.from({ length: n / 2 }, (_, i) => ({ c: v[i], f: v[n - 1 - i], gc: null, gf: null })).filter(m => m.c && m.f));
-    v.splice(1, 0, v.pop());
-  }
-  const volta = turnos === 2 ? ida.map(r => r.map(m => ({ c: m.f, f: m.c, gc: null, gf: null }))) : [];
-  return [...ida, ...volta];
-}
+const gerarRodadas = Regras.gerarRodadas;   // ../core/regras.js
 const FM = d => S.cfg.fmt[d];            // formato da divisão: {g grupos, tn turnos, po mata-mata, k classificados, p vagas via mata-mata, pl jogos/confronto, fl jogos da final}
 const grupos = d => { const n = S.divs[d].length / FM(d).g; return Array.from({ length: FM(d).g }, (_, g) => S.divs[d].slice(g * n, (g + 1) * n)); };
 const montarFix = () => {
@@ -60,9 +51,13 @@ const montarFix = () => {
 };
 /* Placares vêm de ../core/sim.js (Poisson): a força de cada time pesa nos gols e o mandante leva uma pequena vantagem. */
 const forca = id => S.forcas[id] ?? T.get(id)?.forca ?? 500;   // força atual: a da base ou a evoluída entre temporadas (vai no save)
-const golsJogo = (casa, fora) => Sim.golsPartida(forca(casa), forca(fora));   // [gols da casa, gols do visitante]
+const modoPartida = () => S.cfg.modo === "forca" ? "forca" : "equilibrada";   // regra da competição (S.cfg.modo)
+const golsJogo = (casa, fora) => modoPartida() === "forca"
+  ? Sim.golsPartida(forca(casa), forca(fora))   // por força: a força de cada time pesa nos gols
+  : Sim.golsPartida(1, 1);                      // equilibrada: forças iguais, só o mando de campo pesa. Retorna [gols da casa, gols do visitante]
 function simular(d, rodada) {            // preenche só o que ainda não tem placar
   (rodada ? [S.fix[d][rodada - 1]] : S.fix[d]).forEach(r => r.forEach(m => {
+    if (m.ac == null) Object.assign(m, Regras.cartoes());   // cartões da partida (para os desempates)
     if (m.gc != null && m.gf != null) return;
     const [gc, gf] = golsJogo(m.c, m.f);
     if (m.gc == null) m.gc = gc;         // mantém o lado que a pessoa já digitou
@@ -75,30 +70,23 @@ const completa = d => ligaOk(d) && (!FM(d).po || !!poOrdem(d));
 const completaTudo = () => S.divs.every((_, d) => completa(d));
 
 /* ---------- Tabela ---------- */
+// O cálculo e os desempates ficam em ../core/regras.js; aqui só se monta a entrada. Critérios e semente do sorteio vêm do save.
+const nomeTime = id => T.get(id)?.nome ?? String(id);
+const opcRegras = () => ({ pv: S.cfg.pv, pe: S.cfg.pe, deducoes: S.deducoes, criterios: S.cfg.desempates, semente: S.sorteio, nome: nomeTime });
 function tabela(d, g = 0) {
-  const L = grupos(d)[g].map(id => ({ t: T.get(id), P: 0, J: 0, V: 0, E: 0, D: 0, GP: 0, GC: 0, SG: 0, ded: 0 }));
-  const por = new Map(L.map(x => [x.t.id, x]));
-  S.fix[d].forEach(r => r.forEach(m => {
-    if (m.g !== g || m.gc == null || m.gf == null) return;
-    const a = por.get(m.c), b = por.get(m.f);
-    a.J++; b.J++; a.GP += m.gc; a.GC += m.gf; b.GP += m.gf; b.GC += m.gc;
-    if (m.gc > m.gf) { a.P += S.cfg.pv; a.V++; b.D++; }
-    else if (m.gc < m.gf) { b.P += S.cfg.pv; b.V++; a.D++; }
-    else { a.P += S.cfg.pe; b.P += S.cfg.pe; a.E++; b.E++; }
-  }));
-  S.deducoes.forEach(x => { if (por.has(x.id)) por.get(x.id).ded += x.pts; });   // punições
-  L.forEach(x => { x.P -= x.ded; x.SG = x.GP - x.GC; });
-  return L.sort((a, b) => b.P - a.P || b.V - a.V || b.SG - a.SG || b.GP - a.GP || a.t.nome.localeCompare(b.t.nome, "pt-BR"));
+  const jogos = S.fix[d].flat().filter(m => m.g === g);
+  return Regras.tabela(grupos(d)[g], jogos, opcRegras()).map(x => ({ ...x, t: T.get(x.id) }));
 }
 
 /* ---------- Classificação geral, mata-mata e ranking final ---------- */
 const pp = d => d === 0 ? 1 : FM(d).g > 1 ? S.cfg.acc[d - 1] : FM(d).p;            // vagas de acesso decididas no mata-mata
 const nDir = d => d > 0 && FM(d).po && FM(d).g === 1 ? S.cfg.acc[d - 1] - pp(d) : 0; // sobem direto pela tabela
 const nK = d => FM(d).g === 1 ? FM(d).k : FM(d).k * FM(d).g;                         // classificados ao mata-mata
-function base(d) {                       // tabela geral: 1 grupo = a própria tabela; vários = posição no grupo, depois P > V > SG > GP
+function base(d) {                       // tabela geral: 1 grupo = a própria tabela; vários = posição no grupo, depois pontos e os desempates da competição (sem confronto direto)
   if (FM(d).g === 1) return tabela(d, 0);
+  const cmp = Regras.comparador(S.cfg.desempates, S.sorteio, nomeTime);
   return grupos(d).flatMap((_, g) => tabela(d, g).map((x, i) => ({ ...x, pos: i })))
-    .sort((a, b) => a.pos - b.pos || b.P - a.P || b.V - a.V || b.SG - a.SG || b.GP - a.GP || a.t.nome.localeCompare(b.t.nome, "pt-BR"));
+    .sort((a, b) => a.pos - b.pos || b.P - a.P || cmp(a, b));
 }
 function qualificados(d) {               // ids na ordem de cabeça de chave
   const f = FM(d); if (!f.po) return [];
@@ -212,7 +200,7 @@ function encerrar() {
   });
   reg.sobem.flat().forEach(id => S.forcas[id] = Sim.evoluirForca(forca(id), "sobe"));    // quem subiu ganha um pouco de força
   reg.descem.flat().forEach(id => S.forcas[id] = Sim.evoluirForca(forca(id), "desce"));  // quem caiu perde um pouco (limite 1 a 1000)
-  S.ano++; S.deducoes = []; S.ext = []; montarFix();
+  S.ano++; S.sorteio = RNG.rnd(2147483648); S.deducoes = []; S.ext = []; montarFix();   // sorteio de desempate novo a cada temporada
 }
 function simularAnos() {
   const k = Math.min(Math.max(parseInt($("nAnos").value) || 1, 1), 100);
@@ -224,19 +212,21 @@ function simularAnos() {
 /* ---------- Save ---------- */
 function paraJSON() {                    // só os placares: as rodadas são refeitas a partir da ordem dos times
   return { versao: 2, po: S.po, ano: S.ano, cfg: S.cfg, divs: S.divs, deducoes: S.deducoes, ext: S.ext, historico: S.historico,
-    placar: S.fix.map(rs => rs.flatMap(r => r.map(m => (m.gc == null || m.gf == null) ? null : [m.gc, m.gf]))),
-    forcas: S.forcas,                    // só as forças que mudaram desde a base: { id: força }
+    placar: S.fix.map(rs => rs.flatMap(r => r.map(m => (m.gc == null || m.gf == null) ? null : m.ac == null ? [m.gc, m.gf] : [m.gc, m.gf, m.ac, m.af, m.vc, m.vf]))),   // gols e, se houver, cartões
+    forcas: S.forcas, sorteio: S.sorteio,                    // só as forças que mudaram desde a base: { id: força }
     rng: RNG.salvar() };                 // { semente, estado }: ao carregar, os sorteios continuam de onde pararam
 }
 function deJSON(o) {
   if (!o || !Array.isArray(o.divs) || !o.cfg) throw new Error("Arquivo de save inválido.");
   const falta = o.divs.flat().filter(id => !T.has(id));
   if (falta.length) throw new Error("A base não tem mais estes times: " + falta.slice(0, 5).join(", "));
-  S = { cfg: o.cfg, ano: o.ano, divs: o.divs, deducoes: o.deducoes || [], ext: o.ext || [], historico: o.historico || [], forcas: o.forcas || {} };   // saves antigos: todos na força da base
+  S = { cfg: o.cfg, ano: o.ano, divs: o.divs, deducoes: o.deducoes || [], ext: o.ext || [], historico: o.historico || [], forcas: o.forcas || {}, sorteio: o.sorteio ?? (o.ano || 1) * 7919 };   // saves antigos: todos na força da base
   S.cfg.comps = S.cfg.comps || [];       // saves antigos não tinham competições
+  S.cfg.modo = S.cfg.modo || "forca";    // saves antigos já eram jogados por força
+  S.cfg.desempates = Regras.validos(S.cfg.desempates || ["vitorias", "saldo", "golspro"]);   // saves antigos: V > SG > GP, depois ordem alfabética
   S.cfg.fmt = S.cfg.fmt || S.divs.map(() => ({ g: 1, tn: S.cfg.turnos, po: false, k: 4, p: 1, pl: 2, fl: 1 }));
   montarFix();
-  S.fix.forEach((rs, d) => rs.flat().forEach((m, i) => { const p = o.placar?.[d]?.[i]; if (p) { m.gc = p[0]; m.gf = p[1]; } }));
+  S.fix.forEach((rs, d) => rs.flat().forEach((m, i) => { const p = o.placar?.[d]?.[i]; if (p) { m.gc = p[0]; m.gf = p[1]; if (p.length > 2) [m.ac, m.af, m.vc, m.vf] = p.slice(2); } }));
   if (Array.isArray(o.po) && o.po.length === S.divs.length) S.po = o.po;
   RNG.restaurar(o.rng);                  // saves antigos não têm "rng": seguem com a semente da página
   ui = { aba: "temporada", div: 0, rodada: 1 };
@@ -336,7 +326,7 @@ function qErros() {
 }
 function questionario() {
   $("ano").hidden = true;
-  if (!Q) { Q = { reg: [...new Set(TIMES.map(t => t.regiao))], nd: 0, tam: [], acc: [], pv: 3, pe: 1, turnos: 2, dist: "sorteio", alloc: [], sel: new Set(), busca: "", fmt: [],
+  if (!Q) { Q = { reg: [...new Set(TIMES.map(t => t.regiao))], nd: 0, tam: [], acc: [], pv: 3, pe: 1, turnos: 2, dist: "sorteio", modo: "equilibrada", crit: Regras.PADRAO.map(id => ({ id, on: true })), alloc: [], sel: new Set(), busca: "", fmt: [],
     comps: [{ nome: "Libertadores", vagas: 4 }, { nome: "Sul-Americana", vagas: 6 }] }; Q.nd = Math.max(1, Math.round(pool().length / 20)); qRecalcular(); }
   const regs = [...new Set(TIMES.map(t => t.regiao))];
   $("app").innerHTML = `<div class="quest">
@@ -356,13 +346,28 @@ function questionario() {
     <label>Pontos por vitória<input type="number" id="q-pv" min="1" max="5" value="${Q.pv}"></label>
     <label>Pontos por empate<input type="number" id="q-pe" min="0" max="3" value="${Q.pe}"></label>
     <label>Formato<select id="q-tn"><option value="2">Turno e returno</option><option value="1">Turno único</option></select></label>
-    <label>Distribuição dos times<select id="q-ds"><option value="sorteio">Sorteio aleatório</option><option value="base">Ordem da base</option><option value="manual">Escolher manualmente</option></select></label></div></section>
+    <label>Distribuição dos times<select id="q-ds"><option value="sorteio">Sorteio aleatório</option><option value="base">Ordem da base</option><option value="manual">Escolher manualmente</option></select></label>
+    <label>Placares das partidas<select id="q-modo"><option value="equilibrada">Equilibrada (força não importa)</option><option value="forca">Por força dos times</option></select></label></div>
+    <div id="q-crit"></div></section>
    <section class="card"><h2><span class="n">6</span>Formato de cada divisão</h2>
     <p class="dica">Pontos corridos ou grupos (zonas) e, se quiser, um mata-mata: pelo título ou pelas vagas de acesso. Use um modelo pronto ou ajuste à mão.</p><div id="q-fmt"></div></section>
    <section class="card" id="q-c5" hidden><h2><span class="n">7</span>Monte as séries</h2><div id="q-board"></div></section>
    <section class="card"><div id="q-res"></div><button class="b verde" id="q-go" data-a="q-go">Começar competição</button></section></div>`;
-  $("q-tn").value = Q.turnos; $("q-ds").value = Q.dist; $("q-c5").hidden = Q.dist !== "manual";
-  qParciais();
+  $("q-tn").value = Q.turnos; $("q-ds").value = Q.dist; $("q-modo").value = Q.modo; $("q-c5").hidden = Q.dist !== "manual";
+  qParciais(); qCrit();
+}
+function qCrit() {                     // lista ordenada de critérios de desempate: marcar liga/desliga, ▲ ▼ muda a ordem
+  const el = $("q-crit"); if (!el) return;
+  const fim = Q.crit.findIndex(c => c.on && c.id === "sorteio");
+  el.innerHTML = `<h3>Critérios de desempate</h3><p class="dica">Valem depois dos pontos, na ordem da lista. Desmarque para não usar e mude a ordem com ▲ ▼. O sorteio sempre decide, então o que vier depois dele nunca é usado.</p>
+   <ol class="crit" style="list-style:none;padding:0;margin:8px 0;display:grid;gap:6px">${Q.crit.map((c, i) => `<li style="display:flex;align-items:center;gap:8px"><span>${i + 1}.</span><label class="opt" style="flex:1"><input type="checkbox" data-crit="${c.id}" ${c.on ? "checked" : ""}> ${h(Regras.CRITERIOS[c.id].nome)}</label>${fim >= 0 && i > fim && c.on ? `<small class="dica">nunca usado</small>` : ""}
+     <button class="b peq" data-a="crit-sobe" data-v="${c.id}" aria-label="Subir" ${i === 0 ? "disabled" : ""}>▲</button><button class="b peq" data-a="crit-desce" data-v="${c.id}" aria-label="Descer" ${i === Q.crit.length - 1 ? "disabled" : ""}>▼</button></li>`).join("")}</ol>
+   <p class="dica">Confronto direto: vale só o que aconteceu entre os empatados (minitabela), para dois ou mais times.</p>`;
+}
+function qCritMover(id, dir) {
+  const i = Q.crit.findIndex(c => c.id === id), j = i + dir;
+  if (i < 0 || j < 0 || j >= Q.crit.length) return;
+  [Q.crit[i], Q.crit[j]] = [Q.crit[j], Q.crit[i]]; qCrit();
 }
 function qParciais() {                   // redesenha só o que depende das respostas anteriores
   if (!$("q-pool")) return;               // o questionário já saiu da tela (ex.: clicou em Começar logo depois de editar)
@@ -500,9 +505,9 @@ function qPick(c) {
 function comecar() {
   RNG.semear();                          // semente própria desta competição (vai para o save)
   const ids = (Q.dist === "sorteio" ? embaralhar : x => x)(pool().map(t => t.id)); let p = 0;
-  S = { cfg: { pv: Q.pv, pe: Q.pe, turnos: Q.turnos, acc: Q.acc.slice(0, Q.nd - 1), fmt: Q.fmt.slice(0, Q.nd).map(f => ({ ...f })),
+  S = { cfg: { pv: Q.pv, pe: Q.pe, turnos: Q.turnos, modo: Q.modo, desempates: Q.crit.filter(c => c.on).map(c => c.id), acc: Q.acc.slice(0, Q.nd - 1), fmt: Q.fmt.slice(0, Q.nd).map(f => ({ ...f })),
           comps: Q.comps.map(c => ({ nome: c.nome.trim(), sigla: c.nome.trim().slice(0, 3).toUpperCase(), vagas: c.vagas })) },
-        ano: 1, deducoes: [], ext: [], historico: [], forcas: {},
+        ano: 1, deducoes: [], ext: [], historico: [], forcas: {}, sorteio: RNG.rnd(2147483648),
         divs: Q.dist === "manual" ? Q.alloc.map(l => embaralhar(l)) : Q.tam.map(t => ids.slice(p, p += t)) };
   montarFix(); ui = { aba: "temporada", div: 0, rodada: 1 }; salvarLocal(); desenhar();
 }
@@ -526,7 +531,7 @@ function vTemporada() {
     <span class="anos"><input id="nAnos" type="number" min="1" max="100" value="5" aria-label="Quantidade de anos"><button class="b" data-a="anos">Simular anos</button></span></div>
    <div class="grid">
     <section class="card"><div class="ctit"><span id="titulo"></span><button class="b peq" data-a="limpar">Limpar série</button></div>
-     <div class="rolagem"><table><thead><tr><th>Clube</th><th>P</th><th>J</th><th>V</th><th>E</th><th>D</th><th>GP</th><th>GC</th><th>SG</th>${(S.cfg.comps || []).length ? "<th><span class=\"so-leitor\">Vaga externa</span></th>" : ""}</tr></thead><tbody id="tabela"></tbody></table></div>
+     <div class="rolagem"><table><thead><tr><th>Clube</th><th>P</th><th>J</th><th>V</th><th>E</th><th>D</th><th>GP</th><th>GC</th><th>SG</th><th title="Cartões amarelos">CA</th><th title="Cartões vermelhos">CV</th>${(S.cfg.comps || []).length ? "<th><span class=\"so-leitor\">Vaga externa</span></th>" : ""}</tr></thead><tbody id="tabela"></tbody></table></div>
      <div class="legenda" id="legenda"></div></section>
     <section class="card"><div class="ctit">Confrontos</div>
      <div class="rod"><button class="b peq" data-a="prev" id="bp">❮</button><span id="rod-label"></span><button class="b peq" data-a="next" id="bn">❯</button></div>
@@ -547,7 +552,7 @@ function desenharTabela() {
     const vaga = q ? COR_COMP[q.c % COR_COMP.length] : "";
     const barra = zona && vaga ? `inset 3px 0 0 ${zona}, inset 6px 0 0 ${vaga}` : zona || vaga ? `inset 3px 0 0 ${zona || vaga}` : "";
     return `<tr><td style="box-shadow:${barra || "none"}" title="${q ? h(descVaga(q)) : ""}"><div class="cl"><span class="pos">${i + 1}</span>${esc(x.t)}<span>${h(x.t.nome)}</span><span class="uf">${h(x.t.uf)}</span></div></td>
-      <td><strong>${x.P}</strong>${x.ded ? `<span class="ded" title="Pontos deduzidos">−${x.ded}</span>` : ""}</td><td>${x.J}</td><td>${x.V}</td><td>${x.E}</td><td>${x.D}</td><td>${x.GP}</td><td>${x.GC}</td><td>${x.SG}</td>${K ? `<td><button class="mini" data-a="ext-sel" data-v="${h(x.t.id)}" title="Marcar vaga externa" aria-label="Marcar vaga externa para ${h(x.t.nome)}">🏆</button></td>` : ""}</tr>`;
+      <td><strong>${x.P}</strong>${x.ded ? `<span class="ded" title="Pontos deduzidos">−${x.ded}</span>` : ""}</td><td>${x.J}</td><td>${x.V}</td><td>${x.E}</td><td>${x.D}</td><td>${x.GP}</td><td>${x.GC}</td><td>${x.SG}</td><td>${x.AM}</td><td>${x.VM}</td>${K ? `<td><button class="mini" data-a="ext-sel" data-v="${h(x.t.id)}" title="Marcar vaga externa" aria-label="Marcar vaga externa para ${h(x.t.nome)}">🏆</button></td>` : ""}</tr>`;
   }).join("");
   $("legenda").innerHTML = [d === 0 && !f.po && ["z-top", "Campeão"], dir && ["z-up", `Acesso${f.po ? " direto" : ""} (${dir})`], f.po && ["z-po", `Mata-mata (${nK(d)})`], desce && ["z-down", `Rebaixamento (${desce})`]]
     .filter(Boolean).map(([c, t]) => `<span><i class="${c}"></i>${t}</span>`).join("")
@@ -654,6 +659,8 @@ function acao(a, v) {
     case "q-esvaziar": Q.alloc = Q.alloc.map(() => []); Q.sel.clear(); qBoard(); return qRes();
     case "q-mover": return qMover([...Q.sel], v);
     case "q-selvis": qLivres().forEach(id => Q.sel.add(id)); return qBoard();
+    case "crit-sobe": return qCritMover(v, -1);
+    case "crit-desce": return qCritMover(v, 1);
     case "aba": ui.aba = v; return desenhar();
     case "div": ui.div = +v; ui.rodada = 1; ui.grupo = 0; return desenhar();
     case "grp": ui.grupo = +v; return desenhar();
@@ -664,7 +671,7 @@ function acao(a, v) {
     case "temporada": S.divs.forEach((_, i) => simular(i)); break;
     case "encerrar": encerrar(); ui.rodada = 1; aviso(`Temporada ${S.ano - 1} encerrada. Times promovidos e rebaixados.`); break;
     case "anos": return simularAnos();
-    case "limpar": if (!confirm(`Limpar todos os resultados da Série ${LETRAS[d]}?`)) return; S.fix[d].forEach(r => r.forEach(m => { m.gc = null; m.gf = null; })); break;
+    case "limpar": if (!confirm(`Limpar todos os resultados da Série ${LETRAS[d]}?`)) return; S.fix[d].forEach(r => r.forEach(m => { m.gc = null; m.gf = null; m.ac = m.af = m.vc = m.vf = null; })); break;
     case "ext-sel": ui.extSel = v; desenhar(); { const el = $("ext-comp"); if (el) { el.scrollIntoView({ block: "center" }); el.focus(); } } ui.extSel = null; return;
     case "ext-add": return marcarExterno();
     case "ext-del": S.ext.splice(+v, 1); break;
@@ -719,6 +726,8 @@ $("app").addEventListener("change", e => {
   else if (el.id === "q-pv") { Q.pv = v; qRes(); }
   else if (el.id === "q-pe") { Q.pe = v; qRes(); }
   else if (el.id === "q-tn") { Q.turnos = v; Q.fmt.forEach(f => f.tn = v); qFmt(); }
+  else if (d.crit) { const c = Q.crit.find(x => x.id === d.crit); if (c) c.on = el.checked; qCrit(); }
+  else if (el.id === "q-modo") Q.modo = el.value === "forca" ? "forca" : "equilibrada";
   else if (el.id === "q-ds") { Q.dist = el.value; $("q-c5").hidden = Q.dist !== "manual"; if (Q.dist === "manual") qBoard(); qRes(); }
   else if (d.f) {                        // formato da divisão
     const i = +d.i; Q.fmt[i][d.f] = d.f === "po" ? el.checked : d.f === "g" ? (v || 1) : v;
