@@ -7,9 +7,10 @@ const LETRAS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const LOCAL = "mainfut:campeonato:save";
 const $ = id => document.getElementById(id);
 const h = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-if (typeof RNG === "undefined") {        // sem o rng.js a página ficaria parada em "Carregando times…"
-  $("app").innerHTML = `<p class="erros">Não carreguei ../core/rng.js. Confira se o index.html tem <code>&lt;script src="../core/rng.js"&gt;&lt;/script&gt;</code> antes do campeonato.js e se o arquivo foi publicado em /mainFut/core/rng.js.</p>`;
-  throw new Error("RNG não carregado (../core/rng.js)");
+const semModulo = [typeof RNG === "undefined" && "rng", typeof Sim === "undefined" && "sim"].filter(Boolean);
+if (semModulo.length) {                  // sem os módulos a página ficaria parada em "Carregando times…"
+  $("app").innerHTML = `<p class="erros">Não carreguei ${semModulo.map(m => `../core/${m}.js`).join(" e ")}. Confira se o index.html tem as tags <code>&lt;script src="../core/rng.js"&gt;&lt;/script&gt;</code> e <code>&lt;script src="../core/sim.js"&gt;&lt;/script&gt;</code> antes do campeonato.js e se os arquivos foram publicados em /mainFut/core/.</p>`;
+  throw new Error("Módulo não carregado: " + semModulo.join(", "));
 }
 const rnd = RNG.rnd, embaralhar = RNG.embaralhar;   // sorteios vêm de ../core/rng.js (com semente, gravada no save)
 const sigla = t => t.sigla || t.nome.slice(0, 3).toUpperCase();
@@ -57,11 +58,15 @@ const montarFix = () => {
   });
   S.po = S.divs.map(() => null);
 };
-const gols = () => [0, 0, 1, 1, 1, 2, 2, 3][rnd(8)];
+/* Placares vêm de ../core/sim.js (Poisson): a força de cada time pesa nos gols e o mandante leva uma pequena vantagem. */
+const forca = id => S.forcas[id] ?? T.get(id)?.forca ?? 500;   // força atual: a da base ou a evoluída entre temporadas (vai no save)
+const golsJogo = (casa, fora) => Sim.golsPartida(forca(casa), forca(fora));   // [gols da casa, gols do visitante]
 function simular(d, rodada) {            // preenche só o que ainda não tem placar
   (rodada ? [S.fix[d][rodada - 1]] : S.fix[d]).forEach(r => r.forEach(m => {
-    if (m.gc == null) m.gc = gols();     // mantém o lado que a pessoa já digitou
-    if (m.gf == null) m.gf = gols();
+    if (m.gc != null && m.gf != null) return;
+    const [gc, gf] = golsJogo(m.c, m.f);
+    if (m.gc == null) m.gc = gc;         // mantém o lado que a pessoa já digitou
+    if (m.gf == null) m.gf = gf;
   }));
   if (!rodada) poSim(d);                 // simular a série inclui o mata-mata
 }
@@ -135,7 +140,12 @@ function poOrdem(d) {                    // campeão, vice, semifinalistas… (n
 }
 function poJogar(t) {
   if (t.bye || !t.a || !t.b) return;
-  t.l.forEach(l => { if (l[0] == null) l[0] = gols(); if (l[1] == null) l[1] = gols(); });
+  t.l.forEach((l, i) => {                // l[0] = gols do time a, l[1] = gols do time b; na ida de dois jogos o b é o mandante
+    if (l[0] != null && l[1] != null) return;
+    const aCasa = !(t.l.length === 2 && i === 0), [gc, gf] = golsJogo(aCasa ? t.a : t.b, aCasa ? t.b : t.a);
+    if (l[0] == null) l[0] = aCasa ? gc : gf;
+    if (l[1] == null) l[1] = aCasa ? gf : gc;
+  });
   const [A, B] = agg(t), p = t.pen;
   if (A === B && !(p && p[0] != null && p[1] != null && p[0] !== p[1])) t.pen = rnd(2) ? [5, 4] : [4, 5];
 }
@@ -200,6 +210,8 @@ function encerrar() {
     const sobe = d > 0 ? n[d - 1] : 0, desce = d < ids.length - 1 ? n[d] : 0;
     return embaralhar([...l.slice(sobe, l.length - desce), ...(d > 0 ? reg.descem[d - 1] : []), ...(d < ids.length - 1 ? reg.sobem[d] : [])]);
   });
+  reg.sobem.flat().forEach(id => S.forcas[id] = Sim.evoluirForca(forca(id), "sobe"));    // quem subiu ganha um pouco de força
+  reg.descem.flat().forEach(id => S.forcas[id] = Sim.evoluirForca(forca(id), "desce"));  // quem caiu perde um pouco (limite 1 a 1000)
   S.ano++; S.deducoes = []; S.ext = []; montarFix();
 }
 function simularAnos() {
@@ -213,13 +225,14 @@ function simularAnos() {
 function paraJSON() {                    // só os placares: as rodadas são refeitas a partir da ordem dos times
   return { versao: 2, po: S.po, ano: S.ano, cfg: S.cfg, divs: S.divs, deducoes: S.deducoes, ext: S.ext, historico: S.historico,
     placar: S.fix.map(rs => rs.flatMap(r => r.map(m => (m.gc == null || m.gf == null) ? null : [m.gc, m.gf]))),
+    forcas: S.forcas,                    // só as forças que mudaram desde a base: { id: força }
     rng: RNG.salvar() };                 // { semente, estado }: ao carregar, os sorteios continuam de onde pararam
 }
 function deJSON(o) {
   if (!o || !Array.isArray(o.divs) || !o.cfg) throw new Error("Arquivo de save inválido.");
   const falta = o.divs.flat().filter(id => !T.has(id));
   if (falta.length) throw new Error("A base não tem mais estes times: " + falta.slice(0, 5).join(", "));
-  S = { cfg: o.cfg, ano: o.ano, divs: o.divs, deducoes: o.deducoes || [], ext: o.ext || [], historico: o.historico || [] };
+  S = { cfg: o.cfg, ano: o.ano, divs: o.divs, deducoes: o.deducoes || [], ext: o.ext || [], historico: o.historico || [], forcas: o.forcas || {} };   // saves antigos: todos na força da base
   S.cfg.comps = S.cfg.comps || [];       // saves antigos não tinham competições
   S.cfg.fmt = S.cfg.fmt || S.divs.map(() => ({ g: 1, tn: S.cfg.turnos, po: false, k: 4, p: 1, pl: 2, fl: 1 }));
   montarFix();
@@ -489,7 +502,7 @@ function comecar() {
   const ids = (Q.dist === "sorteio" ? embaralhar : x => x)(pool().map(t => t.id)); let p = 0;
   S = { cfg: { pv: Q.pv, pe: Q.pe, turnos: Q.turnos, acc: Q.acc.slice(0, Q.nd - 1), fmt: Q.fmt.slice(0, Q.nd).map(f => ({ ...f })),
           comps: Q.comps.map(c => ({ nome: c.nome.trim(), sigla: c.nome.trim().slice(0, 3).toUpperCase(), vagas: c.vagas })) },
-        ano: 1, deducoes: [], ext: [], historico: [],
+        ano: 1, deducoes: [], ext: [], historico: [], forcas: {},
         divs: Q.dist === "manual" ? Q.alloc.map(l => embaralhar(l)) : Q.tam.map(t => ids.slice(p, p += t)) };
   montarFix(); ui = { aba: "temporada", div: 0, rodada: 1 }; salvarLocal(); desenhar();
 }
