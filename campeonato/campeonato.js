@@ -7,6 +7,10 @@ const LETRAS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const LOCAL = "mainfut:campeonato:save";
 const $ = id => document.getElementById(id);
 const h = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+if (typeof RNG === "undefined") {        // sem o rng.js a página ficaria parada em "Carregando times…"
+  $("app").innerHTML = `<p class="erros">Não carreguei ../core/rng.js. Confira se o index.html tem <code>&lt;script src="../core/rng.js"&gt;&lt;/script&gt;</code> antes do campeonato.js e se o arquivo foi publicado em /mainFut/core/rng.js.</p>`;
+  throw new Error("RNG não carregado (../core/rng.js)");
+}
 const rnd = RNG.rnd, embaralhar = RNG.embaralhar;   // sorteios vêm de ../core/rng.js (com semente, gravada no save)
 const sigla = t => t.sigla || t.nome.slice(0, 3).toUpperCase();
 const sem = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
