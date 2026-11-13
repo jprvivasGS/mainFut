@@ -2,7 +2,7 @@
 // Script comum, como o rng.js e o sim.js: <script src="../core/rng.js"></script>, <script src="../core/sim.js"></script>
 // e <script src="../core/regras.js"></script> antes do campeonato.js. Tudo fica no objeto global Regras.
 //
-//   Regras.gerarRodadas(ids, turnos)          -> lista de rodadas; cada rodada é uma lista de jogos { c, f, gc, gf, ac, af, vc, vf }
+//   Regras.gerarRodadas(ids, vezes)           -> lista de rodadas (vezes = quantas vezes cada par se enfrenta: 1, 2, 3…); cada rodada é uma lista de jogos { c, f, gc, gf, ac, af, vc, vf }
 //   Regras.tabela(ids, jogos, opcoes)         -> linhas ordenadas { id, P, J, V, E, D, GP, GC, SG, AM, VM, ded }
 //   Regras.comparador(criterios, semente, nome) -> função de ordenação para comparar times de grupos diferentes
 //   Regras.cartoes(opcoes)                    -> { ac, af, vc, vf }: cartões sorteados de uma partida
@@ -47,7 +47,9 @@ const Regras = (() => {
   const validos = l => Array.isArray(l) ? l.filter((c, i) => CRITERIOS[c] && l.indexOf(c) === i) : PADRAO.slice();
 
   /* ---------- Rodadas (método do círculo) ---------- */
-  function gerarRodadas(ids, turnos) {
+  // vezes: quantas vezes cada par de times se enfrenta. 1 = turno único, 2 = turno e returno (como antes) e assim por diante.
+  // O mando alterna a cada "volta": a 1ª, a 3ª, a 5ª… seguem a ordem original; a 2ª, a 4ª… invertem o mando.
+  function gerarRodadas(ids, vezes) {
     const novo = (c, f) => ({ c, f, gc: null, gf: null, ac: null, af: null, vc: null, vf: null });
     const v = [...ids]; if (v.length % 2) v.push(null);            // grupo ímpar: alguém folga a cada rodada
     const n = v.length, ida = [];
@@ -55,8 +57,9 @@ const Regras = (() => {
       ida.push(Array.from({ length: n / 2 }, (_, i) => novo(v[i], v[n - 1 - i])).filter(m => m.c && m.f));
       v.splice(1, 0, v.pop());
     }
-    const volta = turnos === 2 ? ida.map(r => r.map(m => novo(m.f, m.c))) : [];
-    return [...ida, ...volta];
+    const rodadas = [...ida], total = Math.max(1, Math.floor(vezes) || 1);
+    for (let k = 1; k < total; k++) rodadas.push(...ida.map(r => r.map(m => k % 2 ? novo(m.f, m.c) : novo(m.c, m.f))));
+    return rodadas;
   }
 
   /* ---------- Sorteio estável ---------- */

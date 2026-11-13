@@ -40,7 +40,7 @@ function logo() {                        // tenta os endereços possíveis do lo
 
 /* ---------- Rodadas (método do círculo) ---------- */
 const gerarRodadas = Regras.gerarRodadas;   // ../core/regras.js
-const FM = d => S.cfg.fmt[d];            // formato da divisão: {g grupos, tn turnos, po mata-mata, k classificados, p vagas via mata-mata, pl jogos/confronto, fl jogos da final}
+const FM = d => S.cfg.fmt[d];            // formato da divisão: {g grupos, tn vezes que os times se enfrentam (1, 2, 3…), po mata-mata, k classificados, p vagas via mata-mata, pl jogos/confronto, fl jogos da final}
 const grupos = d => { const n = S.divs[d].length / FM(d).g; return Array.from({ length: FM(d).g }, (_, g) => S.divs[d].slice(g * n, (g + 1) * n)); };
 const montarFix = () => {
   S.fix = S.divs.map((_, d) => {
@@ -345,7 +345,7 @@ function questionario() {
    <section class="card"><h2><span class="n">5</span>Regras da tabela</h2><div class="campos">
     <label>Pontos por vitória<input type="number" id="q-pv" min="1" max="5" value="${Q.pv}"></label>
     <label>Pontos por empate<input type="number" id="q-pe" min="0" max="3" value="${Q.pe}"></label>
-    <label>Formato<select id="q-tn"><option value="2">Turno e returno</option><option value="1">Turno único</option></select></label>
+    <label>Vezes que os times se enfrentam<input type="number" id="q-tn" min="1" max="10" value="2" title="1 = turno único, 2 = turno e returno, 3 ou mais = mais voltas. O mando alterna a cada volta."></label>
     <label>Distribuição dos times<select id="q-ds"><option value="sorteio">Sorteio aleatório</option><option value="base">Ordem da base</option><option value="manual">Escolher manualmente</option></select></label>
     <label>Placares das partidas<select id="q-modo"><option value="equilibrada">Equilibrada (força não importa)</option><option value="forca">Por força dos times</option></select></label></div>
     <div id="q-crit"></div></section>
@@ -402,7 +402,7 @@ function aplicarPreset(i, k) {
 function qFmtDica(i) {
   const el = document.querySelector(`[data-fh="${i}"]`); if (!el) return;
   const f = Q.fmt[i], n = Q.tam[i], g = f.g || 1, ac = i > 0 ? Q.acc[i - 1] : 0, p = i === 0 ? 1 : g > 1 ? ac : f.p, dir = i > 0 && g === 1 && f.po ? ac - p : 0;
-  el.textContent = (g > 1 ? `${g} grupos de ${n / g} times` : "Pontos corridos") + (f.po ? ` · mata-mata com ${f.k} ${g > 1 ? "por grupo" : "classificados"}${i > 0 ? `, ${p} ${p > 1 ? "vagas" : "vaga"} de acesso` : ", decide o título"}${dir > 0 ? `; ${dir} ${dir > 1 ? "sobem" : "sobe"} direto pela tabela` : ""}` : "");
+  el.textContent = (g > 1 ? `${g} grupos de ${n / g} times` : "Pontos corridos") + ` · cada par se enfrenta ${f.tn} ${f.tn === 1 ? "vez" : "vezes"}` + (f.po ? ` · mata-mata com ${f.k} ${g > 1 ? "por grupo" : "classificados"}${i > 0 ? `, ${p} ${p > 1 ? "vagas" : "vaga"} de acesso` : ", decide o título"}${dir > 0 ? `; ${dir} ${dir > 1 ? "sobem" : "sobe"} direto pela tabela` : ""}` : "");
 }
 function qFmt() {
   const sel = (a, b) => a == b ? " selected" : "";
@@ -411,7 +411,7 @@ function qFmt() {
     return `<div class="fmt"><h3>Série ${LETRAS[i]} · ${n} times</h3><div class="campos">
      <label>Modelo pronto<select data-pre="${i}"><option value="">Escolher…</option>${PRE.map(([k, t]) => `<option value="${k}">${t}</option>`).join("")}</select></label>
      <label>Grupos<input type="number" data-f="g" ${id} min="1" value="${g}"></label>
-     <label>Jogos na fase de pontos<select data-f="tn" ${id}><option value="2"${sel(f.tn, 2)}>Turno e returno</option><option value="1"${sel(f.tn, 1)}>Turno único</option></select></label>
+     <label>Vezes que os times se enfrentam<input type="number" data-f="tn" ${id} min="1" max="10" value="${f.tn}" title="1 = turno único, 2 = turno e returno, 3 ou mais = mais voltas. O mando alterna a cada volta."></label>
      <label class="opt"><input type="checkbox" data-f="po" ${id} ${f.po ? "checked" : ""}> Mata-mata ${i > 0 ? "pelas vagas de acesso" : "pelo título"}</label></div>
      ${f.po ? `<div class="campos"><label>Classificados ${g > 1 ? "por grupo" : "no total"}<input type="number" data-f="k" ${id} min="1" value="${f.k}"></label>
       ${i > 0 ? `<label>Vagas de acesso no mata-mata<input type="number" data-f="p" ${id} min="1" value="${g > 1 ? ac : f.p}" ${g > 1 ? "disabled" : ""}></label>` : ""}
@@ -725,12 +725,13 @@ $("app").addEventListener("change", e => {
   else if (d.cv) { Q.comps[d.cv].vagas = parseInt(el.value); qHints(); qRes(); }
   else if (el.id === "q-pv") { Q.pv = v; qRes(); }
   else if (el.id === "q-pe") { Q.pe = v; qRes(); }
-  else if (el.id === "q-tn") { Q.turnos = v; Q.fmt.forEach(f => f.tn = v); qFmt(); }
+  else if (el.id === "q-tn") { const n = Math.min(Math.max(Math.round(v) || 1, 1), 10); Q.turnos = n; Q.fmt.forEach(f => f.tn = n); qFmt(); }
   else if (d.crit) { const c = Q.crit.find(x => x.id === d.crit); if (c) c.on = el.checked; qCrit(); }
   else if (el.id === "q-modo") Q.modo = el.value === "forca" ? "forca" : "equilibrada";
   else if (el.id === "q-ds") { Q.dist = el.value; $("q-c5").hidden = Q.dist !== "manual"; if (Q.dist === "manual") qBoard(); qRes(); }
   else if (d.f) {                        // formato da divisão
-    const i = +d.i; Q.fmt[i][d.f] = d.f === "po" ? el.checked : d.f === "g" ? (v || 1) : v;
+    const i = +d.i; Q.fmt[i][d.f] = d.f === "po" ? el.checked : d.f === "g" ? (v || 1) : d.f === "tn" ? Math.min(Math.max(Math.round(v) || 1, 1), 10) : v;
+    if (d.f === "tn") el.value = Q.fmt[i].tn;                 // mostra o valor já ajustado (1 a 10)
     if (d.f === "po" || d.f === "g") { qFmt(); const n = document.querySelector(`[data-f="${d.f}"][data-i="${i}"]`); if (n) n.focus(); } else qFmtDica(i);
     qRes();
   }
