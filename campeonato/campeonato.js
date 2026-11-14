@@ -52,6 +52,8 @@ const montarFix = () => {
 /* Placares vêm de ../core/sim.js (Poisson): a força de cada time pesa nos gols e o mandante leva uma pequena vantagem. */
 const forca = id => S.forcas[id] ?? T.get(id)?.forca ?? 500;   // força atual: a da base ou a evoluída entre temporadas (vai no save)
 const modoPartida = () => S.cfg.modo === "forca" ? "forca" : "equilibrada";   // regra da competição (S.cfg.modo)
+const golsNeutro = (a, b) => modoPartida() === "forca"      // jogo extra em campo neutro: ninguém tem o mando
+  ? Sim.golsPartida(forca(a), forca(b), { mando: 1 }) : Sim.golsPartida(1, 1, { mando: 1 });
 const golsJogo = (casa, fora) => modoPartida() === "forca"
   ? Sim.golsPartida(forca(casa), forca(fora))   // por força: a força de cada time pesa nos gols
   : Sim.golsPartida(1, 1);                      // equilibrada: forças iguais, só o mando de campo pesa. Retorna [gols da casa, gols do visitante]
@@ -94,8 +96,8 @@ function qualificados(d) {               // ids na ordem de cabeça de chave
 }
 /* ---------- Mata-mata: o motor está em ../core/matamata.js; aqui só se liga à competição ---------- */
 const poVenc = Matamata.vencedor, agg = Matamata.agregado;
-const regrasPO = f => ({ pernas: f.pl, final: f.fl });          // jogos por confronto e jogos da final (questionário)
-const opcoesPO = () => ({ gols: golsJogo, penaltis: () => RNG.rnd(2) ? [5, 4] : [4, 5] });
+const regrasPO = f => ({ pernas: f.pl, final: f.fl, desempate: f.dp });   // jogos por confronto, jogos da final e desempate (questionário)
+const opcoesPO = () => ({ gols: golsJogo, golsNeutro, penaltis: () => RNG.rnd(2) ? [5, 4] : [4, 5] });
 function poSync(d) {                     // cria a chave quando a fase de pontos termina e repassa os vencedores
   const f = FM(d); if (!f.po || !ligaOk(d)) { S.po[d] = null; return; }
   S.po[d] = Matamata.sincronizar(S.po[d], qualificados(d), regrasPO(f));
@@ -186,7 +188,7 @@ function deJSON(o) {
   S.cfg.comps = S.cfg.comps || [];       // saves antigos não tinham competições
   S.cfg.modo = S.cfg.modo || "forca";    // saves antigos já eram jogados por força
   S.cfg.desempates = Regras.validos(S.cfg.desempates || ["vitorias", "saldo", "golspro"]);   // saves antigos: V > SG > GP, depois ordem alfabética
-  S.cfg.fmt = S.cfg.fmt || S.divs.map(() => ({ g: 1, tn: S.cfg.turnos, po: false, k: 4, p: 1, pl: 2, fl: 1 }));
+  S.cfg.fmt = S.cfg.fmt || S.divs.map(() => ({ g: 1, tn: S.cfg.turnos, po: false, k: 4, p: 1, pl: 2, fl: 1, dp: "penaltis" }));
   montarFix();
   S.fix.forEach((rs, d) => rs.flat().forEach((m, i) => { const p = o.placar?.[d]?.[i]; if (p) { m.gc = p[0]; m.gf = p[1]; if (p.length > 2) [m.ac, m.af, m.vc, m.vf] = p.slice(2); } }));
   if (Array.isArray(o.po) && o.po.length === S.divs.length) S.po = o.po;
@@ -347,7 +349,7 @@ function qParciais() {                   // redesenha só o que depende das resp
   const novo = chave && document.querySelector(`[data-${chave}="${f.dataset[chave]}"]`);
   if (novo) novo.focus();                // devolve o foco ao mesmo campo depois de refeito
 }
-const fmtPadrao = () => ({ g: 1, tn: Q.turnos, po: false, k: 4, p: 1, pl: 2, fl: 1 });
+const fmtPadrao = () => ({ g: 1, tn: Q.turnos, po: false, k: 4, p: 1, pl: 2, fl: 1, dp: "penaltis" });
 const PRE = [["pc", "Pontos corridos"], ["acc", "Pontos corridos + mata-mata (Série B/C)"], ["red", "Campeão direto + reducido (Primera B/C/D)"],
   ["zon", "2 zonas + mata-mata (Primera Nacional)"], ["grp", "Vários grupos + mata-mata (Série D)"]];
 function aplicarPreset(i, k) {
@@ -364,7 +366,7 @@ function aplicarPreset(i, k) {
 function qFmtDica(i) {
   const el = document.querySelector(`[data-fh="${i}"]`); if (!el) return;
   const f = Q.fmt[i], n = Q.tam[i], g = f.g || 1, ac = i > 0 ? Q.acc[i - 1] : 0, p = i === 0 ? 1 : g > 1 ? ac : f.p, dir = i > 0 && g === 1 && f.po ? ac - p : 0;
-  el.textContent = (g > 1 ? `${g} grupos de ${n / g} times` : "Pontos corridos") + ` · cada par se enfrenta ${f.tn} ${f.tn === 1 ? "vez" : "vezes"}` + (f.po ? ` · mata-mata com ${f.k} ${g > 1 ? "por grupo" : "classificados"}${i > 0 ? `, ${p} ${p > 1 ? "vagas" : "vaga"} de acesso` : ", decide o título"}${dir > 0 ? `; ${dir} ${dir > 1 ? "sobem" : "sobe"} direto pela tabela` : ""}` : "");
+  el.textContent = (g > 1 ? `${g} grupos de ${n / g} times` : "Pontos corridos") + ` · cada par se enfrenta ${f.tn} ${f.tn === 1 ? "vez" : "vezes"}` + (f.po ? ` · mata-mata com ${f.k} ${g > 1 ? "por grupo" : "classificados"}${i > 0 ? `, ${p} ${p > 1 ? "vagas" : "vaga"} de acesso` : ", decide o título"}${dir > 0 ? `; ${dir} ${dir > 1 ? "sobem" : "sobe"} direto pela tabela` : ""}, empate no confronto: ${({ neutro: "jogo extra em campo neutro", golfora: f.pl === 1 && f.fl === 1 ? "gol fora (com jogo único, decidem os pênaltis)" : "gol fora" })[f.dp] || "pênaltis"}` : "");
 }
 function qFmt() {
   const sel = (a, b) => a == b ? " selected" : "";
@@ -378,7 +380,8 @@ function qFmt() {
      ${f.po ? `<div class="campos"><label>Classificados ${g > 1 ? "por grupo" : "no total"}<input type="number" data-f="k" ${id} min="1" value="${f.k}"></label>
       ${i > 0 ? `<label>Vagas de acesso no mata-mata<input type="number" data-f="p" ${id} min="1" value="${g > 1 ? ac : f.p}" ${g > 1 ? "disabled" : ""}></label>` : ""}
       <label>Confrontos<select data-f="pl" ${id}><option value="1"${sel(f.pl, 1)}>Jogo único</option><option value="2"${sel(f.pl, 2)}>Ida e volta</option></select></label>
-      <label>Final<select data-f="fl" ${id}><option value="1"${sel(f.fl, 1)}>Jogo único</option><option value="2"${sel(f.fl, 2)}>Ida e volta</option></select></label></div>` : ""}
+      <label>Final<select data-f="fl" ${id}><option value="1"${sel(f.fl, 1)}>Jogo único</option><option value="2"${sel(f.fl, 2)}>Ida e volta</option></select></label>
+      <label>Se o confronto empatar<select data-f="dp" ${id} title="Vale quando o placar somado das pernas termina empatado. Gol fora só vale com ida e volta; em jogo único decidem os pênaltis."><option value="penaltis"${sel(f.dp || "penaltis", "penaltis")}>Pênaltis</option><option value="neutro"${sel(f.dp, "neutro")}>Terceiro jogo em campo neutro</option><option value="golfora"${sel(f.dp, "golfora")}>Gol fora</option></select></label></div>` : ""}
      <p class="dica" data-fh="${i}"></p></div>`;
   }).join("");
   Q.fmt.forEach((_, i) => qFmtDica(i));
@@ -535,8 +538,10 @@ function htmlPO() {
     const legs = t.l.map((_, li) => { const H = Matamata.casaDaPerna(t, li), A = H === "a" ? "b" : "a", th = T.get(t[H]), ta = T.get(t[A]);
       return `<div class="jogo"><span class="eq casa" title="${h(th.nome)}">${h(sigla(th))}${esc(th)}</span><span class="placar">${inp(H, li)}x${inp(A, li)}</span><span class="eq">${esc(ta)}${h(sigla(ta))}</span></div>`; }).join("");
     const cheio = t.l.every(x => x[0] != null && x[1] != null), [A, B] = cheio ? agg(t) : [0, 1];
-    const pen = cheio && A === B ? `<div class="pen">Pênaltis: ${h(sigla(T.get(t.a)))} <input type="number" min="0" data-pen="${ri},${ti},0,a" value="${t.pen?.[0] ?? ""}" aria-label="Pênaltis ${h(T.get(t.a).nome)}"> x <input type="number" min="0" data-pen="${ri},${ti},0,b" value="${t.pen?.[1] ?? ""}" aria-label="Pênaltis ${h(T.get(t.b).nome)}"> ${h(sigla(T.get(t.b)))}</div>` : "";
-    return `<div class="tie">${legs}${n === 2 && cheio ? `<small>Agregado ${A} x ${B}</small>` : ""}${pen}${w ? `<small>✓ ${nm(w)} avança</small>` : ""}</div>`;
+    const pend = Matamata.pendencia(t), por = Matamata.decididoPor(t);
+    const neu = t.desempate === "neutro" && cheio && A === B ? `<div class="pen">Jogo extra (campo neutro): ${h(sigla(T.get(t.a)))} <input type="number" min="0" max="20" data-neu="${ri},${ti},0,a" value="${t.n?.[0] ?? ""}" aria-label="Gols no jogo extra ${h(T.get(t.a).nome)}"> x <input type="number" min="0" max="20" data-neu="${ri},${ti},0,b" value="${t.n?.[1] ?? ""}" aria-label="Gols no jogo extra ${h(T.get(t.b).nome)}"> ${h(sigla(T.get(t.b)))}</div>` : "";
+    const pen = pend === "penaltis" ? `<div class="pen">Pênaltis: ${h(sigla(T.get(t.a)))} <input type="number" min="0" data-pen="${ri},${ti},0,a" value="${t.pen?.[0] ?? ""}" aria-label="Pênaltis ${h(T.get(t.a).nome)}"> x <input type="number" min="0" data-pen="${ri},${ti},0,b" value="${t.pen?.[1] ?? ""}" aria-label="Pênaltis ${h(T.get(t.b).nome)}"> ${h(sigla(T.get(t.b)))}</div>` : "";
+    return `<div class="tie">${legs}${n === 2 && cheio ? `<small>Agregado ${A} x ${B}</small>` : ""}${neu}${pen}${w ? `<small>✓ ${nm(w)} avança${({ golfora: " (gol fora)", neutro: " (jogo extra)", penaltis: " (pênaltis)" })[por] || ""}</small>` : ""}</div>`;
   };
   return `${cab}<div class="acoes"><button class="b sim" data-a="po-fase">🎲 Simular próxima fase</button></div>
    <div class="comps">${b.r.map((rd, ri) => `<div class="comp-col"><h4>${rod(ri)}</h4>${rd.map((t, ti) => tie(t, ri, ti)).join("")}</div>`).join("")}</div>
@@ -692,15 +697,17 @@ $("app").addEventListener("change", e => {
   else if (el.id === "q-modo") Q.modo = el.value === "forca" ? "forca" : "equilibrada";
   else if (el.id === "q-ds") { Q.dist = el.value; $("q-c5").hidden = Q.dist !== "manual"; if (Q.dist === "manual") qBoard(); qRes(); }
   else if (d.f) {                        // formato da divisão
-    const i = +d.i; Q.fmt[i][d.f] = d.f === "po" ? el.checked : d.f === "g" ? (v || 1) : d.f === "tn" ? Math.min(Math.max(Math.round(v) || 1, 1), 10) : v;
+    const i = +d.i; Q.fmt[i][d.f] = d.f === "po" ? el.checked : d.f === "g" ? (v || 1) : d.f === "tn" ? Math.min(Math.max(Math.round(v) || 1, 1), 10) : d.f === "dp" ? el.value : v;
     if (d.f === "tn") el.value = Q.fmt[i].tn;                 // mostra o valor já ajustado (1 a 10)
     if (d.f === "po" || d.f === "g") { qFmt(); const n = document.querySelector(`[data-f="${d.f}"][data-i="${i}"]`); if (n) n.focus(); } else qFmtDica(i);
     qRes();
   }
   else if (d.pre !== undefined) aplicarPreset(+d.pre, el.value);
-  else if (d.po || d.pen) {              // placar do mata-mata
-    const [ri, ti, x, s] = (d.po || d.pen).split(","), t = S.po[ui.div].r[+ri][+ti], val = el.value === "" ? null : Math.max(0, parseInt(el.value));
-    if (d.po) t.l[+x][s === "a" ? 0 : 1] = val; else { t.pen = t.pen || [null, null]; t.pen[s === "a" ? 0 : 1] = val; }
+  else if (d.po || d.pen || d.neu) {     // placar do mata-mata (pernas, jogo extra em campo neutro e pênaltis)
+    const [ri, ti, x, s] = (d.po || d.pen || d.neu).split(","), t = S.po[ui.div].r[+ri][+ti], val = el.value === "" ? null : Math.max(0, parseInt(el.value));
+    if (d.po) t.l[+x][s === "a" ? 0 : 1] = val;
+    else if (d.neu) { t.n = t.n || [null, null]; t.n[s === "a" ? 0 : 1] = val; }
+    else { t.pen = t.pen || [null, null]; t.pen[s === "a" ? 0 : 1] = val; }
     poSync(ui.div); salvarLocal(); desenharPO(); desenharTabela(); $("abas-div").innerHTML = abasDiv(); $("btn-enc").disabled = !completaTudo();
   }
   else if (d.j) {                        // placar digitado à mão
