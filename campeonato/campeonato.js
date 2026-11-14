@@ -92,60 +92,22 @@ function qualificados(d) {               // ids na ordem de cabeça de chave
   const f = FM(d); if (!f.po) return [];
   return (f.g === 1 ? base(d).slice(nDir(d), nDir(d) + f.k) : base(d).filter(x => x.pos < f.k)).map(x => x.t.id);
 }
-const agg = t => [t.l.reduce((s, x) => s + x[0], 0), t.l.reduce((s, x) => s + x[1], 0)];
-function poVenc(t) {
-  if (t.bye) return t.a;
-  if (!t.a || !t.b || t.l.some(x => x[0] == null || x[1] == null)) return null;
-  const [A, B] = agg(t); if (A !== B) return A > B ? t.a : t.b;
-  const p = t.pen; return p && p[0] != null && p[1] != null && p[0] !== p[1] ? (p[0] > p[1] ? t.a : t.b) : null;
-}
-function poCriar(sd, f) {
-  const K = sd.length, m = Math.ceil(Math.log2(K)), N = 2 ** m, r = [];
-  let o = [1]; while (o.length < N) o = o.flatMap(s => [s, o.length * 2 + 1 - s]);   // chave padrão: 1 x último, melhores nunca se cruzam cedo
-  const at = s => sd[s - 1] || null;
-  for (let ri = 0, n = N / 2; ri < m; ri++, n /= 2) {
-    const legs = (ri === m - 1 ? f.fl : f.pl) || 1;
-    r.push(Array.from({ length: n }, (_, i) => ({ a: ri ? null : at(o[2 * i]), b: ri ? null : at(o[2 * i + 1]), bye: ri === 0 && !at(o[2 * i + 1]),
-      l: Array.from({ length: legs }, () => [null, null]), pen: null })));
-  }
-  return { sd, r };
-}
+/* ---------- Mata-mata: o motor está em ../core/matamata.js; aqui só se liga à competição ---------- */
+const poVenc = Matamata.vencedor, agg = Matamata.agregado;
+const regrasPO = f => ({ pernas: f.pl, final: f.fl });          // jogos por confronto e jogos da final (questionário)
+const opcoesPO = () => ({ gols: golsJogo, penaltis: () => RNG.rnd(2) ? [5, 4] : [4, 5] });
 function poSync(d) {                     // cria a chave quando a fase de pontos termina e repassa os vencedores
   const f = FM(d); if (!f.po || !ligaOk(d)) { S.po[d] = null; return; }
-  const sd = qualificados(d); let b = S.po[d];
-  if (!b || b.sd.join() !== sd.join()) b = S.po[d] = poCriar(sd, f);
-  b.r.forEach((rd, ri) => ri && rd.forEach((t, i) => {
-    const a = poVenc(b.r[ri - 1][2 * i]), c = poVenc(b.r[ri - 1][2 * i + 1]);
-    if (t.a !== a || t.b !== c) { t.a = a; t.b = c; t.l = t.l.map(() => [null, null]); t.pen = null; }
-  }));
+  S.po[d] = Matamata.sincronizar(S.po[d], qualificados(d), regrasPO(f));
 }
-function poOrdem(d) {                    // campeão, vice, semifinalistas… (null enquanto não termina)
-  poSync(d); const b = S.po[d]; if (!b) return null;
-  const camp = poVenc(b.r[b.r.length - 1][0]); if (!camp) return null;
-  const out = [camp], pos = id => b.sd.indexOf(id);
-  for (let ri = b.r.length - 1; ri >= 0; ri--) out.push(...b.r[ri].filter(t => !t.bye).map(t => poVenc(t) === t.a ? t.b : t.a).filter(Boolean).sort((x, y) => pos(x) - pos(y)));
-  return out;
-}
-function poJogar(t) {
-  if (t.bye || !t.a || !t.b) return;
-  t.l.forEach((l, i) => {                // l[0] = gols do time a, l[1] = gols do time b; na ida de dois jogos o b é o mandante
-    if (l[0] != null && l[1] != null) return;
-    const aCasa = !(t.l.length === 2 && i === 0), [gc, gf] = golsJogo(aCasa ? t.a : t.b, aCasa ? t.b : t.a);
-    if (l[0] == null) l[0] = aCasa ? gc : gf;
-    if (l[1] == null) l[1] = aCasa ? gf : gc;
-  });
-  const [A, B] = agg(t), p = t.pen;
-  if (A === B && !(p && p[0] != null && p[1] != null && p[0] !== p[1])) t.pen = rnd(2) ? [5, 4] : [4, 5];
-}
-function poSim(d) {
-  for (let ri = 0; ; ri++) { poSync(d); const b = S.po[d]; if (!b || ri >= b.r.length) return; b.r[ri].forEach(poJogar); }
-}
+function poOrdem(d) { poSync(d); return Matamata.ordem(S.po[d]); }   // campeão, vice, semifinalistas… (null enquanto não termina)
+function poSim(d) { poSync(d); if (S.po[d]) Matamata.simular(S.po[d], opcoesPO()); }
 function poFase(d) {
   poSync(d); const b = S.po[d];
   if (!b) { aviso("Termine a fase de pontos antes.", true); return false; }
-  const ri = b.r.findIndex(r => r.some(t => !t.bye && !poVenc(t)));
+  const ri = Matamata.proximaRodada(b);
   if (ri < 0) { aviso("O mata-mata já terminou.", true); return false; }
-  b.r[ri].forEach(poJogar); poSync(d); return true;
+  Matamata.jogarRodada(b, ri, opcoesPO()); return true;
 }
 function ranking(d) {                    // ordem final: sobe direto, resultado do mata-mata, resto da tabela
   const B = base(d).map(x => x.t.id); if (!FM(d).po) return B;
@@ -564,13 +526,13 @@ function htmlPO() {
   const cab = `<h3>Mata-mata – Série ${LETRAS[d]}</h3><p class="dica">${d === 0 ? "Decide o campeão." : `${p} ${p > 1 ? "vagas de acesso saem" : "vaga de acesso sai"} daqui${nDir(d) ? `; os ${nDir(d)} melhores da tabela sobem direto` : ""}.`}</p>`;
   if (!b) return `${cab}<p class="vazio">Termine a fase de pontos para definir os ${nK(d)} classificados.</p>`;
   const nm = x => x ? h(T.get(x).nome) : "A definir", ord = poOrdem(d);
-  const rod = ri => { const t = 2 ** (b.r.length - ri); return t === 2 ? "Final" : t === 4 ? "Semifinal" : t === 8 ? "Quartas de final" : t === 16 ? "Oitavas de final" : `Fase de ${t}`; };
+  const rod = ri => Matamata.nomeRodada(b, ri);
   const tie = (t, ri, ti) => {
     if (t.bye) return `<div class="tie"><small>${nm(t.a)} avança direto</small></div>`;
     if (!t.a || !t.b) return `<div class="tie"><div class="jogo"><span class="eq casa">${nm(t.a)}</span><span class="placar">x</span><span class="eq">${nm(t.b)}</span></div></div>`;
     const n = t.l.length, w = poVenc(t);
     const inp = (s, li) => `<input type="number" min="0" max="20" data-po="${ri},${ti},${li},${s}" value="${t.l[li][s === "a" ? 0 : 1] ?? ""}" aria-label="Gols ${h(T.get(t[s]).nome)}">`;
-    const legs = t.l.map((_, li) => { const H = n === 2 && li === 0 ? "b" : "a", A = H === "a" ? "b" : "a", th = T.get(t[H]), ta = T.get(t[A]);
+    const legs = t.l.map((_, li) => { const H = Matamata.casaDaPerna(t, li), A = H === "a" ? "b" : "a", th = T.get(t[H]), ta = T.get(t[A]);
       return `<div class="jogo"><span class="eq casa" title="${h(th.nome)}">${h(sigla(th))}${esc(th)}</span><span class="placar">${inp(H, li)}x${inp(A, li)}</span><span class="eq">${esc(ta)}${h(sigla(ta))}</span></div>`; }).join("");
     const cheio = t.l.every(x => x[0] != null && x[1] != null), [A, B] = cheio ? agg(t) : [0, 1];
     const pen = cheio && A === B ? `<div class="pen">Pênaltis: ${h(sigla(T.get(t.a)))} <input type="number" min="0" data-pen="${ri},${ti},0,a" value="${t.pen?.[0] ?? ""}" aria-label="Pênaltis ${h(T.get(t.a).nome)}"> x <input type="number" min="0" data-pen="${ri},${ti},0,b" value="${t.pen?.[1] ?? ""}" aria-label="Pênaltis ${h(T.get(t.b).nome)}"> ${h(sigla(T.get(t.b)))}</div>` : "";
