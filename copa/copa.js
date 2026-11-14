@@ -63,10 +63,7 @@ function logo() {                // o arquivo pode estar como Logo.png ou logo.p
 }
 
 /* ---------- Estrutura do chaveamento (só depende de N) ---------- */
-function estrutura(n) {
-  let B = 2; while (B * 2 <= n) B *= 2;         // maior potência de 2 que cabe em n
-  return { n, B, m: n - B, byes: 2 * B - n };   // m = jogos da preliminar; byes = times que entram direto
-}
+const estrutura = Sorteio.estrutura;            // { n, B, m, byes }: B = maior potência de 2 que cabe em n; m = jogos da preliminar; byes = entram direto
 function nomeFase(c) {                          // c = quantidade de times que entram na fase
   return c === 2 ? "Final" : c === 4 ? "Semifinais" : c === 8 ? "Quartas de final" : c === 16 ? "Oitavas de final" : `${c / 2}-avos de final`;
 }
@@ -80,24 +77,10 @@ const corAnel = r => R[r].tipo === "prelim" ? COR_PRELIM : PALETA[(R.length - 1 
 const pernas = r => (C.cfg.ida && !(r === R.length - 1 && C.cfg.finalUnico)) ? 2 : 1;   // jogos do confronto
 
 /* ---------- Sorteio ---------- */
-function ordemSeparada(ids) {                   // espalha os times do mesmo estado pelo círculo
-  const grupos = new Map(), chaves = [];
-  embaralhar(ids).forEach(id => { const u = T.get(id).uf; if (!grupos.has(u)) grupos.set(u, []); grupos.get(u).push(id); });
-  grupos.forEach(l => l.forEach((id, i) => chaves.push([(i + Math.random()) / l.length, id])));
-  return chaves.sort((a, b) => a[0] - b[0]).map(x => x[1]);
-}
-function montarSorteio(ids, modo) {
-  const { B, m, byes } = estrutura(ids.length);
-  const L = modo === "base" ? TIMES.map(t => t.id).filter(id => ids.includes(id))
-    : modo === "separar" ? ordemSeparada(ids) : embaralhar(ids);
-  // posições do anel principal que recebem um time direto, espalhadas de forma uniforme
-  const direto = new Set(Array.from({ length: byes }, (_, k) => Math.floor((k + 0.5) * B / byes)));
-  const prelim = [], slots = []; let k = 0;
-  for (let j = 0; j < B; j++) {
-    if (m === 0 || direto.has(j)) slots.push(L[k++]);          // entra direto
-    else { slots.push(null); prelim.push(L[k++], L[k++]); }     // espera o vencedor de um jogo da preliminar
-  }
-  return { prelim, slots };
+const novaSemente = () => Math.floor(Math.random() * 4294967296);   // cada sorteio guarda a sua semente em C.cfg.semente
+function montarSorteio(ids, modo, semente, potes) {   // o sorteio em si está em ../core/sorteio.js
+  const quer = new Set(ids), lista = TIMES.filter(t => quer.has(t.id));   // na ordem da base
+  return Sorteio.sortear(modo, lista, { semente, potes });
 }
 
 /* ---------- Estado da copa: quem está em cada posição ---------- */
@@ -522,7 +505,7 @@ function deJSON(o) {
   if (ids.length < 2 || new Set(ids).size !== ids.length) throw new Error("Arquivo de save inválido.");
   const { B, m } = estrutura(ids.length);
   if (o.slots.length !== B || o.prelim.length !== 2 * m) throw new Error("Arquivo de save inválido.");
-  C = { cfg: { ida: !!o.cfg.ida, finalUnico: !!o.cfg.finalUnico, sorteio: o.cfg.sorteio || "aleatorio", visual: o.cfg.visual === "classico" ? "classico" : "circular" }, prelim: o.prelim, slots: o.slots, res: [], festa: o.festa || null };
+  C = { cfg: { ida: !!o.cfg.ida, finalUnico: !!o.cfg.finalUnico, sorteio: o.cfg.sorteio || "aleatorio", potes: o.cfg.potes || 2, semente: o.cfg.semente ?? null, visual: o.cfg.visual === "classico" ? "classico" : "circular" }, prelim: o.prelim, slots: o.slots, res: [], festa: o.festa || null };
   preparar(o.res);
 }
 function preparar(res) {         // monta os anéis e confere os resultados guardados
@@ -566,7 +549,7 @@ function descricao(n) {          // resumo do formato para o número de times es
 }
 function questionario() {
   C = null; $("chip").hidden = true;
-  if (!Q) { Q = { reg: [...new Set(TIMES.map(t => t.regiao))], modo: "sorteio", n: TIMES.length, escolha: new Set(), busca: "", sorteio: "aleatorio", visual: "circular", ida: false, finalUnico: true }; qRecalcular(); Q.n = pool().length; }
+  if (!Q) { Q = { reg: [...new Set(TIMES.map(t => t.regiao))], modo: "sorteio", n: TIMES.length, escolha: new Set(), busca: "", sorteio: "aleatorio", potes: 2, visual: "circular", ida: false, finalUnico: true }; qRecalcular(); Q.n = pool().length; }
   const regs = [...new Set(TIMES.map(t => t.regiao))];
   $("app").innerHTML = `<div class="quest">
    <section class="card"><h2><span class="n">1</span>De onde vêm os times?</h2>
@@ -584,8 +567,9 @@ function questionario() {
       <label class="opt"><input type="radio" name="q-vis" value="classico" ${Q.visual === "classico" ? "checked" : ""}> ▤ Clássico (árvore em colunas)</label></div>
     <p class="dica">Os dois mostram a mesma copa — dá para trocar de visual a qualquer momento, no botão da barra de ações.</p></section>
    <section class="card"><h2><span class="n">4</span>Como sortear o chaveamento?</h2>
-    <div class="campos"><label>Sorteio<select id="q-so"><option value="aleatorio">Totalmente aleatório</option><option value="separar">Espalhar times do mesmo estado pelo círculo</option><option value="base">Ordem da base (alfabética)</option></select></label></div>
-    <p class="dica">“Espalhar” faz times do mesmo estado tenderem a só se encontrar nas fases finais. Em “Ordem da base”, vizinhos no círculo são vizinhos na lista.</p></section>
+    <div class="campos"><label>Sorteio<select id="q-so"><option value="aleatorio">Totalmente aleatório</option><option value="separar">Espalhar times do mesmo estado pelo círculo</option><option value="base">Ordem da base (alfabética)</option><option value="potes-regiao">Potes por região (regiões diferentes se enfrentam primeiro)</option><option value="potes-forca">Potes por força (fortes contra fracos)</option></select></label>
+      <label id="q-pow" hidden>Número de potes<input type="number" id="q-po" min="2" max="8" value="${Q.potes}"></label></div>
+    <p class="dica">“Espalhar” faz times do mesmo estado tenderem a só se encontrar nas fases finais. Em “Ordem da base”, vizinhos no círculo são vizinhos na lista. Em “Potes por região”, cada região é um pote e o primeiro jogo é entre regiões diferentes sempre que der. Em “Potes por força”, os times são divididos em potes pela força (o pote 1 tem os mais fortes): com 2 potes, cada jogo da 1ª fase é um forte contra um fraco, e as vagas diretas, quando existem, ficam com os mais fortes.</p></section>
    <section class="card"><h2><span class="n">5</span>Formato dos jogos</h2>
     <div class="campos"><label>Confrontos<select id="q-ida"><option value="unico">Jogo único</option><option value="ida">Ida e volta</option></select></label>
       <label class="linha-chk" id="q-fuw" hidden><input type="checkbox" id="q-fu" ${Q.finalUnico ? "checked" : ""}> Final em jogo único</label></div>
@@ -606,7 +590,7 @@ function qParciais() {           // redesenha só o que depende das respostas an
   if (!$("q-pool")) return;
   const pn = pool().length;
   $("q-pool").textContent = `${pn} time${pn === 1 ? "" : "s"} nas regiões marcadas.`;
-  $("q-nw").hidden = Q.modo === "manual"; $("q-manual").hidden = Q.modo !== "manual"; $("q-fuw").hidden = !Q.ida;
+  $("q-pow").hidden = Q.sorteio !== "potes-forca"; $("q-nw").hidden = Q.modo === "manual"; $("q-manual").hidden = Q.modo !== "manual"; $("q-fuw").hidden = !Q.ida;
   $("q-pre").innerHTML = [`<button class="b peq" data-a="q-n" data-v="${pn}">Todos (${pn})</button>`, ...[128, 64, 32, 16, 8].filter(x => x < pn).map(x => `<button class="b peq" data-a="q-n" data-v="${x}">${x}</button>`)].join("");
   if (Q.modo === "manual") qChips();
   qRes();
@@ -616,6 +600,7 @@ function qErros() {
   if (pn < 2) e.push("Marque regiões que somem pelo menos 2 times.");
   else if (n < 2) e.push(Q.modo === "manual" ? "Marque pelo menos 2 times." : "Use pelo menos 2 times.");
   if (Q.modo === "sorteio" && n > pn) e.push(`Só há ${pn} times nas regiões marcadas.`);
+  if (Q.sorteio === "potes-forca" && n >= 2 && Q.potes > n) e.push(`O número de potes (${Q.potes}) não pode passar do número de times (${n}).`);
   return e;
 }
 function qRes() {
@@ -631,8 +616,8 @@ function qPick(c) {
 }
 function comecar() {
   const ids = Q.modo === "manual" ? [...Q.escolha] : embaralhar(pool().map(t => t.id)).slice(0, Q.n);
-  const { prelim, slots } = montarSorteio(ids, Q.sorteio);
-  C = { cfg: { ida: Q.ida, finalUnico: Q.ida && Q.finalUnico, sorteio: Q.sorteio, visual: Q.visual }, prelim, slots, res: [], festa: null };
+  const semente = novaSemente(), { prelim, slots } = montarSorteio(ids, Q.sorteio, semente, Q.potes);
+  C = { cfg: { ida: Q.ida, finalUnico: Q.ida && Q.finalUnico, sorteio: Q.sorteio, potes: Q.potes, semente, visual: Q.visual }, prelim, slots, res: [], festa: null };
   preparar(); sincronizarHub(null); salvarLocal(); entrarCopa();
 }
 
@@ -672,8 +657,8 @@ function acao(a, v) {
     case "sim-tudo": return simularTudo();
     case "sortear": {
       if (C.res.some(rs => Object.keys(rs).length) && !confirm("Sortear de novo apaga os resultados desta copa. Continuar?")) return;
-      const ids = C.slots.concat(C.prelim).filter(Boolean), { prelim, slots } = montarSorteio(ids, C.cfg.sorteio);
-      C.prelim = prelim; C.slots = slots; C.festa = null; preparar(); return atualizar();
+      const ids = C.slots.concat(C.prelim).filter(Boolean), semente = novaSemente(), { prelim, slots } = montarSorteio(ids, C.cfg.sorteio, semente, C.cfg.potes);
+      C.prelim = prelim; C.slots = slots; C.cfg.semente = semente; C.festa = null; preparar(); return atualizar();
     }
     case "limpar":
       if (C.res.some(rs => Object.keys(rs).length) && !confirm("Apagar todos os resultados e manter o sorteio?")) return;
@@ -718,7 +703,8 @@ document.addEventListener("change", e => {
   else if (el.name === "q-modo") { Q.modo = el.value; qParciais(); }
   else if (el.name === "q-vis") Q.visual = el.value;
   else if (el.id === "q-n") { Q.n = Math.min(Math.max(parseInt(el.value) || 2, 2), Math.max(pool().length, 2)); el.value = Q.n; qRes(); }
-  else if (el.id === "q-so") Q.sorteio = el.value;
+  else if (el.id === "q-so") { Q.sorteio = el.value; qParciais(); }
+  else if (el.id === "q-po") { Q.potes = Math.min(Math.max(parseInt(el.value) || 2, 2), 8); el.value = Q.potes; qRes(); }
   else if (el.id === "q-ida") { Q.ida = el.value === "ida"; qParciais(); }
   else if (el.id === "q-fu") Q.finalUnico = el.checked;
 });
