@@ -74,12 +74,13 @@ main { max-width:1500px; margin:0 auto; padding:18px 16px 70px; }
 .jg .v { stroke-linejoin:round; }
 .svg-padrao { width:14px; height:14px; fill:var(--mut); }
 
-.campeao { position:absolute; transform:translate(-50%,-50%); z-index:30; display:flex; align-items:center; justify-content:center; gap:6px;
-  max-width:130px; padding:8px 14px; border-radius:30px; border:2px solid var(--red); color:#fff; font-size:.8rem; font-weight:700; cursor:default;
-  background:linear-gradient(135deg,#da3633,#b62324); box-shadow:0 6px 20px rgba(218,54,51,.4); }
+.campeao { position:absolute; transform:translate(-50%,-50%); z-index:30; display:flex; align-items:center; justify-content:center; gap:4px;
+  max-width:78px; padding:2px 8px; border-radius:30px; border:1px solid var(--red); color:#fff; font-size:.58rem; font-weight:700; line-height:1.4; cursor:default;
+  background:linear-gradient(135deg,#da3633,#b62324); box-shadow:0 3px 10px rgba(218,54,51,.4); }
+.campeao:not(.tem) { pointer-events:none; }                         /* sem campeão é só um rótulo: o clique passa para a linha da final */
 .campeao span:last-child { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .campeao.tem { cursor:pointer; }
-.campeao .esc { width:20px; height:20px; }
+.campeao .esc { width:12px; height:12px; }
 
 /* ---------- Janelas ---------- */
 dialog { background:var(--panel); color:var(--txt); border:1px solid var(--line); border-radius:14px; padding:0; width:min(560px,94vw); max-height:92vh; box-shadow:0 16px 40px rgba(0,0,0,.6); }

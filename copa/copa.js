@@ -84,19 +84,29 @@ function montarSorteio(ids, modo, semente, potes) {   // o sorteio em si está e
 }
 
 /* ---------- Estado da copa: quem está em cada posição ---------- */
-function venc(r, p) {            // vencedor do confronto p do anel r (ou null)
-  const m = C.res[r][p]; if (!m) return null;
-  if (m.a !== E[r][2 * p] || m.b !== E[r][2 * p + 1]) { delete C.res[r][p]; return null; }   // os times mudaram: resultado antigo não vale
-  return m.w || null;
-}
-function derivar() {             // recalcula E a partir do sorteio e dos resultados
-  E = []; NUL = [];
-  C.slots.forEach((id, j) => { if (id == null) NUL.push(j); });
-  R.forEach((a, r) => {
-    if (r === 0) E[r] = a.tipo === "prelim" ? [...C.prelim] : [...C.slots];
-    else if (a.tipo === "main" && R[0].tipo === "prelim") { let k = 0; E[r] = C.slots.map(id => id ?? venc(r - 1, k++)); }
-    else E[r] = Array.from({ length: a.count }, (_, i) => venc(r - 1, i));
+// O vencedor de cada confronto e a passagem entre os anéis vêm do core/matamata.js. A Copa continua guardando
+// C.res[r][p] = { a, b, legs, pen, man, w } (o formato do save não mudou) e, a cada derivar(), monta a chave do módulo
+// a partir do sorteio e dos resultados guardados. Aqui a ida é no campo de A e a volta no de B (idaEm: "a"); a Copa guarda
+// cada perna como [gols do mandante, gols do visitante] e o módulo como [gols de a, gols de b]: só a volta troca de lado.
+let CH = null;                   // chave do Matamata, com os mesmos anéis de R e as mesmas posições de E
+const regrasMM = () => ({ pernas: C.cfg.ida ? 2 : 1, final: C.cfg.ida && !C.cfg.finalUnico ? 2 : 1, idaEm: "a" });
+const perna = (lg, i, n) => n === 2 && i === 1 ? [lg[1], lg[0]] : lg;    // a mesma troca vale nos dois sentidos
+const tieDe = m => ({ a: m.a, b: m.b, bye: false, idaEm: "a", l: m.legs.map((lg, i, v) => perna(lg, i, v.length)), pen: m.pen, man: m.man || null });
+const venc = (r, p) => Matamata.vencedor(CH.r[r][p]);            // vencedor do confronto p do anel r (ou null)
+function derivar() {             // recalcula a chave (e E) a partir do sorteio e dos resultados
+  NUL = []; C.slots.forEach((id, j) => { if (id == null) NUL.push(j); });
+  CH = Matamata.criarDeSlots(C.prelim, C.slots, regrasMM());
+  CH.r.forEach((rd, r) => {
+    Matamata.propagar(CH);       // leva os vencedores do anel anterior para este
+    rd.forEach((t, p) => {
+      const m = C.res[r][p]; if (!m) return;
+      if (m.a !== t.a || m.b !== t.b) { delete C.res[r][p]; return; }   // os times mudaram: resultado antigo não vale
+      if (m.legs.length === t.l.length) t.l = m.legs.map((lg, i) => perna(lg, i, m.legs.length).slice());
+      t.pen = m.pen ? [...m.pen] : null; if (m.man) t.man = m.man;
+    });
   });
+  Matamata.propagar(CH);
+  E = CH.r.map(rd => rd.flatMap(t => [t.a, t.b]));
 }
 const pronto = (r, p) => !!(E[r][2 * p] && E[r][2 * p + 1]);
 const faseCompleta = r => Array.from({ length: R[r].count / 2 }, (_, p) => venc(r, p)).every(Boolean);
@@ -106,18 +116,12 @@ const campeaoId = () => venc(R.length - 1, 0);
 /* ---------- Resultados ---------- */
 const gols = () => [0, 0, 1, 1, 1, 2, 2, 3][rnd(8)];
 function penaltis() { const a = 2 + rnd(4); let b = 2 + rnd(4); while (b === a) b = 2 + rnd(4); return [a, b]; }
-function totais(m) {             // soma dos gols (A, B); null se faltar algum placar. Na volta o mandante é o time B.
+function totais(m) {             // soma dos gols (A, B); null se faltar algum placar
   if (!m.legs.length || m.legs.some(l => l[0] == null || l[1] == null)) return null;
-  let a = 0, b = 0;
-  m.legs.forEach((l, i) => { if (i === 0) { a += l[0]; b += l[1]; } else { a += l[1]; b += l[0]; } });
-  return [a, b];
+  return Matamata.agregado(tieDe(m));
 }
-function decidir(m) {            // quem avança: decisão manual, placar ou pênaltis
-  if (m.man) return m.man;
-  const t = totais(m); if (!t) return null;
-  if (t[0] !== t[1]) return t[0] > t[1] ? m.a : m.b;
-  if (m.pen && m.pen[0] != null && m.pen[1] != null && m.pen[0] !== m.pen[1]) return m.pen[0] > m.pen[1] ? m.a : m.b;
-  return null;
+function decidir(m) {            // quem avança: decisão manual, placar ou pênaltis (as regras estão no módulo)
+  return m.man || (totais(m) ? Matamata.vencedor(tieDe(m)) : null);
 }
 function resumo(m) {
   const t = totais(m);
@@ -125,8 +129,9 @@ function resumo(m) {
   return `${t[0]}×${t[1]}${m.legs.length > 1 ? " (agregado)" : ""}${m.pen ? ` · pên. ${m.pen[0]}–${m.pen[1]}` : ""}`;
 }
 function simularJogo(r, p) {
-  const m = { a: E[r][2 * p], b: E[r][2 * p + 1], legs: Array.from({ length: pernas(r) }, () => [gols(), gols()]), pen: null, man: null, w: null };
-  const t = totais(m); if (t[0] === t[1]) m.pen = penaltis();
+  const t = { a: E[r][2 * p], b: E[r][2 * p + 1], bye: false, idaEm: "a", l: Array.from({ length: pernas(r) }, () => [null, null]), pen: null };
+  Matamata.jogar(t, { gols: () => [gols(), gols()], penaltis });   // os mesmos sorteios de gols e de pênaltis de antes
+  const m = { a: t.a, b: t.b, legs: t.l.map((l, i) => perna(l, i, t.l.length)), pen: t.pen, man: null, w: null };
   m.w = decidir(m); C.res[r][p] = m;
 }
 function simularAnel(r) { for (let p = 0; p < R[r].count / 2; p++) if (!venc(r, p) && pronto(r, p)) simularJogo(r, p); }
