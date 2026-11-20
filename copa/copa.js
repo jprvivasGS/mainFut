@@ -28,6 +28,12 @@ const sigla = t => t.sigla || t.nome.slice(0, 3).toUpperCase();
 const sem = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 const nomeDaCor = c => { const b = c.split("/").pop().replace(/\.[a-z]+$/i, ""); return b.charAt(0).toUpperCase() + b.slice(1); };
 
+let DET = null;   // times-detalhe.json: carregado só ao abrir a ficha de um time ou a comemoração do campeão
+function detalhes() {
+  if (!DET) DET = fetch(RAIZ + "times-detalhe.json", { cache: "no-cache" }).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(d => d.times || {}).catch(() => { DET = null; return {}; });   // falhou: usa só o básico e tenta de novo depois
+  return DET;
+}
 let TIMES = [], T = new Map();   // base de times e busca por id
 let Q = null;                    // respostas do questionário
 let C = null;                    // copa em andamento: { cfg, prelim, slots, res, festa }
@@ -57,10 +63,7 @@ function logo() {                // o arquivo pode estar como Logo.png ou logo.p
 }
 
 /* ---------- Estrutura do chaveamento (só depende de N) ---------- */
-function estrutura(n) {
-  let B = 2; while (B * 2 <= n) B *= 2;         // maior potência de 2 que cabe em n
-  return { n, B, m: n - B, byes: 2 * B - n };   // m = jogos da preliminar; byes = times que entram direto
-}
+const estrutura = Sorteio.estrutura;            // { n, B, m, byes }: B = maior potência de 2 que cabe em n; m = jogos da preliminar; byes = entram direto
 function nomeFase(c) {                          // c = quantidade de times que entram na fase
   return c === 2 ? "Final" : c === 4 ? "Semifinais" : c === 8 ? "Quartas de final" : c === 16 ? "Oitavas de final" : `${c / 2}-avos de final`;
 }
@@ -74,40 +77,36 @@ const corAnel = r => R[r].tipo === "prelim" ? COR_PRELIM : PALETA[(R.length - 1 
 const pernas = r => (C.cfg.ida && !(r === R.length - 1 && C.cfg.finalUnico)) ? 2 : 1;   // jogos do confronto
 
 /* ---------- Sorteio ---------- */
-function ordemSeparada(ids) {                   // espalha os times do mesmo estado pelo círculo
-  const grupos = new Map(), chaves = [];
-  embaralhar(ids).forEach(id => { const u = T.get(id).uf; if (!grupos.has(u)) grupos.set(u, []); grupos.get(u).push(id); });
-  grupos.forEach(l => l.forEach((id, i) => chaves.push([(i + Math.random()) / l.length, id])));
-  return chaves.sort((a, b) => a[0] - b[0]).map(x => x[1]);
-}
-function montarSorteio(ids, modo) {
-  const { B, m, byes } = estrutura(ids.length);
-  const L = modo === "base" ? TIMES.map(t => t.id).filter(id => ids.includes(id))
-    : modo === "separar" ? ordemSeparada(ids) : embaralhar(ids);
-  // posições do anel principal que recebem um time direto, espalhadas de forma uniforme
-  const direto = new Set(Array.from({ length: byes }, (_, k) => Math.floor((k + 0.5) * B / byes)));
-  const prelim = [], slots = []; let k = 0;
-  for (let j = 0; j < B; j++) {
-    if (m === 0 || direto.has(j)) slots.push(L[k++]);          // entra direto
-    else { slots.push(null); prelim.push(L[k++], L[k++]); }     // espera o vencedor de um jogo da preliminar
-  }
-  return { prelim, slots };
+const novaSemente = () => Math.floor(Math.random() * 4294967296);   // cada sorteio guarda a sua semente em C.cfg.semente
+function montarSorteio(ids, modo, semente, potes) {   // o sorteio em si está em ../core/sorteio.js
+  const quer = new Set(ids), lista = TIMES.filter(t => quer.has(t.id));   // na ordem da base
+  return Sorteio.sortear(modo, lista, { semente, potes });
 }
 
 /* ---------- Estado da copa: quem está em cada posição ---------- */
-function venc(r, p) {            // vencedor do confronto p do anel r (ou null)
-  const m = C.res[r][p]; if (!m) return null;
-  if (m.a !== E[r][2 * p] || m.b !== E[r][2 * p + 1]) { delete C.res[r][p]; return null; }   // os times mudaram: resultado antigo não vale
-  return m.w || null;
-}
-function derivar() {             // recalcula E a partir do sorteio e dos resultados
-  E = []; NUL = [];
-  C.slots.forEach((id, j) => { if (id == null) NUL.push(j); });
-  R.forEach((a, r) => {
-    if (r === 0) E[r] = a.tipo === "prelim" ? [...C.prelim] : [...C.slots];
-    else if (a.tipo === "main" && R[0].tipo === "prelim") { let k = 0; E[r] = C.slots.map(id => id ?? venc(r - 1, k++)); }
-    else E[r] = Array.from({ length: a.count }, (_, i) => venc(r - 1, i));
+// O vencedor de cada confronto e a passagem entre os anéis vêm do core/matamata.js. A Copa continua guardando
+// C.res[r][p] = { a, b, legs, pen, man, w } (o formato do save não mudou) e, a cada derivar(), monta a chave do módulo
+// a partir do sorteio e dos resultados guardados. Aqui a ida é no campo de A e a volta no de B (idaEm: "a"); a Copa guarda
+// cada perna como [gols do mandante, gols do visitante] e o módulo como [gols de a, gols de b]: só a volta troca de lado.
+let CH = null;                   // chave do Matamata, com os mesmos anéis de R e as mesmas posições de E
+const regrasMM = () => ({ pernas: C.cfg.ida ? 2 : 1, final: C.cfg.ida && !C.cfg.finalUnico ? 2 : 1, idaEm: "a" });
+const perna = (lg, i, n) => n === 2 && i === 1 ? [lg[1], lg[0]] : lg;    // a mesma troca vale nos dois sentidos
+const tieDe = m => ({ a: m.a, b: m.b, bye: false, idaEm: "a", l: m.legs.map((lg, i, v) => perna(lg, i, v.length)), pen: m.pen, man: m.man || null });
+const venc = (r, p) => Matamata.vencedor(CH.r[r][p]);            // vencedor do confronto p do anel r (ou null)
+function derivar() {             // recalcula a chave (e E) a partir do sorteio e dos resultados
+  NUL = []; C.slots.forEach((id, j) => { if (id == null) NUL.push(j); });
+  CH = Matamata.criarDeSlots(C.prelim, C.slots, regrasMM());
+  CH.r.forEach((rd, r) => {
+    Matamata.propagar(CH);       // leva os vencedores do anel anterior para este
+    rd.forEach((t, p) => {
+      const m = C.res[r][p]; if (!m) return;
+      if (m.a !== t.a || m.b !== t.b) { delete C.res[r][p]; return; }   // os times mudaram: resultado antigo não vale
+      if (m.legs.length === t.l.length) t.l = m.legs.map((lg, i) => perna(lg, i, m.legs.length).slice());
+      t.pen = m.pen ? [...m.pen] : null; if (m.man) t.man = m.man;
+    });
   });
+  Matamata.propagar(CH);
+  E = CH.r.map(rd => rd.flatMap(t => [t.a, t.b]));
 }
 const pronto = (r, p) => !!(E[r][2 * p] && E[r][2 * p + 1]);
 const faseCompleta = r => Array.from({ length: R[r].count / 2 }, (_, p) => venc(r, p)).every(Boolean);
@@ -117,18 +116,12 @@ const campeaoId = () => venc(R.length - 1, 0);
 /* ---------- Resultados ---------- */
 const gols = () => [0, 0, 1, 1, 1, 2, 2, 3][rnd(8)];
 function penaltis() { const a = 2 + rnd(4); let b = 2 + rnd(4); while (b === a) b = 2 + rnd(4); return [a, b]; }
-function totais(m) {             // soma dos gols (A, B); null se faltar algum placar. Na volta o mandante é o time B.
+function totais(m) {             // soma dos gols (A, B); null se faltar algum placar
   if (!m.legs.length || m.legs.some(l => l[0] == null || l[1] == null)) return null;
-  let a = 0, b = 0;
-  m.legs.forEach((l, i) => { if (i === 0) { a += l[0]; b += l[1]; } else { a += l[1]; b += l[0]; } });
-  return [a, b];
+  return Matamata.agregado(tieDe(m));
 }
-function decidir(m) {            // quem avança: decisão manual, placar ou pênaltis
-  if (m.man) return m.man;
-  const t = totais(m); if (!t) return null;
-  if (t[0] !== t[1]) return t[0] > t[1] ? m.a : m.b;
-  if (m.pen && m.pen[0] != null && m.pen[1] != null && m.pen[0] !== m.pen[1]) return m.pen[0] > m.pen[1] ? m.a : m.b;
-  return null;
+function decidir(m) {            // quem avança: decisão manual, placar ou pênaltis (as regras estão no módulo)
+  return m.man || (totais(m) ? Matamata.vencedor(tieDe(m)) : null);
 }
 function resumo(m) {
   const t = totais(m);
@@ -136,8 +129,9 @@ function resumo(m) {
   return `${t[0]}×${t[1]}${m.legs.length > 1 ? " (agregado)" : ""}${m.pen ? ` · pên. ${m.pen[0]}–${m.pen[1]}` : ""}`;
 }
 function simularJogo(r, p) {
-  const m = { a: E[r][2 * p], b: E[r][2 * p + 1], legs: Array.from({ length: pernas(r) }, () => [gols(), gols()]), pen: null, man: null, w: null };
-  const t = totais(m); if (t[0] === t[1]) m.pen = penaltis();
+  const t = { a: E[r][2 * p], b: E[r][2 * p + 1], bye: false, idaEm: "a", l: Array.from({ length: pernas(r) }, () => [null, null]), pen: null };
+  Matamata.jogar(t, { gols: () => [gols(), gols()], penaltis });   // os mesmos sorteios de gols e de pênaltis de antes
+  const m = { a: t.a, b: t.b, legs: t.l.map((l, i) => perna(l, i, t.l.length)), pen: t.pen, man: null, w: null };
   m.w = decidir(m); C.res[r][p] = m;
 }
 function simularAnel(r) { for (let p = 0; p < R[r].count / 2; p++) if (!venc(r, p) && pronto(r, p)) simularJogo(r, p); }
@@ -398,8 +392,8 @@ function kit(rotulo, src, alt) {
   if (!src) return `<div class="kit">${h(rotulo)}<div style="cursor:default">Sem foto</div></div>`;
   return `<div class="kit">${h(rotulo)}<div data-img="${h(RAIZ + src)}"><img src="${RAIZ}${h(src)}" alt="${h(alt)}" onerror="this.replaceWith(document.createTextNode('Sem foto'))"></div></div>`;
 }
-function abrirTime(id) {
-  const t = T.get(id), u = t.uniformes || {}, m = t.mascote || {}, f = t.federacao || {}, cores = (t.cores || []).map(nomeDaCor);
+async function abrirTime(id) {
+  const t = { ...T.get(id), ...((await detalhes())[id] || {}) }, u = t.uniformes || {}, m = t.mascote || {}, f = t.federacao || {}, cores = (t.cores || []).map(nomeDaCor);
   const camp = campanha(id);
   $("timeBox").innerHTML = `<button class="fechar" data-a="t-fechar" aria-label="Fechar">×</button>
     <div class="ficha">${esc(t)}<div><h3>${h(t.nome)}</h3><p>${h([t.cidade, t.uf].filter(Boolean).join(" · "))}${t.fundacao ? ` · fundado em ${h(t.fundacao)}` : ""}</p>
@@ -438,7 +432,7 @@ function corHex(caminho) {       // lê o hex da imagem em cores/…; se falhar,
 }
 let fogos = null;
 async function festa(id) {
-  const t = T.get(id);
+  const t = { ...T.get(id), ...((await detalhes())[id] || {}) };
   if ($("jogoDlg").open) $("jogoDlg").close();
   $("festaEsc").innerHTML = esc(t); $("festaNome").textContent = t.nome; $("festaLocal").textContent = [t.cidade, t.uf].filter(Boolean).join(" · ");
   $("festa").hidden = false;
@@ -516,7 +510,7 @@ function deJSON(o) {
   if (ids.length < 2 || new Set(ids).size !== ids.length) throw new Error("Arquivo de save inválido.");
   const { B, m } = estrutura(ids.length);
   if (o.slots.length !== B || o.prelim.length !== 2 * m) throw new Error("Arquivo de save inválido.");
-  C = { cfg: { ida: !!o.cfg.ida, finalUnico: !!o.cfg.finalUnico, sorteio: o.cfg.sorteio || "aleatorio", visual: o.cfg.visual === "classico" ? "classico" : "circular" }, prelim: o.prelim, slots: o.slots, res: [], festa: o.festa || null };
+  C = { cfg: { ida: !!o.cfg.ida, finalUnico: !!o.cfg.finalUnico, sorteio: o.cfg.sorteio || "aleatorio", potes: o.cfg.potes || 2, semente: o.cfg.semente ?? null, visual: o.cfg.visual === "classico" ? "classico" : "circular" }, prelim: o.prelim, slots: o.slots, res: [], festa: o.festa || null };
   preparar(o.res);
 }
 function preparar(res) {         // monta os anéis e confere os resultados guardados
@@ -560,7 +554,7 @@ function descricao(n) {          // resumo do formato para o número de times es
 }
 function questionario() {
   C = null; $("chip").hidden = true;
-  if (!Q) { Q = { reg: [...new Set(TIMES.map(t => t.regiao))], modo: "sorteio", n: TIMES.length, escolha: new Set(), busca: "", sorteio: "aleatorio", visual: "circular", ida: false, finalUnico: true }; qRecalcular(); Q.n = pool().length; }
+  if (!Q) { Q = { reg: [...new Set(TIMES.map(t => t.regiao))], modo: "sorteio", n: TIMES.length, escolha: new Set(), busca: "", sorteio: "aleatorio", potes: 2, visual: "circular", ida: false, finalUnico: true }; qRecalcular(); Q.n = pool().length; }
   const regs = [...new Set(TIMES.map(t => t.regiao))];
   $("app").innerHTML = `<div class="quest">
    <section class="card"><h2><span class="n">1</span>De onde vêm os times?</h2>
@@ -578,8 +572,9 @@ function questionario() {
       <label class="opt"><input type="radio" name="q-vis" value="classico" ${Q.visual === "classico" ? "checked" : ""}> ▤ Clássico (árvore em colunas)</label></div>
     <p class="dica">Os dois mostram a mesma copa — dá para trocar de visual a qualquer momento, no botão da barra de ações.</p></section>
    <section class="card"><h2><span class="n">4</span>Como sortear o chaveamento?</h2>
-    <div class="campos"><label>Sorteio<select id="q-so"><option value="aleatorio">Totalmente aleatório</option><option value="separar">Espalhar times do mesmo estado pelo círculo</option><option value="base">Ordem da base (alfabética)</option></select></label></div>
-    <p class="dica">“Espalhar” faz times do mesmo estado tenderem a só se encontrar nas fases finais. Em “Ordem da base”, vizinhos no círculo são vizinhos na lista.</p></section>
+    <div class="campos"><label>Sorteio<select id="q-so"><option value="aleatorio">Totalmente aleatório</option><option value="separar">Espalhar times do mesmo estado pelo círculo</option><option value="base">Ordem da base (alfabética)</option><option value="potes-regiao">Potes por região (regiões diferentes se enfrentam primeiro)</option><option value="potes-forca">Potes por força (fortes contra fracos)</option></select></label>
+      <label id="q-pow" hidden>Número de potes<input type="number" id="q-po" min="2" max="8" value="${Q.potes}"></label></div>
+    <p class="dica">“Espalhar” faz times do mesmo estado tenderem a só se encontrar nas fases finais. Em “Ordem da base”, vizinhos no círculo são vizinhos na lista. Em “Potes por região”, cada região é um pote e o primeiro jogo é entre regiões diferentes sempre que der. Em “Potes por força”, os times são divididos em potes pela força (o pote 1 tem os mais fortes): com 2 potes, cada jogo da 1ª fase é um forte contra um fraco, e as vagas diretas, quando existem, ficam com os mais fortes.</p></section>
    <section class="card"><h2><span class="n">5</span>Formato dos jogos</h2>
     <div class="campos"><label>Confrontos<select id="q-ida"><option value="unico">Jogo único</option><option value="ida">Ida e volta</option></select></label>
       <label class="linha-chk" id="q-fuw" hidden><input type="checkbox" id="q-fu" ${Q.finalUnico ? "checked" : ""}> Final em jogo único</label></div>
@@ -600,7 +595,7 @@ function qParciais() {           // redesenha só o que depende das respostas an
   if (!$("q-pool")) return;
   const pn = pool().length;
   $("q-pool").textContent = `${pn} time${pn === 1 ? "" : "s"} nas regiões marcadas.`;
-  $("q-nw").hidden = Q.modo === "manual"; $("q-manual").hidden = Q.modo !== "manual"; $("q-fuw").hidden = !Q.ida;
+  $("q-pow").hidden = Q.sorteio !== "potes-forca"; $("q-nw").hidden = Q.modo === "manual"; $("q-manual").hidden = Q.modo !== "manual"; $("q-fuw").hidden = !Q.ida;
   $("q-pre").innerHTML = [`<button class="b peq" data-a="q-n" data-v="${pn}">Todos (${pn})</button>`, ...[128, 64, 32, 16, 8].filter(x => x < pn).map(x => `<button class="b peq" data-a="q-n" data-v="${x}">${x}</button>`)].join("");
   if (Q.modo === "manual") qChips();
   qRes();
@@ -610,6 +605,7 @@ function qErros() {
   if (pn < 2) e.push("Marque regiões que somem pelo menos 2 times.");
   else if (n < 2) e.push(Q.modo === "manual" ? "Marque pelo menos 2 times." : "Use pelo menos 2 times.");
   if (Q.modo === "sorteio" && n > pn) e.push(`Só há ${pn} times nas regiões marcadas.`);
+  if (Q.sorteio === "potes-forca" && n >= 2 && Q.potes > n) e.push(`O número de potes (${Q.potes}) não pode passar do número de times (${n}).`);
   return e;
 }
 function qRes() {
@@ -625,8 +621,8 @@ function qPick(c) {
 }
 function comecar() {
   const ids = Q.modo === "manual" ? [...Q.escolha] : embaralhar(pool().map(t => t.id)).slice(0, Q.n);
-  const { prelim, slots } = montarSorteio(ids, Q.sorteio);
-  C = { cfg: { ida: Q.ida, finalUnico: Q.ida && Q.finalUnico, sorteio: Q.sorteio, visual: Q.visual }, prelim, slots, res: [], festa: null };
+  const semente = novaSemente(), { prelim, slots } = montarSorteio(ids, Q.sorteio, semente, Q.potes);
+  C = { cfg: { ida: Q.ida, finalUnico: Q.ida && Q.finalUnico, sorteio: Q.sorteio, potes: Q.potes, semente, visual: Q.visual }, prelim, slots, res: [], festa: null };
   preparar(); sincronizarHub(null); salvarLocal(); entrarCopa();
 }
 
@@ -666,8 +662,8 @@ function acao(a, v) {
     case "sim-tudo": return simularTudo();
     case "sortear": {
       if (C.res.some(rs => Object.keys(rs).length) && !confirm("Sortear de novo apaga os resultados desta copa. Continuar?")) return;
-      const ids = C.slots.concat(C.prelim).filter(Boolean), { prelim, slots } = montarSorteio(ids, C.cfg.sorteio);
-      C.prelim = prelim; C.slots = slots; C.festa = null; preparar(); return atualizar();
+      const ids = C.slots.concat(C.prelim).filter(Boolean), semente = novaSemente(), { prelim, slots } = montarSorteio(ids, C.cfg.sorteio, semente, C.cfg.potes);
+      C.prelim = prelim; C.slots = slots; C.cfg.semente = semente; C.festa = null; preparar(); return atualizar();
     }
     case "limpar":
       if (C.res.some(rs => Object.keys(rs).length) && !confirm("Apagar todos os resultados e manter o sorteio?")) return;
@@ -712,7 +708,8 @@ document.addEventListener("change", e => {
   else if (el.name === "q-modo") { Q.modo = el.value; qParciais(); }
   else if (el.name === "q-vis") Q.visual = el.value;
   else if (el.id === "q-n") { Q.n = Math.min(Math.max(parseInt(el.value) || 2, 2), Math.max(pool().length, 2)); el.value = Q.n; qRes(); }
-  else if (el.id === "q-so") Q.sorteio = el.value;
+  else if (el.id === "q-so") { Q.sorteio = el.value; qParciais(); }
+  else if (el.id === "q-po") { Q.potes = Math.min(Math.max(parseInt(el.value) || 2, 2), 8); el.value = Q.potes; qRes(); }
   else if (el.id === "q-ida") { Q.ida = el.value === "ida"; qParciais(); }
   else if (el.id === "q-fu") Q.finalUnico = el.checked;
 });

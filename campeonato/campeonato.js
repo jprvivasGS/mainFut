@@ -1,14 +1,18 @@
 /* Campeonato Nacional – mainFut
    Fluxo: questionário → temporada (rodadas + tabela) → encerrar (acesso/descenso) → próxima temporada.
-   Rodadas e tabela vêm do simulador regional: método do círculo e desempate P > V > SG > GP. */
+   Rodadas, tabela e critérios de desempate vêm de ../core/regras.js. */
 const RAIZ = "../";                     // times.json e imagens ficam na pasta do hub
 const REG = { norte: "Norte", nordeste: "Nordeste", centro_oeste: "Centro-Oeste", sudeste: "Sudeste", sul: "Sul" };
 const LETRAS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const LOCAL = "mainfut:campeonato:save";
 const $ = id => document.getElementById(id);
 const h = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const rnd = n => Math.floor(Math.random() * n);
-const embaralhar = a => { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = rnd(i + 1); [b[i], b[j]] = [b[j], b[i]]; } return b; };
+const semModulo = [typeof RNG === "undefined" && "rng", typeof Sim === "undefined" && "sim", typeof Regras === "undefined" && "regras"].filter(Boolean);
+if (semModulo.length) {                  // sem os módulos a página ficaria parada em "Carregando times…"
+  $("app").innerHTML = `<p class="erros">Não carreguei ${semModulo.map(m => `../core/${m}.js`).join(" e ")}. Confira se o index.html tem as tags ${semModulo.map(m => `<code>&lt;script src="../core/${m}.js"&gt;&lt;/script&gt;</code>`).join(" ")} antes do campeonato.js (na ordem rng.js, sim.js, regras.js) e se os arquivos foram publicados em /mainFut/core/.</p>`;
+  throw new Error("Módulo não carregado: " + semModulo.join(", "));
+}
+const rnd = RNG.rnd, embaralhar = RNG.embaralhar;   // sorteios vêm de ../core/rng.js (com semente, gravada no save)
 const sigla = t => t.sigla || t.nome.slice(0, 3).toUpperCase();
 const sem = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
@@ -35,17 +39,8 @@ function logo() {                        // tenta os endereços possíveis do lo
 }
 
 /* ---------- Rodadas (método do círculo) ---------- */
-function gerarRodadas(ids, turnos) {
-  const v = [...ids]; if (v.length % 2) v.push(null);            // grupo ímpar: alguém folga a cada rodada
-  const n = v.length, ida = [];
-  for (let r = 0; r < n - 1; r++) {
-    ida.push(Array.from({ length: n / 2 }, (_, i) => ({ c: v[i], f: v[n - 1 - i], gc: null, gf: null })).filter(m => m.c && m.f));
-    v.splice(1, 0, v.pop());
-  }
-  const volta = turnos === 2 ? ida.map(r => r.map(m => ({ c: m.f, f: m.c, gc: null, gf: null }))) : [];
-  return [...ida, ...volta];
-}
-const FM = d => S.cfg.fmt[d];            // formato da divisão: {g grupos, tn turnos, po mata-mata, k classificados, p vagas via mata-mata, pl jogos/confronto, fl jogos da final}
+const gerarRodadas = Regras.gerarRodadas;   // ../core/regras.js
+const FM = d => S.cfg.fmt[d];            // formato da divisão: {g grupos, tn vezes que os times se enfrentam (1, 2, 3…), po mata-mata, k classificados, p vagas via mata-mata, pl jogos/confronto, fl jogos da final}
 const grupos = d => { const n = S.divs[d].length / FM(d).g; return Array.from({ length: FM(d).g }, (_, g) => S.divs[d].slice(g * n, (g + 1) * n)); };
 const montarFix = () => {
   S.fix = S.divs.map((_, d) => {
@@ -54,11 +49,21 @@ const montarFix = () => {
   });
   S.po = S.divs.map(() => null);
 };
-const gols = () => [0, 0, 1, 1, 1, 2, 2, 3][rnd(8)];
+/* Placares vêm de ../core/sim.js (Poisson): a força de cada time pesa nos gols e o mandante leva uma pequena vantagem. */
+const forca = id => S.forcas[id] ?? T.get(id)?.forca ?? 500;   // força atual: a da base ou a evoluída entre temporadas (vai no save)
+const modoPartida = () => S.cfg.modo === "forca" ? "forca" : "equilibrada";   // regra da competição (S.cfg.modo)
+const golsNeutro = (a, b) => modoPartida() === "forca"      // jogo extra em campo neutro: ninguém tem o mando
+  ? Sim.golsPartida(forca(a), forca(b), { mando: 1 }) : Sim.golsPartida(1, 1, { mando: 1 });
+const golsJogo = (casa, fora) => modoPartida() === "forca"
+  ? Sim.golsPartida(forca(casa), forca(fora))   // por força: a força de cada time pesa nos gols
+  : Sim.golsPartida(1, 1);                      // equilibrada: forças iguais, só o mando de campo pesa. Retorna [gols da casa, gols do visitante]
 function simular(d, rodada) {            // preenche só o que ainda não tem placar
   (rodada ? [S.fix[d][rodada - 1]] : S.fix[d]).forEach(r => r.forEach(m => {
-    if (m.gc == null) m.gc = gols();     // mantém o lado que a pessoa já digitou
-    if (m.gf == null) m.gf = gols();
+    if (m.ac == null) Object.assign(m, Regras.cartoes());   // cartões da partida (para os desempates)
+    if (m.gc != null && m.gf != null) return;
+    const [gc, gf] = golsJogo(m.c, m.f);
+    if (m.gc == null) m.gc = gc;         // mantém o lado que a pessoa já digitou
+    if (m.gf == null) m.gf = gf;
   }));
   if (!rodada) poSim(d);                 // simular a série inclui o mata-mata
 }
@@ -67,84 +72,44 @@ const completa = d => ligaOk(d) && (!FM(d).po || !!poOrdem(d));
 const completaTudo = () => S.divs.every((_, d) => completa(d));
 
 /* ---------- Tabela ---------- */
+// O cálculo e os desempates ficam em ../core/regras.js; aqui só se monta a entrada. Critérios e semente do sorteio vêm do save.
+const nomeTime = id => T.get(id)?.nome ?? String(id);
+const opcRegras = () => ({ pv: S.cfg.pv, pe: S.cfg.pe, deducoes: S.deducoes, criterios: S.cfg.desempates, semente: S.sorteio, nome: nomeTime });
 function tabela(d, g = 0) {
-  const L = grupos(d)[g].map(id => ({ t: T.get(id), P: 0, J: 0, V: 0, E: 0, D: 0, GP: 0, GC: 0, SG: 0, ded: 0 }));
-  const por = new Map(L.map(x => [x.t.id, x]));
-  S.fix[d].forEach(r => r.forEach(m => {
-    if (m.g !== g || m.gc == null || m.gf == null) return;
-    const a = por.get(m.c), b = por.get(m.f);
-    a.J++; b.J++; a.GP += m.gc; a.GC += m.gf; b.GP += m.gf; b.GC += m.gc;
-    if (m.gc > m.gf) { a.P += S.cfg.pv; a.V++; b.D++; }
-    else if (m.gc < m.gf) { b.P += S.cfg.pv; b.V++; a.D++; }
-    else { a.P += S.cfg.pe; b.P += S.cfg.pe; a.E++; b.E++; }
-  }));
-  S.deducoes.forEach(x => { if (por.has(x.id)) por.get(x.id).ded += x.pts; });   // punições
-  L.forEach(x => { x.P -= x.ded; x.SG = x.GP - x.GC; });
-  return L.sort((a, b) => b.P - a.P || b.V - a.V || b.SG - a.SG || b.GP - a.GP || a.t.nome.localeCompare(b.t.nome, "pt-BR"));
+  const jogos = S.fix[d].flat().filter(m => m.g === g);
+  return Regras.tabela(grupos(d)[g], jogos, opcRegras()).map(x => ({ ...x, t: T.get(x.id) }));
 }
 
 /* ---------- Classificação geral, mata-mata e ranking final ---------- */
 const pp = d => d === 0 ? 1 : FM(d).g > 1 ? S.cfg.acc[d - 1] : FM(d).p;            // vagas de acesso decididas no mata-mata
 const nDir = d => d > 0 && FM(d).po && FM(d).g === 1 ? S.cfg.acc[d - 1] - pp(d) : 0; // sobem direto pela tabela
 const nK = d => FM(d).g === 1 ? FM(d).k : FM(d).k * FM(d).g;                         // classificados ao mata-mata
-function base(d) {                       // tabela geral: 1 grupo = a própria tabela; vários = posição no grupo, depois P > V > SG > GP
+function base(d) {                       // tabela geral: 1 grupo = a própria tabela; vários = posição no grupo, depois pontos e os desempates da competição (sem confronto direto)
   if (FM(d).g === 1) return tabela(d, 0);
+  const cmp = Regras.comparador(S.cfg.desempates, S.sorteio, nomeTime);
   return grupos(d).flatMap((_, g) => tabela(d, g).map((x, i) => ({ ...x, pos: i })))
-    .sort((a, b) => a.pos - b.pos || b.P - a.P || b.V - a.V || b.SG - a.SG || b.GP - a.GP || a.t.nome.localeCompare(b.t.nome, "pt-BR"));
+    .sort((a, b) => a.pos - b.pos || b.P - a.P || cmp(a, b));
 }
 function qualificados(d) {               // ids na ordem de cabeça de chave
   const f = FM(d); if (!f.po) return [];
   return (f.g === 1 ? base(d).slice(nDir(d), nDir(d) + f.k) : base(d).filter(x => x.pos < f.k)).map(x => x.t.id);
 }
-const agg = t => [t.l.reduce((s, x) => s + x[0], 0), t.l.reduce((s, x) => s + x[1], 0)];
-function poVenc(t) {
-  if (t.bye) return t.a;
-  if (!t.a || !t.b || t.l.some(x => x[0] == null || x[1] == null)) return null;
-  const [A, B] = agg(t); if (A !== B) return A > B ? t.a : t.b;
-  const p = t.pen; return p && p[0] != null && p[1] != null && p[0] !== p[1] ? (p[0] > p[1] ? t.a : t.b) : null;
-}
-function poCriar(sd, f) {
-  const K = sd.length, m = Math.ceil(Math.log2(K)), N = 2 ** m, r = [];
-  let o = [1]; while (o.length < N) o = o.flatMap(s => [s, o.length * 2 + 1 - s]);   // chave padrão: 1 x último, melhores nunca se cruzam cedo
-  const at = s => sd[s - 1] || null;
-  for (let ri = 0, n = N / 2; ri < m; ri++, n /= 2) {
-    const legs = (ri === m - 1 ? f.fl : f.pl) || 1;
-    r.push(Array.from({ length: n }, (_, i) => ({ a: ri ? null : at(o[2 * i]), b: ri ? null : at(o[2 * i + 1]), bye: ri === 0 && !at(o[2 * i + 1]),
-      l: Array.from({ length: legs }, () => [null, null]), pen: null })));
-  }
-  return { sd, r };
-}
+/* ---------- Mata-mata: o motor está em ../core/matamata.js; aqui só se liga à competição ---------- */
+const poVenc = Matamata.vencedor, agg = Matamata.agregado;
+const regrasPO = f => ({ pernas: f.pl, final: f.fl, desempate: f.dp });   // jogos por confronto, jogos da final e desempate (questionário)
+const opcoesPO = () => ({ gols: golsJogo, golsNeutro, penaltis: () => RNG.rnd(2) ? [5, 4] : [4, 5] });
 function poSync(d) {                     // cria a chave quando a fase de pontos termina e repassa os vencedores
   const f = FM(d); if (!f.po || !ligaOk(d)) { S.po[d] = null; return; }
-  const sd = qualificados(d); let b = S.po[d];
-  if (!b || b.sd.join() !== sd.join()) b = S.po[d] = poCriar(sd, f);
-  b.r.forEach((rd, ri) => ri && rd.forEach((t, i) => {
-    const a = poVenc(b.r[ri - 1][2 * i]), c = poVenc(b.r[ri - 1][2 * i + 1]);
-    if (t.a !== a || t.b !== c) { t.a = a; t.b = c; t.l = t.l.map(() => [null, null]); t.pen = null; }
-  }));
+  S.po[d] = Matamata.sincronizar(S.po[d], qualificados(d), regrasPO(f));
 }
-function poOrdem(d) {                    // campeão, vice, semifinalistas… (null enquanto não termina)
-  poSync(d); const b = S.po[d]; if (!b) return null;
-  const camp = poVenc(b.r[b.r.length - 1][0]); if (!camp) return null;
-  const out = [camp], pos = id => b.sd.indexOf(id);
-  for (let ri = b.r.length - 1; ri >= 0; ri--) out.push(...b.r[ri].filter(t => !t.bye).map(t => poVenc(t) === t.a ? t.b : t.a).filter(Boolean).sort((x, y) => pos(x) - pos(y)));
-  return out;
-}
-function poJogar(t) {
-  if (t.bye || !t.a || !t.b) return;
-  t.l.forEach(l => { if (l[0] == null) l[0] = gols(); if (l[1] == null) l[1] = gols(); });
-  const [A, B] = agg(t), p = t.pen;
-  if (A === B && !(p && p[0] != null && p[1] != null && p[0] !== p[1])) t.pen = rnd(2) ? [5, 4] : [4, 5];
-}
-function poSim(d) {
-  for (let ri = 0; ; ri++) { poSync(d); const b = S.po[d]; if (!b || ri >= b.r.length) return; b.r[ri].forEach(poJogar); }
-}
+function poOrdem(d) { poSync(d); return Matamata.ordem(S.po[d]); }   // campeão, vice, semifinalistas… (null enquanto não termina)
+function poSim(d) { poSync(d); if (S.po[d]) Matamata.simular(S.po[d], opcoesPO()); }
 function poFase(d) {
   poSync(d); const b = S.po[d];
   if (!b) { aviso("Termine a fase de pontos antes.", true); return false; }
-  const ri = b.r.findIndex(r => r.some(t => !t.bye && !poVenc(t)));
+  const ri = Matamata.proximaRodada(b);
   if (ri < 0) { aviso("O mata-mata já terminou.", true); return false; }
-  b.r[ri].forEach(poJogar); poSync(d); return true;
+  Matamata.jogarRodada(b, ri, opcoesPO()); return true;
 }
 function ranking(d) {                    // ordem final: sobe direto, resultado do mata-mata, resto da tabela
   const B = base(d).map(x => x.t.id); if (!FM(d).po) return B;
@@ -197,7 +162,9 @@ function encerrar() {
     const sobe = d > 0 ? n[d - 1] : 0, desce = d < ids.length - 1 ? n[d] : 0;
     return embaralhar([...l.slice(sobe, l.length - desce), ...(d > 0 ? reg.descem[d - 1] : []), ...(d < ids.length - 1 ? reg.sobem[d] : [])]);
   });
-  S.ano++; S.deducoes = []; S.ext = []; montarFix();
+  reg.sobem.flat().forEach(id => S.forcas[id] = Sim.evoluirForca(forca(id), "sobe"));    // quem subiu ganha um pouco de força
+  reg.descem.flat().forEach(id => S.forcas[id] = Sim.evoluirForca(forca(id), "desce"));  // quem caiu perde um pouco (limite 1 a 1000)
+  S.ano++; S.sorteio = RNG.rnd(2147483648); S.deducoes = []; S.ext = []; montarFix();   // sorteio de desempate novo a cada temporada
 }
 function simularAnos() {
   const k = Math.min(Math.max(parseInt($("nAnos").value) || 1, 1), 100);
@@ -209,21 +176,45 @@ function simularAnos() {
 /* ---------- Save ---------- */
 function paraJSON() {                    // só os placares: as rodadas são refeitas a partir da ordem dos times
   return { versao: 2, po: S.po, ano: S.ano, cfg: S.cfg, divs: S.divs, deducoes: S.deducoes, ext: S.ext, historico: S.historico,
-    placar: S.fix.map(rs => rs.flatMap(r => r.map(m => (m.gc == null || m.gf == null) ? null : [m.gc, m.gf]))) };
+    placar: S.fix.map(rs => rs.flatMap(r => r.map(m => (m.gc == null || m.gf == null) ? null : m.ac == null ? [m.gc, m.gf] : [m.gc, m.gf, m.ac, m.af, m.vc, m.vf]))),   // gols e, se houver, cartões
+    forcas: S.forcas, sorteio: S.sorteio,                    // só as forças que mudaram desde a base: { id: força }
+    rng: RNG.salvar() };                 // { semente, estado }: ao carregar, os sorteios continuam de onde pararam
 }
 function deJSON(o) {
   if (!o || !Array.isArray(o.divs) || !o.cfg) throw new Error("Arquivo de save inválido.");
   const falta = o.divs.flat().filter(id => !T.has(id));
   if (falta.length) throw new Error("A base não tem mais estes times: " + falta.slice(0, 5).join(", "));
-  S = { cfg: o.cfg, ano: o.ano, divs: o.divs, deducoes: o.deducoes || [], ext: o.ext || [], historico: o.historico || [] };
+  S = { cfg: o.cfg, ano: o.ano, divs: o.divs, deducoes: o.deducoes || [], ext: o.ext || [], historico: o.historico || [], forcas: o.forcas || {}, sorteio: o.sorteio ?? (o.ano || 1) * 7919 };   // saves antigos: todos na força da base
   S.cfg.comps = S.cfg.comps || [];       // saves antigos não tinham competições
-  S.cfg.fmt = S.cfg.fmt || S.divs.map(() => ({ g: 1, tn: S.cfg.turnos, po: false, k: 4, p: 1, pl: 2, fl: 1 }));
+  S.cfg.modo = S.cfg.modo || "forca";    // saves antigos já eram jogados por força
+  S.cfg.desempates = Regras.validos(S.cfg.desempates || ["vitorias", "saldo", "golspro"]);   // saves antigos: V > SG > GP, depois ordem alfabética
+  S.cfg.fmt = S.cfg.fmt || S.divs.map(() => ({ g: 1, tn: S.cfg.turnos, po: false, k: 4, p: 1, pl: 2, fl: 1, dp: "penaltis" }));
   montarFix();
-  S.fix.forEach((rs, d) => rs.flat().forEach((m, i) => { const p = o.placar?.[d]?.[i]; if (p) { m.gc = p[0]; m.gf = p[1]; } }));
+  S.fix.forEach((rs, d) => rs.flat().forEach((m, i) => { const p = o.placar?.[d]?.[i]; if (p) { m.gc = p[0]; m.gf = p[1]; if (p.length > 2) [m.ac, m.af, m.vc, m.vf] = p.slice(2); } }));
   if (Array.isArray(o.po) && o.po.length === S.divs.length) S.po = o.po;
+  RNG.restaurar(o.rng);                  // saves antigos não têm "rng": seguem com a semente da página
   ui = { aba: "temporada", div: 0, rodada: 1 };
 }
-function salvarLocal() { try { localStorage.setItem(LOCAL, JSON.stringify(paraJSON())); } catch (e) { /* sem armazenamento */ } }
+function salvarLocal() { try { localStorage.setItem(LOCAL, JSON.stringify(paraJSON())); } catch (e) { /* sem armazenamento */ } sincronizarHub(); }
+
+/* ---------- Ponte com o hub (hub-data.js) ---------- */
+// Grava no contrato do hub: campeonato:progresso { concluidas, total } e campeonato:campeao { id, nome, uf }.
+// concluidas = temporadas encerradas; total = concluidas + a temporada em andamento.
+// campeao = campeão da Série A assim que ela termina; antes disso, o da última temporada encerrada.
+function sincronizarHub() {
+  if (typeof HubData === "undefined" || !S) return;      // sem hub-data.js na página, o campeonato segue normal
+  try {
+    const feitas = S.historico.length;
+    HubData.set("campeonato:progresso", { concluidas: feitas, total: feitas + 1 });
+    const id = completa(0) ? ranking(0)[0] : (feitas ? S.historico[feitas - 1].divs[0][0][0] : null), t = id && T.get(id);
+    if (t) HubData.set("campeonato:campeao", { id: t.id, nome: t.nome, uf: t.uf });
+    else HubData.remove("campeonato:campeao");
+  } catch (e) { /* o hub é opcional: nunca atrapalha o save */ }
+}
+function limparHub() {
+  if (typeof HubData === "undefined") return;
+  HubData.remove("campeonato:progresso"); HubData.remove("campeonato:campeao");
+}
 function baixar() {
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([JSON.stringify(paraJSON())], { type: "application/json" }));
@@ -299,7 +290,7 @@ function qErros() {
 }
 function questionario() {
   $("ano").hidden = true;
-  if (!Q) { Q = { reg: [...new Set(TIMES.map(t => t.regiao))], nd: 0, tam: [], acc: [], pv: 3, pe: 1, turnos: 2, dist: "sorteio", alloc: [], sel: new Set(), busca: "", fmt: [],
+  if (!Q) { Q = { reg: [...new Set(TIMES.map(t => t.regiao))], nd: 0, tam: [], acc: [], pv: 3, pe: 1, turnos: 2, dist: "sorteio", modo: "equilibrada", crit: Regras.PADRAO.map(id => ({ id, on: true })), alloc: [], sel: new Set(), busca: "", fmt: [],
     comps: [{ nome: "Libertadores", vagas: 4 }, { nome: "Sul-Americana", vagas: 6 }] }; Q.nd = Math.max(1, Math.round(pool().length / 20)); qRecalcular(); }
   const regs = [...new Set(TIMES.map(t => t.regiao))];
   $("app").innerHTML = `<div class="quest">
@@ -318,14 +309,29 @@ function questionario() {
    <section class="card"><h2><span class="n">5</span>Regras da tabela</h2><div class="campos">
     <label>Pontos por vitória<input type="number" id="q-pv" min="1" max="5" value="${Q.pv}"></label>
     <label>Pontos por empate<input type="number" id="q-pe" min="0" max="3" value="${Q.pe}"></label>
-    <label>Formato<select id="q-tn"><option value="2">Turno e returno</option><option value="1">Turno único</option></select></label>
-    <label>Distribuição dos times<select id="q-ds"><option value="sorteio">Sorteio aleatório</option><option value="base">Ordem da base</option><option value="manual">Escolher manualmente</option></select></label></div></section>
+    <label>Vezes que os times se enfrentam<input type="number" id="q-tn" min="1" max="10" value="2" title="1 = turno único, 2 = turno e returno, 3 ou mais = mais voltas. O mando alterna a cada volta."></label>
+    <label>Distribuição dos times<select id="q-ds"><option value="sorteio">Sorteio aleatório</option><option value="base">Ordem da base</option><option value="manual">Escolher manualmente</option></select></label>
+    <label>Placares das partidas<select id="q-modo"><option value="equilibrada">Equilibrada (força não importa)</option><option value="forca">Por força dos times</option></select></label></div>
+    <div id="q-crit"></div></section>
    <section class="card"><h2><span class="n">6</span>Formato de cada divisão</h2>
     <p class="dica">Pontos corridos ou grupos (zonas) e, se quiser, um mata-mata: pelo título ou pelas vagas de acesso. Use um modelo pronto ou ajuste à mão.</p><div id="q-fmt"></div></section>
    <section class="card" id="q-c5" hidden><h2><span class="n">7</span>Monte as séries</h2><div id="q-board"></div></section>
    <section class="card"><div id="q-res"></div><button class="b verde" id="q-go" data-a="q-go">Começar competição</button></section></div>`;
-  $("q-tn").value = Q.turnos; $("q-ds").value = Q.dist; $("q-c5").hidden = Q.dist !== "manual";
-  qParciais();
+  $("q-tn").value = Q.turnos; $("q-ds").value = Q.dist; $("q-modo").value = Q.modo; $("q-c5").hidden = Q.dist !== "manual";
+  qParciais(); qCrit();
+}
+function qCrit() {                     // lista ordenada de critérios de desempate: marcar liga/desliga, ▲ ▼ muda a ordem
+  const el = $("q-crit"); if (!el) return;
+  const fim = Q.crit.findIndex(c => c.on && c.id === "sorteio");
+  el.innerHTML = `<h3>Critérios de desempate</h3><p class="dica">Valem depois dos pontos, na ordem da lista. Desmarque para não usar e mude a ordem com ▲ ▼. O sorteio sempre decide, então o que vier depois dele nunca é usado.</p>
+   <ol class="crit" style="list-style:none;padding:0;margin:8px 0;display:grid;gap:6px">${Q.crit.map((c, i) => `<li style="display:flex;align-items:center;gap:8px"><span>${i + 1}.</span><label class="opt" style="flex:1"><input type="checkbox" data-crit="${c.id}" ${c.on ? "checked" : ""}> ${h(Regras.CRITERIOS[c.id].nome)}</label>${fim >= 0 && i > fim && c.on ? `<small class="dica">nunca usado</small>` : ""}
+     <button class="b peq" data-a="crit-sobe" data-v="${c.id}" aria-label="Subir" ${i === 0 ? "disabled" : ""}>▲</button><button class="b peq" data-a="crit-desce" data-v="${c.id}" aria-label="Descer" ${i === Q.crit.length - 1 ? "disabled" : ""}>▼</button></li>`).join("")}</ol>
+   <p class="dica">Confronto direto: vale só o que aconteceu entre os empatados (minitabela), para dois ou mais times.</p>`;
+}
+function qCritMover(id, dir) {
+  const i = Q.crit.findIndex(c => c.id === id), j = i + dir;
+  if (i < 0 || j < 0 || j >= Q.crit.length) return;
+  [Q.crit[i], Q.crit[j]] = [Q.crit[j], Q.crit[i]]; qCrit();
 }
 function qParciais() {                   // redesenha só o que depende das respostas anteriores
   if (!$("q-pool")) return;               // o questionário já saiu da tela (ex.: clicou em Começar logo depois de editar)
@@ -343,7 +349,7 @@ function qParciais() {                   // redesenha só o que depende das resp
   const novo = chave && document.querySelector(`[data-${chave}="${f.dataset[chave]}"]`);
   if (novo) novo.focus();                // devolve o foco ao mesmo campo depois de refeito
 }
-const fmtPadrao = () => ({ g: 1, tn: Q.turnos, po: false, k: 4, p: 1, pl: 2, fl: 1 });
+const fmtPadrao = () => ({ g: 1, tn: Q.turnos, po: false, k: 4, p: 1, pl: 2, fl: 1, dp: "penaltis" });
 const PRE = [["pc", "Pontos corridos"], ["acc", "Pontos corridos + mata-mata (Série B/C)"], ["red", "Campeão direto + reducido (Primera B/C/D)"],
   ["zon", "2 zonas + mata-mata (Primera Nacional)"], ["grp", "Vários grupos + mata-mata (Série D)"]];
 function aplicarPreset(i, k) {
@@ -360,7 +366,7 @@ function aplicarPreset(i, k) {
 function qFmtDica(i) {
   const el = document.querySelector(`[data-fh="${i}"]`); if (!el) return;
   const f = Q.fmt[i], n = Q.tam[i], g = f.g || 1, ac = i > 0 ? Q.acc[i - 1] : 0, p = i === 0 ? 1 : g > 1 ? ac : f.p, dir = i > 0 && g === 1 && f.po ? ac - p : 0;
-  el.textContent = (g > 1 ? `${g} grupos de ${n / g} times` : "Pontos corridos") + (f.po ? ` · mata-mata com ${f.k} ${g > 1 ? "por grupo" : "classificados"}${i > 0 ? `, ${p} ${p > 1 ? "vagas" : "vaga"} de acesso` : ", decide o título"}${dir > 0 ? `; ${dir} ${dir > 1 ? "sobem" : "sobe"} direto pela tabela` : ""}` : "");
+  el.textContent = (g > 1 ? `${g} grupos de ${n / g} times` : "Pontos corridos") + ` · cada par se enfrenta ${f.tn} ${f.tn === 1 ? "vez" : "vezes"}` + (f.po ? ` · mata-mata com ${f.k} ${g > 1 ? "por grupo" : "classificados"}${i > 0 ? `, ${p} ${p > 1 ? "vagas" : "vaga"} de acesso` : ", decide o título"}${dir > 0 ? `; ${dir} ${dir > 1 ? "sobem" : "sobe"} direto pela tabela` : ""}, empate no confronto: ${({ neutro: "jogo extra em campo neutro", golfora: f.pl === 1 && f.fl === 1 ? "gol fora (com jogo único, decidem os pênaltis)" : "gol fora" })[f.dp] || "pênaltis"}` : "");
 }
 function qFmt() {
   const sel = (a, b) => a == b ? " selected" : "";
@@ -369,12 +375,13 @@ function qFmt() {
     return `<div class="fmt"><h3>Série ${LETRAS[i]} · ${n} times</h3><div class="campos">
      <label>Modelo pronto<select data-pre="${i}"><option value="">Escolher…</option>${PRE.map(([k, t]) => `<option value="${k}">${t}</option>`).join("")}</select></label>
      <label>Grupos<input type="number" data-f="g" ${id} min="1" value="${g}"></label>
-     <label>Jogos na fase de pontos<select data-f="tn" ${id}><option value="2"${sel(f.tn, 2)}>Turno e returno</option><option value="1"${sel(f.tn, 1)}>Turno único</option></select></label>
+     <label>Vezes que os times se enfrentam<input type="number" data-f="tn" ${id} min="1" max="10" value="${f.tn}" title="1 = turno único, 2 = turno e returno, 3 ou mais = mais voltas. O mando alterna a cada volta."></label>
      <label class="opt"><input type="checkbox" data-f="po" ${id} ${f.po ? "checked" : ""}> Mata-mata ${i > 0 ? "pelas vagas de acesso" : "pelo título"}</label></div>
      ${f.po ? `<div class="campos"><label>Classificados ${g > 1 ? "por grupo" : "no total"}<input type="number" data-f="k" ${id} min="1" value="${f.k}"></label>
       ${i > 0 ? `<label>Vagas de acesso no mata-mata<input type="number" data-f="p" ${id} min="1" value="${g > 1 ? ac : f.p}" ${g > 1 ? "disabled" : ""}></label>` : ""}
       <label>Confrontos<select data-f="pl" ${id}><option value="1"${sel(f.pl, 1)}>Jogo único</option><option value="2"${sel(f.pl, 2)}>Ida e volta</option></select></label>
-      <label>Final<select data-f="fl" ${id}><option value="1"${sel(f.fl, 1)}>Jogo único</option><option value="2"${sel(f.fl, 2)}>Ida e volta</option></select></label></div>` : ""}
+      <label>Final<select data-f="fl" ${id}><option value="1"${sel(f.fl, 1)}>Jogo único</option><option value="2"${sel(f.fl, 2)}>Ida e volta</option></select></label>
+      <label>Se o confronto empatar<select data-f="dp" ${id} title="Vale quando o placar somado das pernas termina empatado. Gol fora só vale com ida e volta; em jogo único decidem os pênaltis."><option value="penaltis"${sel(f.dp || "penaltis", "penaltis")}>Pênaltis</option><option value="neutro"${sel(f.dp, "neutro")}>Terceiro jogo em campo neutro</option><option value="golfora"${sel(f.dp, "golfora")}>Gol fora</option></select></label></div>` : ""}
      <p class="dica" data-fh="${i}"></p></div>`;
   }).join("");
   Q.fmt.forEach((_, i) => qFmtDica(i));
@@ -461,10 +468,11 @@ function qPick(c) {
 }
 
 function comecar() {
+  RNG.semear();                          // semente própria desta competição (vai para o save)
   const ids = (Q.dist === "sorteio" ? embaralhar : x => x)(pool().map(t => t.id)); let p = 0;
-  S = { cfg: { pv: Q.pv, pe: Q.pe, turnos: Q.turnos, acc: Q.acc.slice(0, Q.nd - 1), fmt: Q.fmt.slice(0, Q.nd).map(f => ({ ...f })),
+  S = { cfg: { pv: Q.pv, pe: Q.pe, turnos: Q.turnos, modo: Q.modo, desempates: Q.crit.filter(c => c.on).map(c => c.id), acc: Q.acc.slice(0, Q.nd - 1), fmt: Q.fmt.slice(0, Q.nd).map(f => ({ ...f })),
           comps: Q.comps.map(c => ({ nome: c.nome.trim(), sigla: c.nome.trim().slice(0, 3).toUpperCase(), vagas: c.vagas })) },
-        ano: 1, deducoes: [], ext: [], historico: [],
+        ano: 1, deducoes: [], ext: [], historico: [], forcas: {}, sorteio: RNG.rnd(2147483648),
         divs: Q.dist === "manual" ? Q.alloc.map(l => embaralhar(l)) : Q.tam.map(t => ids.slice(p, p += t)) };
   montarFix(); ui = { aba: "temporada", div: 0, rodada: 1 }; salvarLocal(); desenhar();
 }
@@ -488,7 +496,7 @@ function vTemporada() {
     <span class="anos"><input id="nAnos" type="number" min="1" max="100" value="5" aria-label="Quantidade de anos"><button class="b" data-a="anos">Simular anos</button></span></div>
    <div class="grid">
     <section class="card"><div class="ctit"><span id="titulo"></span><button class="b peq" data-a="limpar">Limpar série</button></div>
-     <div class="rolagem"><table><thead><tr><th>Clube</th><th>P</th><th>J</th><th>V</th><th>E</th><th>D</th><th>GP</th><th>GC</th><th>SG</th>${(S.cfg.comps || []).length ? "<th><span class=\"so-leitor\">Vaga externa</span></th>" : ""}</tr></thead><tbody id="tabela"></tbody></table></div>
+     <div class="rolagem"><table><thead><tr><th>Clube</th><th>P</th><th>J</th><th>V</th><th>E</th><th>D</th><th>GP</th><th>GC</th><th>SG</th><th title="Cartões amarelos">CA</th><th title="Cartões vermelhos">CV</th>${(S.cfg.comps || []).length ? "<th><span class=\"so-leitor\">Vaga externa</span></th>" : ""}</tr></thead><tbody id="tabela"></tbody></table></div>
      <div class="legenda" id="legenda"></div></section>
     <section class="card"><div class="ctit">Confrontos</div>
      <div class="rod"><button class="b peq" data-a="prev" id="bp">❮</button><span id="rod-label"></span><button class="b peq" data-a="next" id="bn">❯</button></div>
@@ -509,7 +517,7 @@ function desenharTabela() {
     const vaga = q ? COR_COMP[q.c % COR_COMP.length] : "";
     const barra = zona && vaga ? `inset 3px 0 0 ${zona}, inset 6px 0 0 ${vaga}` : zona || vaga ? `inset 3px 0 0 ${zona || vaga}` : "";
     return `<tr><td style="box-shadow:${barra || "none"}" title="${q ? h(descVaga(q)) : ""}"><div class="cl"><span class="pos">${i + 1}</span>${esc(x.t)}<span>${h(x.t.nome)}</span><span class="uf">${h(x.t.uf)}</span></div></td>
-      <td><strong>${x.P}</strong>${x.ded ? `<span class="ded" title="Pontos deduzidos">−${x.ded}</span>` : ""}</td><td>${x.J}</td><td>${x.V}</td><td>${x.E}</td><td>${x.D}</td><td>${x.GP}</td><td>${x.GC}</td><td>${x.SG}</td>${K ? `<td><button class="mini" data-a="ext-sel" data-v="${h(x.t.id)}" title="Marcar vaga externa" aria-label="Marcar vaga externa para ${h(x.t.nome)}">🏆</button></td>` : ""}</tr>`;
+      <td><strong>${x.P}</strong>${x.ded ? `<span class="ded" title="Pontos deduzidos">−${x.ded}</span>` : ""}</td><td>${x.J}</td><td>${x.V}</td><td>${x.E}</td><td>${x.D}</td><td>${x.GP}</td><td>${x.GC}</td><td>${x.SG}</td><td>${x.AM}</td><td>${x.VM}</td>${K ? `<td><button class="mini" data-a="ext-sel" data-v="${h(x.t.id)}" title="Marcar vaga externa" aria-label="Marcar vaga externa para ${h(x.t.nome)}">🏆</button></td>` : ""}</tr>`;
   }).join("");
   $("legenda").innerHTML = [d === 0 && !f.po && ["z-top", "Campeão"], dir && ["z-up", `Acesso${f.po ? " direto" : ""} (${dir})`], f.po && ["z-po", `Mata-mata (${nK(d)})`], desce && ["z-down", `Rebaixamento (${desce})`]]
     .filter(Boolean).map(([c, t]) => `<span><i class="${c}"></i>${t}</span>`).join("")
@@ -521,17 +529,19 @@ function htmlPO() {
   const cab = `<h3>Mata-mata – Série ${LETRAS[d]}</h3><p class="dica">${d === 0 ? "Decide o campeão." : `${p} ${p > 1 ? "vagas de acesso saem" : "vaga de acesso sai"} daqui${nDir(d) ? `; os ${nDir(d)} melhores da tabela sobem direto` : ""}.`}</p>`;
   if (!b) return `${cab}<p class="vazio">Termine a fase de pontos para definir os ${nK(d)} classificados.</p>`;
   const nm = x => x ? h(T.get(x).nome) : "A definir", ord = poOrdem(d);
-  const rod = ri => { const t = 2 ** (b.r.length - ri); return t === 2 ? "Final" : t === 4 ? "Semifinal" : t === 8 ? "Quartas de final" : t === 16 ? "Oitavas de final" : `Fase de ${t}`; };
+  const rod = ri => Matamata.nomeRodada(b, ri);
   const tie = (t, ri, ti) => {
     if (t.bye) return `<div class="tie"><small>${nm(t.a)} avança direto</small></div>`;
     if (!t.a || !t.b) return `<div class="tie"><div class="jogo"><span class="eq casa">${nm(t.a)}</span><span class="placar">x</span><span class="eq">${nm(t.b)}</span></div></div>`;
     const n = t.l.length, w = poVenc(t);
     const inp = (s, li) => `<input type="number" min="0" max="20" data-po="${ri},${ti},${li},${s}" value="${t.l[li][s === "a" ? 0 : 1] ?? ""}" aria-label="Gols ${h(T.get(t[s]).nome)}">`;
-    const legs = t.l.map((_, li) => { const H = n === 2 && li === 0 ? "b" : "a", A = H === "a" ? "b" : "a", th = T.get(t[H]), ta = T.get(t[A]);
+    const legs = t.l.map((_, li) => { const H = Matamata.casaDaPerna(t, li), A = H === "a" ? "b" : "a", th = T.get(t[H]), ta = T.get(t[A]);
       return `<div class="jogo"><span class="eq casa" title="${h(th.nome)}">${h(sigla(th))}${esc(th)}</span><span class="placar">${inp(H, li)}x${inp(A, li)}</span><span class="eq">${esc(ta)}${h(sigla(ta))}</span></div>`; }).join("");
     const cheio = t.l.every(x => x[0] != null && x[1] != null), [A, B] = cheio ? agg(t) : [0, 1];
-    const pen = cheio && A === B ? `<div class="pen">Pênaltis: ${h(sigla(T.get(t.a)))} <input type="number" min="0" data-pen="${ri},${ti},0,a" value="${t.pen?.[0] ?? ""}" aria-label="Pênaltis ${h(T.get(t.a).nome)}"> x <input type="number" min="0" data-pen="${ri},${ti},0,b" value="${t.pen?.[1] ?? ""}" aria-label="Pênaltis ${h(T.get(t.b).nome)}"> ${h(sigla(T.get(t.b)))}</div>` : "";
-    return `<div class="tie">${legs}${n === 2 && cheio ? `<small>Agregado ${A} x ${B}</small>` : ""}${pen}${w ? `<small>✓ ${nm(w)} avança</small>` : ""}</div>`;
+    const pend = Matamata.pendencia(t), por = Matamata.decididoPor(t);
+    const neu = t.desempate === "neutro" && cheio && A === B ? `<div class="pen">Jogo extra (campo neutro): ${h(sigla(T.get(t.a)))} <input type="number" min="0" max="20" data-neu="${ri},${ti},0,a" value="${t.n?.[0] ?? ""}" aria-label="Gols no jogo extra ${h(T.get(t.a).nome)}"> x <input type="number" min="0" max="20" data-neu="${ri},${ti},0,b" value="${t.n?.[1] ?? ""}" aria-label="Gols no jogo extra ${h(T.get(t.b).nome)}"> ${h(sigla(T.get(t.b)))}</div>` : "";
+    const pen = pend === "penaltis" ? `<div class="pen">Pênaltis: ${h(sigla(T.get(t.a)))} <input type="number" min="0" data-pen="${ri},${ti},0,a" value="${t.pen?.[0] ?? ""}" aria-label="Pênaltis ${h(T.get(t.a).nome)}"> x <input type="number" min="0" data-pen="${ri},${ti},0,b" value="${t.pen?.[1] ?? ""}" aria-label="Pênaltis ${h(T.get(t.b).nome)}"> ${h(sigla(T.get(t.b)))}</div>` : "";
+    return `<div class="tie">${legs}${n === 2 && cheio ? `<small>Agregado ${A} x ${B}</small>` : ""}${neu}${pen}${w ? `<small>✓ ${nm(w)} avança${({ golfora: " (gol fora)", neutro: " (jogo extra)", penaltis: " (pênaltis)" })[por] || ""}</small>` : ""}</div>`;
   };
   return `${cab}<div class="acoes"><button class="b sim" data-a="po-fase">🎲 Simular próxima fase</button></div>
    <div class="comps">${b.r.map((rd, ri) => `<div class="comp-col"><h4>${rod(ri)}</h4>${rd.map((t, ti) => tie(t, ri, ti)).join("")}</div>`).join("")}</div>
@@ -616,6 +626,8 @@ function acao(a, v) {
     case "q-esvaziar": Q.alloc = Q.alloc.map(() => []); Q.sel.clear(); qBoard(); return qRes();
     case "q-mover": return qMover([...Q.sel], v);
     case "q-selvis": qLivres().forEach(id => Q.sel.add(id)); return qBoard();
+    case "crit-sobe": return qCritMover(v, -1);
+    case "crit-desce": return qCritMover(v, 1);
     case "aba": ui.aba = v; return desenhar();
     case "div": ui.div = +v; ui.rodada = 1; ui.grupo = 0; return desenhar();
     case "grp": ui.grupo = +v; return desenhar();
@@ -626,7 +638,7 @@ function acao(a, v) {
     case "temporada": S.divs.forEach((_, i) => simular(i)); break;
     case "encerrar": encerrar(); ui.rodada = 1; aviso(`Temporada ${S.ano - 1} encerrada. Times promovidos e rebaixados.`); break;
     case "anos": return simularAnos();
-    case "limpar": if (!confirm(`Limpar todos os resultados da Série ${LETRAS[d]}?`)) return; S.fix[d].forEach(r => r.forEach(m => { m.gc = null; m.gf = null; })); break;
+    case "limpar": if (!confirm(`Limpar todos os resultados da Série ${LETRAS[d]}?`)) return; S.fix[d].forEach(r => r.forEach(m => { m.gc = null; m.gf = null; m.ac = m.af = m.vc = m.vf = null; })); break;
     case "ext-sel": ui.extSel = v; desenhar(); { const el = $("ext-comp"); if (el) { el.scrollIntoView({ block: "center" }); el.focus(); } } ui.extSel = null; return;
     case "ext-add": return marcarExterno();
     case "ext-del": S.ext.splice(+v, 1); break;
@@ -637,7 +649,7 @@ function acao(a, v) {
     case "nova":
       if (!confirm("Começar uma nova competição? A atual será substituída (salve antes se quiser guardá-la).")) return;
       try { localStorage.removeItem(LOCAL); } catch (e) { /* ignora */ }
-      S = null; Q = null; return questionario();
+      limparHub(); S = null; Q = null; return questionario();
   }
   salvarLocal(); desenhar();
 }
@@ -680,17 +692,22 @@ $("app").addEventListener("change", e => {
   else if (d.cv) { Q.comps[d.cv].vagas = parseInt(el.value); qHints(); qRes(); }
   else if (el.id === "q-pv") { Q.pv = v; qRes(); }
   else if (el.id === "q-pe") { Q.pe = v; qRes(); }
-  else if (el.id === "q-tn") { Q.turnos = v; Q.fmt.forEach(f => f.tn = v); qFmt(); }
+  else if (el.id === "q-tn") { const n = Math.min(Math.max(Math.round(v) || 1, 1), 10); Q.turnos = n; Q.fmt.forEach(f => f.tn = n); qFmt(); }
+  else if (d.crit) { const c = Q.crit.find(x => x.id === d.crit); if (c) c.on = el.checked; qCrit(); }
+  else if (el.id === "q-modo") Q.modo = el.value === "forca" ? "forca" : "equilibrada";
   else if (el.id === "q-ds") { Q.dist = el.value; $("q-c5").hidden = Q.dist !== "manual"; if (Q.dist === "manual") qBoard(); qRes(); }
   else if (d.f) {                        // formato da divisão
-    const i = +d.i; Q.fmt[i][d.f] = d.f === "po" ? el.checked : d.f === "g" ? (v || 1) : v;
+    const i = +d.i; Q.fmt[i][d.f] = d.f === "po" ? el.checked : d.f === "g" ? (v || 1) : d.f === "tn" ? Math.min(Math.max(Math.round(v) || 1, 1), 10) : d.f === "dp" ? el.value : v;
+    if (d.f === "tn") el.value = Q.fmt[i].tn;                 // mostra o valor já ajustado (1 a 10)
     if (d.f === "po" || d.f === "g") { qFmt(); const n = document.querySelector(`[data-f="${d.f}"][data-i="${i}"]`); if (n) n.focus(); } else qFmtDica(i);
     qRes();
   }
   else if (d.pre !== undefined) aplicarPreset(+d.pre, el.value);
-  else if (d.po || d.pen) {              // placar do mata-mata
-    const [ri, ti, x, s] = (d.po || d.pen).split(","), t = S.po[ui.div].r[+ri][+ti], val = el.value === "" ? null : Math.max(0, parseInt(el.value));
-    if (d.po) t.l[+x][s === "a" ? 0 : 1] = val; else { t.pen = t.pen || [null, null]; t.pen[s === "a" ? 0 : 1] = val; }
+  else if (d.po || d.pen || d.neu) {     // placar do mata-mata (pernas, jogo extra em campo neutro e pênaltis)
+    const [ri, ti, x, s] = (d.po || d.pen || d.neu).split(","), t = S.po[ui.div].r[+ri][+ti], val = el.value === "" ? null : Math.max(0, parseInt(el.value));
+    if (d.po) t.l[+x][s === "a" ? 0 : 1] = val;
+    else if (d.neu) { t.n = t.n || [null, null]; t.n[s === "a" ? 0 : 1] = val; }
+    else { t.pen = t.pen || [null, null]; t.pen[s === "a" ? 0 : 1] = val; }
     poSync(ui.div); salvarLocal(); desenharPO(); desenharTabela(); $("abas-div").innerHTML = abasDiv(); $("btn-enc").disabled = !completaTudo();
   }
   else if (d.j) {                        // placar digitado à mão
@@ -713,6 +730,6 @@ $("app").addEventListener("change", e => {
     $("app").innerHTML = `<p class="erros">Não consegui carregar ../times.json. Abra pelo GitHub Pages ou por um servidor local (python -m http.server).</p>`;
     return;
   }
-  try { const salvo = localStorage.getItem(LOCAL); if (salvo) { deJSON(JSON.parse(salvo)); return desenhar(); } } catch (e) { /* save local inválido: recomeça */ }
+  try { const salvo = localStorage.getItem(LOCAL); if (salvo) { deJSON(JSON.parse(salvo)); sincronizarHub(); return desenhar(); } } catch (e) { /* save local inválido: recomeça */ }
   questionario();
 })();
